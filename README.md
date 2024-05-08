@@ -11,5 +11,8 @@ tbd
 
 see [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480)
 
-Equation 2.2
-$$t_{ACQ}$$
+Equation 2-2
+$$t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}$$
+$$
+t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}
+$$
