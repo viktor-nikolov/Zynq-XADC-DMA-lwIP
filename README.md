@@ -11,10 +11,5 @@ tbd
 
 see [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480)
 
-Euation 2.2
-$$
-t_{ACQ}
-$$
-
-**The Cauchy-Schwarz Inequality**
-$$\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)$$
+Equation 2.2
+$$t_{ACQ}$$
