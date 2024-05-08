@@ -11,8 +11,17 @@ tbd
 
 see [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480)
 
-Equation 2-2
+<img src="pictures\UG480_fig_2-5.png" title=""  width="500">
+
+Equation 2-2 for acquisition time in unipolar mode
 $$t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}$$
+
+In our case
+
+$$
+R_{MUX} = 
+$$
+
 $$
 t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}
 $$
