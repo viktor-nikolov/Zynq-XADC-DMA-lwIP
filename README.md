@@ -31,6 +31,11 @@ $C_{SAMPLE}$ is specified by Xilinx as 3 pF.
 We now calculate the needed acquisition time for VAUX1 as follows:
 $$t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-12} = 629\mskip3muns$$
 
+> [!IMPORTANT]
+>
+> **TODO:**  
+> Beware of an impedance of circuit you connect to the A0 pin.
+
 **TODO:**  
 We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898&nbsp;MHz. 
 We need to find an XADC input frequency DCLK, which, divided by an integer, results in a frequency close to 15.898&nbsp;MHz.
