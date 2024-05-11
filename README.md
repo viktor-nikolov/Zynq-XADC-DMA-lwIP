@@ -34,14 +34,16 @@ $$t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-1
 > [!IMPORTANT]
 >
 > **TODO:**  
-> Beware of an impedance of circuit you connect to the A0 pin.
+> Beware of the impedance of the circuit you connect to the A0 pin.
 
 **TODO:**  
 We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898&nbsp;MHz. 
 We need to find an XADC input frequency DCLK, which, divided by an integer, results in a frequency close to 15.898&nbsp;MHz.
 
 Using a Clocking Wizard, we are able to generate an output frequency of 95.363 MHz (with the Wizard clocked by 50&nbsp;MHz from the Zynq FCLK_CLK0).  
-95.363 MHz divided by 6 gives us DCLK of 15.894 MHz, which is very close to a value desired by us.
+95.363 MHz divided by 6 gives us a DCLK of 15.894 MHz, which is very close to the value we desire.
+
+With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 kbps (a single conversion cycle will take 32 ADCLKs).
 
 #### Bipolar input 
 
@@ -60,8 +62,8 @@ We now calculate the needed acquisition time for V_P/V_N as follows:
 $$t_{ACQ} = 9 \times ( 100 + 140) \times 3 \times 10^{-12} = 6.5\mskip3muns$$
 
 **TODO:**  
-This would allow us to use a sampling rate of 1 Msps because, with the ADCCLK frequency of 26&nbsp;MHz and four ADCCLKs allowed for the acquisition, we get 150&nbsp;ns acquisition time, which is more than enough.
+This would allow us to use a sampling rate of 1 Msps because, with the ADCCLK frequency of 26&nbsp;MHz and 4 ADCCLKs allowed for the acquisition, we get 150&nbsp;ns acquisition time, which is more than enough.
 
 However, in our design, we are limited to using an ADCCLK frequency of 23.84&nbsp;MHz (95.363&nbsp;MHz divided by 4) because we must use an XADC clock of 95.363&nbsp;MHz to achieve the 629&nbsp;ns acquisition time for the unipolar input as described in the previous chapter.  
-The resulting sampling rate will be, therefore, 917 ksps.
+The resulting sampling rate will be, therefore, 917 ksps (a single conversion cycle will take 26 ADCLKs).
 
