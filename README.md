@@ -25,15 +25,15 @@ In the case of Cora Z7, we need to take into account the unipolar input circuitr
 <img src="pictures\cora-analog-single-ended.png" title=""  width="550">
 
 In our case, $R_{MUX}$ equals to 10 kΩ because we are using the auxiliary input VAUX1 (which is connected to pin A0 on the Cora Z7 board).  
-In addition to $R_{MUX}$, we must include resistors in the signal path on the Cora Z7 board: 2.32 kΩ, 140 Ω, and 845 Ω.  
+In addition to $R_{MUX}$, we must include resistors in the signal path on the Cora Z7 board: 2.32&nbsp;kΩ, 140&nbsp;Ω, and 845&nbsp;Ω.  
 $C_{SAMPLE}$ is specified by Xilinx as 3 pF.
 
 We now calculate the needed acquisition time for VAUX1 as follows:
 $$t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-12} = 629\mskip3muns$$
 
 **TODO:**  
-We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898 MHz. 
-We need to find an XADC input frequency DCLK, which, divided by an integer, results in a frequency close to 15.898 MHz.
+We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898&nbsp;MHz. 
+We need to find an XADC input frequency DCLK, which, divided by an integer, results in a frequency close to 15.898&nbsp;MHz.
 
 Using a Clocking Wizard, we are able to generate an output frequency of 95.363 MHz (with the Wizard clocked by 50&nbsp;MHz from the Zynq FCLK_CLK0).  
 95.363 MHz divided by 6 gives us DCLK of 15.894 MHz, which is very close to a value desired by us.
@@ -48,14 +48,15 @@ On Cora Z7, we need to take into account the bipolar input circuitry for dedicat
 <img src="pictures\cora-analog-dedicated.png"  width="400">
 
 The $R_{MUX}$ for a dedicated analog input is 100 Ω.  
-In addition to $R_{MUX}$, we must include the 140 Ω resistor in the signal path on the Cora Z7 board  
+In addition to $R_{MUX}$, we must include the 140 Ω resistor in the signal path on the Cora&nbsp;Z7 board  
 $C_{SAMPLE}$ is 3 pF.
 
 We now calculate the needed acquisition time for V_P/V_N as follows:
 $$t_{ACQ} = 9 \times ( 100 + 140) \times 3 \times 10^{-12} = 6.5\mskip3muns$$
 
 **TODO:**  
-This would allow us to use a sampling rate of 1 Msps because, with the ADCCLK frequency of 26 MHz and four ADCCLKs allowed for the acquisition, we get 150 ns acquisition time, which is more than enough.
+This would allow us to use a sampling rate of 1 Msps because, with the ADCCLK frequency of 26&nbsp;MHz and four ADCCLKs allowed for the acquisition, we get 150&nbsp;ns acquisition time, which is more than enough.
 
-However, in our design, we are limited to using an ADCCLK frequency of 23.84 MHz ($95.363\mskip3muMHz / 4$) because we must use an XADC clock of 95.363 MHz in order to achieve 629 ns acquisition time for the unipolar input as described in the previous chapter.
+However, in our design, we are limited to using an ADCCLK frequency of 23.84&nbsp;MHz ($95.363\mskip3muMHz / 4$) because we must use an XADC clock of 95.363&nbsp;MHz to achieve 629&nbsp;ns acquisition time for the unipolar input as described in the previous chapter.  
+The resulting sampling rate will be, therefore, 917 ksps.
 
