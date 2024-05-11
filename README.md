@@ -28,6 +28,8 @@ $C_{SAMPLE}$ is specified by Xilinx as 3 pF.
 
 $\SI{2.63}{\ohm}$
 
+$5*ns$
+
 We now calculate the needed acquisition time as fol1lows
 $$
 t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-12} = \SI{629}{\Ohm}
