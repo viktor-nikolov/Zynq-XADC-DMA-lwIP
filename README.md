@@ -31,6 +31,8 @@ $C_{SAMPLE}$ is specified by Xilinx as 3 pF.
 We now calculate the needed acquisition time for VAUX1 as follows:
 $$t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-12} = 629\mskip3muns$$
 
+
+
 #### Bipolar input 
 
 Equation 2-1 from UG480 for acquisition time in unipolar mode:
@@ -46,4 +48,7 @@ $C_{SAMPLE}$ is 3 pF.
 
 We now calculate the needed acquisition time for V_P/V_N as follows:
 $$t_{ACQ} = 9 \times ( 100 + 140) \times 3 \times 10^{-12} = 6.5\mskip3muns$$
+
+TODO:  
+This allows a sampling rate of 1 Msps because an ADCCLK frequency of 26 MHz and four ADCCLKs allowed for the acquisition, and we get 150 ns acquisition time, which is more than enough.
 
