@@ -7,7 +7,7 @@ tbd
 
 tbd
 
-### Acquisition time
+## Acquisition time
 
 See Zynq 7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480)
 
@@ -15,7 +15,7 @@ This is copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknsh
 
 <img src="pictures\UG480_fig_2-5.png" title=""  width="650">
 
-#### Unipolar input 
+### Unipolar input 
 
 Equation 2-2 for acquisition time in unipolar mode:
 $$t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}$$
@@ -45,7 +45,7 @@ Using a Clocking Wizard, we are able to generate an output frequency of 95.363 M
 
 With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 kbps (a single conversion cycle will take 32 ADCLKs).
 
-#### Bipolar input 
+### Bipolar input 
 
 Equation 2-1 from UG480 for acquisition time in unipolar mode:
 $$t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}$$
