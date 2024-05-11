@@ -57,6 +57,6 @@ $$t_{ACQ} = 9 \times ( 100 + 140) \times 3 \times 10^{-12} = 6.5\mskip3muns$$
 **TODO:**  
 This would allow us to use a sampling rate of 1 Msps because, with the ADCCLK frequency of 26&nbsp;MHz and four ADCCLKs allowed for the acquisition, we get 150&nbsp;ns acquisition time, which is more than enough.
 
-However, in our design, we are limited to using an ADCCLK frequency of 23.84&nbsp;MHz ($95.363\mskip3muMHz / 4$) because we must use an XADC clock of 95.363&nbsp;MHz to achieve 629&nbsp;ns acquisition time for the unipolar input as described in the previous chapter.  
+However, in our design, we are limited to using an ADCCLK frequency of 23.84&nbsp;MHz (95.363&nbsp;MHz divided by 4) because we must use an XADC clock of 95.363&nbsp;MHz to achieve a 629&nbsp;ns acquisition time for the unipolar input as described in the previous chapter.  
 The resulting sampling rate will be, therefore, 917 ksps.
 
