@@ -35,7 +35,7 @@ $$t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-1
 We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898 MHz. 
 We need to find an XADC input frequency DCLK, which, divided by an integer, results in a frequency close to 15.898 MHz.
 
-Using a Clocking Wizard, we are able to generate an output frequency of 95.363 MHz (with the Wizard clocked by 50 MHz from the Zynq FCLK_CLK0).  
+Using a Clocking Wizard, we are able to generate an output frequency of 95.363 MHz (with the Wizard clocked by 50&nbsp;MHz from the Zynq FCLK_CLK0).  
 95.363 MHz divided by 6 gives us DCLK of 15.894 MHz, which is very close to a value desired by us.
 
 #### Bipolar input 
