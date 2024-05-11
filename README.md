@@ -15,14 +15,16 @@ This is copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknsh
 
 <img src="pictures\UG480_fig_2-5.png" title=""  width="650">
 
-Equation 2-2 for acquisition time in unipolar mode>
+Equation 2-2 for acquisition time in unipolar mode:
 $$t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}$$
 
 In the case of Cora Z7, we need to take into account the unipolar input circuitry on the board as depicted in Figure 13.2.1 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io):
 
 <img src="pictures\cora-analog-single-ended.png" title=""  width="550">
 
-In our case $R_{MUX}$ is equal to 10 k\Omega$
+In our case, $R_{MUX}$ is equal to 10 kΩ because we are using the auxiliary input VAUX1 (which is connected to pin A0 on the Cora Z7 board).   _
+In addition to $R_{MUX}$ we must include resistors in the signal path on the Cora Z7 board: 2.32 kΩ, 140 Ω and 845 Ω.   _
+__$C_{SAMPLE}$ is specified by Xilinx as 3 pF.
 $$
 R_{MUX} =
 $$
