@@ -27,5 +27,5 @@ In addition to $R_{MUX}$, we must include resistors in the signal path on the Co
 $C_{SAMPLE}$ is specified by Xilinx as 3 pF.
 
 We now calculate the needed acquisition time as follows:
-$t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-12} = 629\mskip3muns$
+$$t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-12} = 629\mskip3muns$$
 
