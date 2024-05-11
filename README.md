@@ -26,8 +26,9 @@ In our case, $R_{MUX}$ is equal to 10 kΩ because we are using the auxiliary inp
 In addition to $R_{MUX}$ we must include resistors in the signal path on the Cora Z7 board: 2.32 kΩ, 140 Ω and 845 Ω.  
 $C_{SAMPLE}$ is specified by Xilinx as 3 pF.
 
-We now calculate the needed acquisition time as follows
+$\SI{2.63}{\ohm}$
 
+We now calculate the needed acquisition time as fol1lows
 $$
 t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-12} = \SI{629}{\Ohm}
 $$
