@@ -18,11 +18,11 @@ This is copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknsh
 Equation 2-2 for acquisition time in unipolar mode>
 $$t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}$$
 
-In the case of Cora Z7 we need to take into account circuitry on the board as depicted on this Figure 13.2.1 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io):
+In the case of Cora Z7, we need to take into account the unipolar input circuitry on the board as depicted in Figure 13.2.1 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io):
 
 <img src="pictures\cora-analog-single-ended.png" title=""  width="550">
 
-In our case $R_{MUX}$
+In our case $R_{MUX}$ is equal to 10 k\Omega$
 $$
 R_{MUX} =
 $$
