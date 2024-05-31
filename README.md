@@ -92,3 +92,10 @@ From [this post](https://support.xilinx.com/s/article/53586?language=en_US), I k
 When the default mode is enabled, both ADCs are calibrated. The XADC also operates in default mode after initial power-up and during FPGA configuration. See the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Sequencer-Modes), chapter Default Mode, page 48.
 
 So unless you want to recalibrate the XADC during runtime, you never need to care about calibration by initiating a conversion on channel 8. It's done during FPGA configuration, which happens also when you re-run the PS code. 
+
+## Measurements
+
+TODO
+
+Connected precise 2.5 V voltage reference to A0. The mean digitized value was 2.496 V.  
+Beware of the precision of the resistors in the Cora Z7 voltage dividers.
