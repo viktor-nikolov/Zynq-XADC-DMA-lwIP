@@ -55,7 +55,7 @@ We need to find an XADC input frequency DCLK, which, divided by an integer, resu
 Using a Clocking Wizard, we are able to generate an output frequency of 95.363 MHz (with the Wizard clocked by 50&nbsp;MHz from the Zynq FCLK_CLK0).  
 95.363 MHz divided by 6 gives us a DCLK of 15.894 MHz, which is very close to the value we desire.
 
-With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 kbps (a single conversion cycle will take 32 ADCLKs).
+With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 ksps (a single conversion cycle will take 32 ADCLKs).
 
 ### Bipolar input 
 
