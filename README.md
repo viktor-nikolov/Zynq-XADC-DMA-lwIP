@@ -1,4 +1,4 @@
-# Demo of Zynq XADC using DMA and data sent over the network
+# Tutorial: Zynq XADC using DMA and network streaming
 tbd
 
 [Real Digital Signal Processing - Hackster.io](https://www.hackster.io/adam-taylor/real-digital-signal-processing-0bea44)
