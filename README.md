@@ -1,23 +1,29 @@
-# Tutorial: Zynq XADC using DMA and network streaming
-tbd
+# Tutorial: Xilinx Zynq XADC using DMA and network streaming
+This tutorial shows how to do a HW design and code a SW application to make use of Xilinx [Zynq XADC](https://www.xilinx.com/products/technology/analog-mixed-signal.html). We will also see how to use the [DMA](https://www.xilinx.com/products/intellectual-property/axi_dma.html) to transfer data from the XADC into Zynq CPU's memory and stream data to a remote server over the network.
 
-[Real Digital Signal Processing - Hackster.io](https://www.hackster.io/adam-taylor/real-digital-signal-processing-0bea44)
+In this tutorial, I'm using the Digilent board [Cora Z7-07S](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/). However, all the principles described here can be used on any other Zynq board. I will highlight aspects specific to Cora Z7 in the text.  
+The Cora Z7 is a suitable board for testing the Zynq XADC because it has analog inputs that are usable in a practical way.
 
-[Signal Processing with XADC and PYNQ - Hackster.io](https://www.hackster.io/adam-taylor/signal-processing-with-xadc-and-pynq-3c716c)
+The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain.
 
-calibration:
+## TODOs, to be removed
 
-[53586 - Zynq and 7-Series XADC Gain Calibration Behaviour with Internal Voltage Reference (xilinx.com)](https://support.xilinx.com/s/article/53586?language=en_US)
+- [Real Digital Signal Processing - Hackster.io](https://www.hackster.io/adam-taylor/real-digital-signal-processing-0bea44)
+- [Signal Processing with XADC and PYNQ - Hackster.io](https://www.hackster.io/adam-taylor/signal-processing-with-xadc-and-pynq-3c716c)
+- calibration:
 
-[The analog input for XADC calibration in 7 series FPGA (xilinx.com)](https://support.xilinx.com/s/question/0D52E00006hpPXlSAM/the-analog-input-for-xadc-calibration-in-7-series-fpga?language=en_US)
-
-
+  - [53586 - Zynq and 7-Series XADC Gain Calibration Behaviour with Internal Voltage Reference (xilinx.com)](https://support.xilinx.com/s/article/53586?language=en_US)
+  - [The analog input for XADC calibration in 7 series FPGA (xilinx.com)](https://support.xilinx.com/s/question/0D52E00006hpPXlSAM/the-analog-input-for-xadc-calibration-in-7-series-fpga?language=en_US)
 
 Cora Z7 has VREFP and VREFN connected to ADCGND
 
 - The XADC also has an on-chip reference option which is selected by connecting VREFP and VREFN to ADCGND as shown in Figure 6-1. Due to reduced accuracy, the on-chip reference does impact the measurement performance of the XADC as explained previously
 
-tbd
+## A short introduction to Zynq XADC
+
+Zynq XADC is, in essence, an Analog to Digital Converted integrated on the Xilinx FPGA chip. It has two basic capabilities
+
+1.  System Monitor (SYSMON) 
 
 ## Acquisition time
 
