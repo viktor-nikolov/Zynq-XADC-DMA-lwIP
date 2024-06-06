@@ -103,5 +103,8 @@ So unless you want to recalibrate the XADC during runtime, you never need to car
 
 TODO
 
-Connected precise 2.5 V voltage reference to A0. The mean digitized value was 2.496 V.  
+Connected precise 2.5 V voltage reference to A0.
+
+Without averaging, the mean value over 10,000 samples was 2.492 V. 
+
 Beware of the precision of the resistors in the Cora Z7 voltage dividers.
