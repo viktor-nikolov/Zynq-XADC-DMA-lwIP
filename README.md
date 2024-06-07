@@ -21,9 +21,14 @@ Cora Z7 has VREFP and VREFN connected to ADCGND
 
 ## A short introduction to Zynq XADC
 
-Zynq XADC is, in essence, an Analog to Digital Converted integrated on the Xilinx FPGA chip. It has two basic capabilities
+Zynq XADC is a feature of an analog-to-digital converter integrated on selected Xilinx FPGA chips, including Zynq 7000. This ADC has two basic capabilities
 
-1.  System Monitor (SYSMON) 
+1.  The System Monitor (SYSMON) reads the Zynq chip temperature and voltages of various Zynq power rails.
+1.  The XADC reads voltages from external inputs, which are called channels.
+
+In this tutorial, we will focus solely on XADC. But don't be confused, Xilinx library functions for controlling XADC are defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h).
+
+XADC can read one external input (channel) at a time and provides a means for switching between channels. Zynq XADC has one dedicated analog input channel called V<sub>P</sub> /V<sub>N</sub> 
 
 ## Acquisition time
 
