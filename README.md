@@ -19,6 +19,8 @@ Cora Z7 has VREFP and VREFN connected to ADCGND
 
 - The XADC also has an on-chip reference option which is selected by connecting VREFP and VREFN to ADCGND as shown in Figure 6-1. Due to reduced accuracy, the on-chip reference does impact the measurement performance of the XADC as explained previously
 
+[Configuring the Zynq TTC to schedule FreeRTOS tasks : r/FPGA (reddit.com)](https://www.reddit.com/r/FPGA/comments/16bfugb/configuring_the_zynq_ttc_to_schedule_freertos/)
+
 ## A short introduction to Zynq XADC
 
 Zynq XADC is a feature of an analog-to-digital converter integrated on selected Xilinx FPGA chips, including Zynq 7000. This ADC has two basic capabilities
@@ -108,7 +110,7 @@ So unless you want to recalibrate the XADC during runtime, you never need to car
 
 TODO
 
-Connected precise 2.5 V voltage reference to A0.
+Connected precise 2.5 V voltage reference to A0 (2.50026 V).
 
 Without averaging, the mean value over 10,000 samples was 2.492 V. 
 
