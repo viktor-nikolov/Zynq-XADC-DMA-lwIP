@@ -32,6 +32,13 @@ In this tutorial, we will focus solely on XADC. But don't be confused, Xilinx li
 
 XADC can read one external input (channel) at a time and provides a means for switching between channels. Zynq XADC has one dedicated analog input channel called V<sub>P</sub> /V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0..15].
 
+A channel may operate in unipolar or bipolar mode.
+
+#### Unipolar mode
+
+- dddd 
+
+
 For using the XADC you need to instantiate an [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) in your HW design.  
 If you don't need to modify the XADC configuration during runtime, you can do all the needed setup in the configuration of the XADC Wizzard IP.  
 Alternatively, you can configure XADC by calling functions defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). This allows you to change the configuration during runtime (e.g., switching between the channels). We will use this method of configuration in this tutorial.
