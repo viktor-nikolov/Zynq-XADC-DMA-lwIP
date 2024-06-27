@@ -31,6 +31,7 @@ Zynq XADC is a feature of an analog-to-digital converter integrated on selected 
 In this tutorial, we will focus solely on XADC. But don't be confused, Xilinx library functions for controlling XADC are defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h).
 
 XADC can read one external input (channel) at a time and provides a means for switching between channels. Zynq XADC has one dedicated analog input channel called V<sub>P</sub> /V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0..15].
+Each channel has two input signals. A positive input marked V<sub>P</sub> or VAUX<sub>P</sub>  and a negative one marked V<sub>N</sub> or VAUX<sub>N</sub>.
 
 A channel may operate in unipolar or bipolar mode.
 
