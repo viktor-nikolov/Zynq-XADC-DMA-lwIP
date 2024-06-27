@@ -32,6 +32,14 @@ In this tutorial, we will focus solely on XADC. But don't be confused, Xilinx li
 
 XADC can read one external input (channel) at a time and provides a means for switching between channels. Zynq XADC has one dedicated analog input channel called V<sub>P</sub> /V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0..15].
 
+For using the XADC you need to instantiate an [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) in your HW design.  
+If you don't need to modify the XADC configuration during runtime, you can do all the needed setup in the configuration of the XADC Wizzard IP.  
+Alternatively, you can configure XADC by calling functions defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). This allows you to change the configuration during runtime (e.g., switching between the channels). We will use this method of configuration in this tutorial.
+
+The XADC can run in several operating modes, see the [relevant chapter](https://docs.amd.com/r/en-US/ug480_7Series_XADC/XADC-Operating-Modes) of the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC).  
+In this tutorial, we will use the simplest one, the Single Channel Mode.  
+We will also configure the XADC for Continuous Sampling. In this timing mode, the XADC does the conversions one after another thus generating a stream of data, which we will process through the DMA.
+
 ## Acquisition time
 
 See Zynq 7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480)
@@ -105,6 +113,10 @@ From [this post](https://support.xilinx.com/s/article/53586?language=en_US), I k
 When the default mode is enabled, both ADCs are calibrated. The XADC also operates in default mode after initial power-up and during FPGA configuration. See the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Sequencer-Modes), chapter Default Mode, page 48.
 
 So unless you want to recalibrate the XADC during runtime, you never need to care about calibration by initiating a conversion on channel 8. It's done during FPGA configuration, which happens also when you re-run the PS code. 
+
+## DMA
+
+TODO
 
 ## Measurements
 
