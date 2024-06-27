@@ -48,13 +48,14 @@ We will also configure the XADC for Continuous Sampling. In this timing mode, th
 >
 > The XADC sampling frequency must be carefully determined to allow sufficient acquisition time given the properties of the circuit you are using. It requires a bit of math, as we explain in this chapter.
 
-See Zynq 7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480)
+The principle of XADC operation is charging an internal capacitor to a voltage equal to the voltage of the analog input being measured. Any electrical resistance between the input voltage and the internal capacitor will of course slow down the charging of the capacitor.  
+If you don't give the internal XADC capacitor enough time to charge, the input voltage determined by the XADC will be lower than the actual voltage of the input.
 
-This is copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_26771_X_Ref_Target) from UG480:
+The next picture is a copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_26771_X_Ref_Target) from Zynq 7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480).
 
 <img src="pictures\UG480_fig_2-5.png" title=""  width="650">
 
-### Unipolar input 
+### Unipolar input of Cora Z7
 
 Equation 2-2 for acquisition time in unipolar mode:
 $$t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}$$
@@ -84,7 +85,7 @@ Using a Clocking Wizard, we are able to generate an output frequency of 95.363 M
 
 With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 ksps (a single conversion cycle will take 32 ADCLKs).
 
-### Bipolar input 
+### Bipolar input  of Cora Z7
 
 Equation 2-1 from UG480 for acquisition time in unipolar mode:
 $$t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}$$
