@@ -42,6 +42,12 @@ We will also configure the XADC for Continuous Sampling. In this timing mode, th
 
 ## Acquisition time
 
+> [!IMPORTANT]
+>
+> The XADC's rated maximum sampling frequency is 1 Msps. But it doesn't mean that you can run the XADC on 1&nbsp;Msps in all circumstances!
+>
+> The XADC sampling frequency must be carefully determined to allow sufficient acquisition time given the properties of the circuit you are using. It requires a bit of math, as we explain in this chapter.
+
 See Zynq 7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480)
 
 This is copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_26771_X_Ref_Target) from UG480:
