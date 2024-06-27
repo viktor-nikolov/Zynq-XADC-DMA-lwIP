@@ -30,7 +30,7 @@ Zynq XADC is a feature of an analog-to-digital converter integrated on selected 
 
 In this tutorial, we will focus solely on XADC. But don't be confused, Xilinx library functions for controlling XADC are defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h).
 
-XADC can read one external input (channel) at a time and provides a means for switching between channels. Zynq XADC has one dedicated analog input channel called V<sub>P</sub> /V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0...15].
+XADC can read one external input (channel) at a time and provides a means for switching between channels. Zynq XADC has one dedicated analog input channel called V<sub>P</sub> /V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0..15].
 Each channel has two input signals because they are differential input channels in nature. A positive input marked V<sub>P</sub> or VAUXP and a negative one marked V<sub>N</sub> or VAUXN.
 
 > [!WARNING]
@@ -49,10 +49,8 @@ A channel may operate in unipolar or bipolar mode (see the chapter [Analog Input
 #### Bipolar mode
 
 - This mode can accommodate input signals driven from a true differential source.
-- The differential analog input (V<sub>P</sub> - V<sub>N</sub>) can have a maximum input range of ±0.5V
-- The differential analog inputs (V<sub>P</sub> and V<sub>N</sub>) have an input range of 0 V to 1.0 V.
-- The voltage on V<sub>P</sub> (measured with respect to V<sub>N</sub>) must always be positive.
-- V<sub>N</sub> is typically connected to a local ground or common mode signal.
+- The differential analog input (V<sub>P</sub> &minus; V<sub>N</sub>) can have a maximum input range of ±0.5V. I.e., the XADC output is a value between &minus;0.5 V and 0.5 V
+- However, both V<sub>P</sub> and V<sub>N</sub> must be always within a range from 0 V to 1.0 V with respect to GNDADC.
 
 For using the XADC you need to instantiate an [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) in your HW design.  
 If you don't need to modify the XADC configuration during runtime, you can do all the needed setup in the configuration of the XADC Wizzard IP.  
