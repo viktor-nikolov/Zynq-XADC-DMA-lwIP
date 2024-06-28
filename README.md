@@ -89,7 +89,7 @@ $C_{SAMPLE}$ is specified by Xilinx as 3 pF.
 Therefore, we calculate the minimum acquisition time t<sub>ACQ</sub> for an unipolar auxiliary input as follows:
 $$t_{ACQ} = 9 \times ( 10000 + 10000 ) \times 3 \times 10^{-12} = 540\mskip3muns$$
 
-For minimum acquisition time in bipolar mode, Xilinx is giving in the [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs):
+For minimum acquisition time in bipolar mode, Xilinx is giving the [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs):
 $$t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}$$	
 
 For a dedicated analog input, R<sub>MUX</sub> equals 100 Ω. This gives us the following value of the minimum acquisition time of a bipolar dedicated input:
@@ -117,14 +117,14 @@ The minimum acquisition time, which we calculated using [Equation 2-1](https://d
 Therefore, we must make sure to set the ADCCLK frequency in the way that 4 or 10 ADCCLK cycles are at least acquisition time t<sub>ACQ</sub> long.
 
 Let's take the unipolar auxiliary input as an example:  
-We determined the minimum acquisition time for an auxiliary input as 540 ns.  
+We determined the minimum acquisition time for an unipolar auxiliary input as 540 ns.  
 To achieve the fastest possible sampling rate we will use the settling period of 10 ADCCLK cycles. We then calculate the ADCCLK frequency as
 $$f_{ADCCLK} ={ 1 \over {540 \times 10^{-9} \over 10} } = 18.519\mskip3muMhz$$
 
 this will give us the sampling rate
 $$f_S ={ 1 \over { {1 \over f_{ADCCLK}} \times 32} } = 578.7\mskip3muksps$$
 
-Please note that f<sub>ADCCLK</sub> and f<sub>S</sub> we calculated here are theoretical values. We probably won't be able to achieve f<sub>ADCCLK</sub> of exactly 18.519 MHz in the actual HW design. The Clocking Wizard IP can't generate any frequency we want, nevertheless, it can generate a frequency close to the desired value. We just need to make sure that the f<sub>ADCCLK</sub> in the actual HW design is <u>lower or equal</u> to the theoretical value calculated by a formula. 
+Please note that f<sub>ADCCLK</sub> and f<sub>S</sub> we calculated here are theoretical values. We probably won't be able to achieve f<sub>ADCCLK</sub> of exactly 18.519 MHz in the actual HW design. The Clocking Wizard IP can't generate any frequency we want, nevertheless, it can generate a frequency close to the desired value. We just need to make sure that the f<sub>ADCCLK</sub> in the actual HW design is <ins>lower or equal</ins> to the theoretical value calculated by a formula. 
 
 
 ### Unipolar input acquisition time of Cora Z7
