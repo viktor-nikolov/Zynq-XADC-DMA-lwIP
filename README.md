@@ -78,6 +78,21 @@ The next picture is a copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1is
 
 <img src="pictures\UG480_fig_2-5.png" title=""  width="650">
 
+We see in the picture that in the unipolar mode the current to the capacitor is going through two internal resistances R<sub>MUX</sub>. In bipolar mode, two capacitors are used and the current into them is going through a single internal resistances R<sub>MUX</sub>.  
+R<sub>MUX</sub> is the resistance of the analog multiplexer circuit inside the Zynq XADC. Please note that the value of R<sub>MUX</sub> for a dedicated analog input is different from the R<sub>MUX</sub> of the auxilirary inputs.  
+
+Xilinx is giving us in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) for calculating acquisition time in unipolar mode:
+$$t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}$$
+
+R<sub>MUX</sub> for an auxiliary input is 10 kΩ.  
+$C_{SAMPLE}$ is specified by Xilinx as 3 pF.  
+Therefore, we calculate the minimum acquisition time t<sub>ACQ</sub> for an auxiliary input as follows:
+
+$$t_{ACQ} = 9 \times ( 10000 + 10000 ) \times 3 \times 10^{-12} = 540\mskip3muns$$
+
+
+
+
 ### Unipolar input of Cora Z7
 
 Equation 2-2 for acquisition time in unipolar mode:
