@@ -81,26 +81,51 @@ The next picture is a copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1is
 We see in the picture that in the unipolar mode the current to the capacitor is going through two internal resistances R<sub>MUX</sub>. In bipolar mode, two capacitors are used and the current into them is going through a single internal resistances R<sub>MUX</sub>.  
 R<sub>MUX</sub> is the resistance of the analog multiplexer circuit inside the Zynq XADC. Please note that the value of R<sub>MUX</sub> for a dedicated analog input is different from the R<sub>MUX</sub> of the auxiliary inputs.  
 
-Xilinx is giving us in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) for calculating acquisition time in unipolar mode:
+Xilinx is giving us in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) for calculating minimum acquisition time in unipolar mode:
 $$t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}$$
 
 R<sub>MUX</sub> for an auxiliary input is 10 kΩ.  
 $C_{SAMPLE}$ is specified by Xilinx as 3 pF.  
 Therefore, we calculate the minimum acquisition time t<sub>ACQ</sub> for an auxiliary input as follows:
-
 $$t_{ACQ} = 9 \times ( 10000 + 10000 ) \times 3 \times 10^{-12} = 540\mskip3muns$$
 
-For acquisition time in bipolar mode Xilinx is giving is in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1):
+For minimum acquisition time in bipolar mode, Xilinx is giving in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1):
 $$t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}$$	
 
-For a dedicated analog input R<sub>MUX</sub> equals to 100 Ω. This gives us the following value of the acquisition time of a dedicated input:
-
+For a dedicated analog input, R<sub>MUX</sub> equals 100 Ω. This gives us the following value of the minimum acquisition time of a dedicated input:
 $$t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7\mskip3muns$$
 
-### Unipolar input of Cora Z7
+> [!IMPORTANT]
+>
+> The calculation of the acquisition times we did above is valid only for an ideal case when the only resistance present in the circuit is the resistance of the internal analog multiplexer of the Zynq XADC.
+>
+> In the next chapters, we will see a real-life example of calculating acquisition times for the development board  [Cora Z7-07S](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/), which has additional resistances in the circuitry outside the Zynq XADC. 
 
-Equation 2-2 for acquisition time in unipolar mode:
-$$t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}$$
+To understand how the calculated acquisition time translates to XADC configuration we need to see how the XADC works in terms of input clock and timing.
+
+**TODO**  
+**How the input clock DCLK translates to ADCCLK.**
+
+In the default XADC setup of Continuous Sampling mode, 26 ADCCLK cycles are required to acquire an analog signal and perform a conversion.
+
+The first 4 ADCCLK cycles are the so-called settling period during which the internal capacitor of XADC is being charged.  
+XADC can be configured to extend the settling period to 10 ADCCLK cycles (thus resulting in a total of 32 ADCCLK cycles for acquisition and conversion).
+
+After the settling period follows 22 ADCCLK cycles of the so-called conversion phase during which the XADC does the conversion and generates the output value.
+
+The minimum acquisition time, which we calculated using [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) or [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) must fit into the settling period.  
+Therefore, we must make sure to set the ADCCLK frequency in the way that 4 or 10 ADCCLK cycles are at least acquisition time t<sub>ACQ</sub> long.
+
+For example:  
+We determined the minimum acquisition time for an auxiliary input as 540 ns.  
+To achieve the fastest possible sampling rate we will use the settling period of 10 ADCCLK cycles. We then calculate the ADCCLK frequency as
+$$f_{ADCCLK} = frac{540 \times 10^{-12}}{10}$$
+$$
+f_{ADCCLK} = frac{540 \times 10^{-12}}{10}
+$$
+
+
+### Unipolar input acquisition time of Cora Z7
 
 In the case of Cora Z7, we need to take into account the unipolar input circuitry on the board as depicted in Figure 13.2.1 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io):
 
@@ -127,7 +152,7 @@ Using a Clocking Wizard, we are able to generate an output frequency of 95.363 M
 
 With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 ksps (a single conversion cycle will take 32 ADCLKs).
 
-### Bipolar input  of Cora Z7
+### Bipolar input acquisition time of Cora Z7
 
 Equation 2-1 from UG480 for acquisition time in unipolar mode:
 $$t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}$$
