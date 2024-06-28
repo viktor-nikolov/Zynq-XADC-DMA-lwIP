@@ -81,7 +81,7 @@ The next picture is a copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1is
 We see in the picture that in the unipolar mode the current to the capacitor is going through two internal resistances R<sub>MUX</sub>. In bipolar mode, two capacitors are used and the current into them is going through a single internal resistances R<sub>MUX</sub>.  
 R<sub>MUX</sub> is the resistance of the analog multiplexer circuit inside the Zynq XADC. Please note that the value of R<sub>MUX</sub> for a dedicated analog input is different from the R<sub>MUX</sub> of the auxiliary inputs.  
 
-Xilinx is giving us in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) for calculating minimum acquisition time in unipolar mode:
+Xilinx is giving us the [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) for calculating minimum acquisition time in unipolar mode:
 $$t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}$$
 
 R<sub>MUX</sub> for an auxiliary input is 10 kΩ.  
@@ -89,7 +89,7 @@ $C_{SAMPLE}$ is specified by Xilinx as 3 pF.
 Therefore, we calculate the minimum acquisition time t<sub>ACQ</sub> for an unipolar auxiliary input as follows:
 $$t_{ACQ} = 9 \times ( 10000 + 10000 ) \times 3 \times 10^{-12} = 540\mskip3muns$$
 
-For minimum acquisition time in bipolar mode, Xilinx is giving in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1):
+For minimum acquisition time in bipolar mode, Xilinx is giving in the [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs):
 $$t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}$$	
 
 For a dedicated analog input, R<sub>MUX</sub> equals 100 Ω. This gives us the following value of the minimum acquisition time of a bipolar dedicated input:
