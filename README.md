@@ -119,9 +119,12 @@ Therefore, we must make sure to set the ADCCLK frequency in the way that 4 or 10
 For example:  
 We determined the minimum acquisition time for an auxiliary input as 540 ns.  
 To achieve the fastest possible sampling rate we will use the settling period of 10 ADCCLK cycles. We then calculate the ADCCLK frequency as
-$$f_{ADCCLK} = frac{540 \times 10^{-12}}{10}$$
+$$f_{ADCCLK} ={ 1 \over {540 \times 10^{-9} \over 10} } = 18.519\mskip3muMhz$$
+
+this will give us the sampling rate
+$$f_S ={ 1 \over { {1 \over f_{ADCCLK}} \times 32} } = 578.7\mskip3muksps$$
 $$
-f_{ADCCLK} = frac{540 \times 10^{-12}}{10}
+f_S ={ 1 \over { {1 \over f_{ADCCLK}} \times 32} } = 578.7\mskip3muksps
 $$
 
 
