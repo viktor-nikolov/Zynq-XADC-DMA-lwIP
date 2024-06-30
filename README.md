@@ -32,7 +32,7 @@ In this tutorial, we will focus solely on XADC. But don't be confused, Xilinx li
 
 XADC can read one external input (channel) at a time and provides a means for switching between channels.  
 The Zynq 7000 XADC has one dedicated analog input channel called V<sub>P</sub> /V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0..15].
-Each channel has two input signals because they are differential input channels in nature. A positive differential input is marked V<sub>P</sub> or VAUXP and a negative one is marked V<sub>N</sub> or VAUXN.
+Each channel has two input signals because they are differential input channels. A positive differential input is denoted V<sub>P</sub> or VAUXP, and a negative one is denoted V<sub>N</sub> or VAUXN.
 
 > [!WARNING]
 >
@@ -50,7 +50,7 @@ A channel may operate in unipolar or bipolar mode.
 #### Bipolar mode
 
 - This mode can accommodate input signals driven from a true differential source.
-- The differential analog input (V<sub>P</sub> &minus; V<sub>N</sub>) can have a maximum input range of ±0.5V. I.e., the XADC output is a value between &minus;0.5 V and 0.5 V.
+- The differential analog input (V<sub>P</sub> &minus; V<sub>N</sub>) can have a maximum input range of ±0.5V. I.e., the XADC output has a value between &minus;0.5 V and 0.5 V.
 - However, both V<sub>P</sub> and V<sub>N</sub> must be always within a range from 0 V to 1.0 V with respect to GNDADC.
 
 See the chapter [Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) of [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC) for more details on unipolar and bipolar inputs.
@@ -58,12 +58,12 @@ See the chapter [Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/
 **TODO: number of bits in output reg**
 
 For using the XADC you need to instantiate an [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) in your HW design.  
-If you don't need to modify the XADC configuration during runtime, you can do all the needed setup in the configuration of the XADC Wizzard IP.  
+If you don't need to modify the XADC configuration during runtime, you can do all the needed setup in the XADC Wizzard IP configuration.  
 Alternatively, you can configure XADC by calling functions defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). This allows you to change the configuration during runtime (e.g., switching between the channels). We will use this method of configuration in this tutorial.
 
 The Zynq 7000 XADC can run in several operating modes, see the [relevant chapter](https://docs.amd.com/r/en-US/ug480_7Series_XADC/XADC-Operating-Modes) of the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC).  
 In this tutorial, we will use the simplest one, the Single Channel Mode.  
-We will also configure the XADC for Continuous Sampling. In this timing mode, the XADC does the conversions one after another thus generating a stream of data, which we will process through the DMA.
+We will also configure the XADC for Continuous Sampling. In this timing mode, the XADC performs the conversions one after another, generating a stream of data that we will process through the DMA.
 
 ## Acquisition time
 
@@ -71,25 +71,26 @@ We will also configure the XADC for Continuous Sampling. In this timing mode, th
 >
 > The XADC's rated maximum sampling frequency is 1 Msps. But it doesn't mean that you can run the XADC on 1&nbsp;Msps in all circumstances!
 >
-> The XADC sampling frequency must be carefully determined to allow sufficient acquisition time given the properties of the circuit you are using. It requires a bit of math, as we explain in this chapter.
+> The XADC sampling frequency must be carefully determined to allow sufficient acquisition time, given the properties of the circuit you are using. It requires a bit of math, as we explain in this chapter.
 
-The principle of XADC operation is charging an internal capacitor to a voltage equal to the voltage of the analog input being measured. Any electrical resistance between the input voltage and the internal capacitor will of course slow down the charging of the capacitor.  
+The principle of XADC operation is charging an internal capacitor to a voltage equal to the voltage of the analog input being measured. Any electrical resistance between the input voltage and the internal capacitor will, of course, slow down the charging of the capacitor.  
 If you don't give the internal XADC capacitor enough time to charge, the input voltage determined by the XADC will be lower than the actual voltage of the input.
 
 The next picture is a copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_26771_X_Ref_Target) from Zynq 7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480).
 
 <img src="pictures\UG480_fig_2-5.png" title=""  width="650">
 
-We see in the picture that in the unipolar mode the current to the capacitor is going through two internal resistances R<sub>MUX</sub>. In bipolar mode, two capacitors are used and the current into them is going through a single internal resistances R<sub>MUX</sub>.  
+We see in the picture that in the unipolar mode the current to the capacitor goes through two internal resistances R<sub>MUX</sub>. In bipolar mode, two capacitors are used, and the current into them goes through a single internal resistance R<sub>MUX</sub>.  
 R<sub>MUX</sub> is the resistance of the analog multiplexer circuit inside the Zynq XADC. Please note that the value of R<sub>MUX</sub> for a dedicated analog input is different from the R<sub>MUX</sub> of the auxiliary inputs.  
 
-Xilinx is giving us the [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) for calculating minimum acquisition time in unipolar mode:
+Xilinx is giving us [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) for calculating minimum acquisition time in unipolar mode:
 ```math
 t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}
 ```
 R<sub>MUX</sub> for an auxiliary input is 10 kΩ.  
-$C_{SAMPLE}$ is specified by Xilinx as 3 pF.  
+$C_{SAMPLE}$ C<sub>SAMPLE</sub> is specified by Xilinx as 3 pF.  
 Therefore, we calculate the minimum acquisition time t<sub>ACQ</sub> for an unipolar auxiliary input as follows:
+
 ```math
 t_{ACQ} = 9 \times ( 10000 + 10000 ) \times 3 \times 10^{-12} = 540\mskip3muns
 ```
