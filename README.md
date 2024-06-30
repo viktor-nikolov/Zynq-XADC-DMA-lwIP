@@ -127,8 +127,7 @@ Therefore, we must ensure that the ADCCLK frequency is set so that 26 or 32 ADCC
 This is not a problem for acquisition times of unipolar auxiliary input (540 ns) and bipolar dedicated input (2.7 ns), which we calculated using [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) or [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2).
 
 The maximum possible ADCLK frequency is 26 MHz. 26 clocks of this frequency take 1 &mu;s, which is more than the needed acquisition time. In this case, we could run the XADC at the maximum sampling rate of 1&nbsp;Msps.  
-Please note that this may not be the case in circuits with higher resistances in the path of analog inputs.  
-**TODO example of higher resistance:** [link](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs)
+Please note that this may not be the case in circuits with additional resistances in the path of analog inputs. As we will see in the next chapter, a low-pass anti-aliasing filter can significantly increase the required acquisition time.
 
 
 ### Unipolar input acquisition time of Cora Z7
@@ -159,9 +158,9 @@ The low-pass filter formed by the circuit has a cut-off frequency of 134 kHz.
 This circuit on Cora Z7 is basically the same as the one discussed in the Application Guidelines chapter [External Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) of UG480.  
 The AAF contains a 1 nF capacitor, which is orders of magnitude larger capacitance than the 3 pF sampling capacitor inside the XADC. Therefore, we can ignore the XADC sampling capacitor when determining the acquisition time.
 
-We need to determine the so-called settling time of the AAF circuit, which is the needed acquisition time for the XADC. 
+We need to determine the AAF circuit's settling time, which is the acquisition time needed for the XADC. 
 
-We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/8erAzNpWEDQ8zWWH_EdtFg?section=XREF_11532_Equation2_5) from [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) to adapt it to the impedances of Cora Z7 analog input:
+We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/8erAzNpWEDQ8zWWH_EdtFg?section=XREF_11532_Equation2_5) from [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) to adapt it to the resistances of Cora Z7 analog input:
 
 ```math
 t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000 }} + 140 + 845) \times 1 \times 10^{-9} = 15.17 \mskip3mu \mu s
