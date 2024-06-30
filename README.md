@@ -98,8 +98,9 @@ For minimum acquisition time in bipolar mode, Xilinx is giving the [Equation 2-1
 t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}
 ```
 For a dedicated analog input, R<sub>MUX</sub> equals 100 Ω. This gives us the following value of the minimum acquisition time of a bipolar dedicated input:
-$$t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7\mskip3muns$$
-
+```math
+t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7\mskip3muns
+```
 > [!IMPORTANT]
 >
 > The calculation of the acquisition times we did above is valid only for an ideal case when the only resistance present in the circuit is the resistance of the internal analog multiplexer of the Zynq XADC.
@@ -124,11 +125,13 @@ Therefore, we must make sure to set the ADCCLK frequency in the way that 4 or 10
 Let's take the unipolar auxiliary input as an example:  
 We determined the minimum acquisition time for an unipolar auxiliary input as 540 ns.  
 To achieve the fastest possible sampling rate we will use the settling period of 10 ADCCLK cycles. We then calculate the ADCCLK frequency as
-$$f_{ADCCLK} ={ 1 \over {540 \times 10^{-9} \over 10} } = 18.519\mskip3muMhz$$
-
+```math
+f_{ADCCLK} ={ 1 \over {540 \times 10^{-9} \over 10} } = 18.519\mskip3muMhz
+```
 this will give us the sampling rate
-$$f_S ={ 1 \over { {1 \over f_{ADCCLK}} \times 32} } = 578.7\mskip3muksps$$
-
+```math
+f_S ={ 1 \over { {1 \over f_{ADCCLK}} \times 32} } = 578.7\mskip3muksps
+```
 Please note that f<sub>ADCCLK</sub> and f<sub>S</sub> we calculated here are theoretical values. We probably won't be able to achieve f<sub>ADCCLK</sub> of exactly 18.519 MHz in the actual HW design. The Clocking Wizard IP can't generate any frequency we want, nevertheless, it can generate a frequency close to the desired value. We just need to make sure that the f<sub>ADCCLK</sub> in the actual HW design is <ins>lower or equal</ins> to the theoretical value calculated by a formula. 
 
 
@@ -143,8 +146,9 @@ In addition to $R_{MUX}$, we must include resistors in the signal path on the Co
 $C_{SAMPLE}$ is specified by Xilinx as 3 pF.
 
 We now calculate the needed acquisition time for VAUX1 as follows:
-$$t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-12} = 629\mskip3muns$$
-
+```math
+t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-12} = 629\mskip3muns
+```
 > [!IMPORTANT]
 >
 > **TODO:**  
@@ -162,8 +166,9 @@ With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 ksps (a single
 ### Bipolar input acquisition time of Cora Z7
 
 Equation 2-1 from UG480 for acquisition time in unipolar mode:
-$$t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}$$
-
+```math
+t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}
+```
 On Cora Z7, we need to take into account the bipolar input circuitry for dedicated V_P/V_N input on the board, as depicted in Figure 13.2.3 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io):
 
 <img src="pictures\cora-analog-dedicated.png"  width="400">
