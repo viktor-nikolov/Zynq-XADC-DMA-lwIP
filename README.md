@@ -163,7 +163,7 @@ We need to determine the AAF circuit's settling time, which is the acquisition t
 We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/8erAzNpWEDQ8zWWH_EdtFg?section=XREF_11532_Equation2_5) from [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) to adapt it to the resistances of Cora Z7 analog input:
 
 ```math
-t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000 }} + 140 + 845) \times 1 \times 10^{-9} = 15.17 \mskip3mu \mu s
+t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000 }} + 140 + 845) \times 1 \times 10^{-9} = 15.1725 \mskip3mu \mu s
 ```
 The term $`\ln(2^{12+1})`$ is the number of time constants needed for 12-bit resolution.
 
@@ -180,7 +180,8 @@ Further details on how the equation was constructed can be found in the Applicat
 
 **TODO:**  
 
-**Determine the DCLK and ADCLK**
+**Determine the DCLK and ADCLK**  
+We need ADCLK 1713.6 kHz.
 
 We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898&nbsp;MHz. 
 We need to find an XADC input frequency DCLK, which, divided by an integer, results in a frequency close to 15.898&nbsp;MHz.
