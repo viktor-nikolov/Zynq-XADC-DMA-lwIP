@@ -92,7 +92,7 @@ C<sub>SAMPLE</sub> is specified by Xilinx as 3 pF.
 Therefore, we calculate the minimum acquisition time t<sub>ACQ</sub> for an unipolar auxiliary input as follows:
 
 ```math
-t_{ACQ} = 9 \times ( 10000 + 10000 ) \times 3 \times 10^{-12} = 540\mskip3muns
+t_{ACQ} = 9 \times ( 10000 + 10000 ) \times 3 \times 10^{-12} = 540 \mskip3mu ns
 ```
 For minimum acquisition time in bipolar mode, Xilinx is giving the [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs):
 ```math
@@ -100,7 +100,7 @@ t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}
 ```
 For a dedicated analog input, R<sub>MUX</sub> equals 100 Ω. This gives us the following value of the minimum acquisition time of a bipolar dedicated input:
 ```math
-t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7\mskip3muns
+t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7 \mskip3mu ns
 ```
 > [!IMPORTANT]
 >
@@ -164,21 +164,9 @@ We need to determine the so-called settling time of the AAF circuit, which is th
 We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/8erAzNpWEDQ8zWWH_EdtFg?section=XREF_11532_Equation2_5) from [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) to adapt it to the impedances of Cora Z7 analog input:
 
 ```math
-t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000 }} + 140 + 845) \times 1 \times 10^{-9} = 15.17\mskip3mu\mus
+t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000 }} + 140 + 845) \times 1 \times 10^{-9} = 15.17 \mskip3mu \mu s
 ```
-
-
-
-xxxxxxx
-
-In our case, R<sub>MUX</sub> equals to 10 kΩ because we are using the auxiliary input VAUX[1] (which is connected to pin A0 on the Cora Z7 board).  
-In addition to R<sub>MUX</sub>, we must include resistors in the signal path on the Cora Z7 board: 2.32&nbsp;kΩ, 140&nbsp;Ω, and 845&nbsp;Ω.  
-C<sub>SAMPLE</sub> is specified by Xilinx as 3 pF.
-
-We now calculate the needed acquisition time for VAUX[1] as follows:
-```math
-t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-12} = 629\mskip3muns
-```
+The term $\mu$
 > [!IMPORTANT]
 >
 > **TODO:**  
