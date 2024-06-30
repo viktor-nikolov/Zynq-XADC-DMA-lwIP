@@ -115,26 +115,19 @@ To understand how the calculated acquisition time translates to XADC configurati
 
 In the default XADC setup of Continuous Sampling mode, 26 ADCCLK cycles are required to acquire an analog signal and perform a conversion.
 
-The first 4 ADCCLK cycles are the so-called settling period during which the internal capacitor of XADC is being charged.  
+The first 4 ADCCLK cycles are the so-called settling period, and they are followed by 22 ADCCLK cycles of the so-called conversion phase, during which the XADC does the conversion and generates the output value.  
 XADC can be configured to extend the settling period to 10 ADCCLK cycles (thus resulting in a total of 32 ADCCLK cycles for acquisition and conversion).
 
-After the settling period follows 22 ADCCLK cycles of the so-called conversion phase during which the XADC does the conversion and generates the output value.
+Charging of the internal capacitor starts at the beginning of the conversion phase. I.e., the XADC does the conversion in parallel with sampling input voltage for the next conversion.  
+This is possible because the XADC has a separate track-and-hold amplifier (T/H). Thus, when the XADC starts to convert an input voltage, the T/H is free to start charging to the next voltage to be converted.
 
-The minimum acquisition time, which we calculated using [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) or [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2), must fit into the settling period.  
-Therefore, we must ensure that the ADCCLK frequency is set so that 4 or 10 ADCCLK cycles are at least acquisition time t<sub>ACQ</sub> long.
+The minimum acquisition time must fit within ADCCLK cycles of the settling and conversion phase. I.e., within 26 or 32 ADCCLK cycles.  
+Therefore, we must ensure that the ADCCLK frequency is set so that 26 or 32 ADCCLK cycles are at least acquisition time t<sub>ACQ</sub> long.
 
-Let's take the unipolar auxiliary input as an example:  
-We determined the minimum acquisition time for an unipolar auxiliary input as 540 ns.  
-We will use the settling period of 10 ADCCLK cycles to achieve the fastest possible sampling rate. We then calculate the ADCCLK frequency as
+This is not a problem for acquisition times of unipolar auxiliary input (540 ns) and bipolar dedicated input (2.7 ns), which we calculated using [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) or [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2).
 
-```math
-f_{ADCCLK} ={ 1 \over {540 \times 10^{-9} \over 10} } = 18.519\mskip3muMhz
-```
-this will give us the sampling rate
-```math
-f_S ={ 1 \over { {1 \over f_{ADCCLK}} \times 32} } = 578.7\mskip3muksps
-```
-Please note that the f<sub>ADCCLK</sub> and f<sub>S</sub> we calculated here are theoretical values. We probably won't be able to achieve f<sub>ADCCLK</sub> of exactly 18.519 MHz in the actual HW design. The Clocking Wizard IP can't generate any frequency we want, nevertheless, it can generate a frequency close to the desired value. We just need to make sure that the f<sub>ADCCLK</sub> in the actual HW design is <ins>lower or equal</ins> to the theoretical value calculated by a formula. 
+The maximum possible ADCLK frequency is 26 MHz. 26 clocks of this frequency take 1 &mu;s, which is more than the needed acquisition time.  
+Please note that this may not be the case in circuits with higher resistances in the path of analog inputs.
 
 
 ### Unipolar input acquisition time of Cora Z7
@@ -145,7 +138,7 @@ In the case of Cora Z7, we need to take into account the unipolar input circuitr
 
 In our case, R<sub>MUX</sub> equals to 10 kΩ because we are using the auxiliary input VAUX[1] (which is connected to pin A0 on the Cora Z7 board).  
 In addition to R<sub>MUX</sub>, we must include resistors in the signal path on the Cora Z7 board: 2.32&nbsp;kΩ, 140&nbsp;Ω, and 845&nbsp;Ω.  
-C<sub>SAMPLE</sub>is specified by Xilinx as 3 pF.
+C<sub>SAMPLE</sub> is specified by Xilinx as 3 pF.
 
 We now calculate the needed acquisition time for VAUX[1] as follows:
 ```math
@@ -171,7 +164,7 @@ Equation 2-1 from UG480 for acquisition time in unipolar mode:
 ```math
 t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}
 ```
-On Cora Z7, we need to take into account the bipolar input circuitry for dedicated V_P/V_N input on the board, as depicted in Figure 13.2.3 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io):
+On Cora Z7, we need to take into account the bipolar input circuitry for dedicated V<sub>P</sub> /V<sub>N</sub> input on the board, as depicted in Figure 13.2.3 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io):
 
 <img src="pictures\cora-analog-dedicated.png"  width="400">
 
@@ -179,7 +172,7 @@ The R<sub>MUX</sub>for a dedicated analog input is 100 Ω.
 In addition to R<sub>MUX</sub>, we must include the 140 Ω resistor in the signal path on the Cora&nbsp;Z7 board  
 C<sub>SAMPLE</sub> is 3 pF.
 
-We now calculate the needed acquisition time for V_P/V_N as follows:
+We now calculate the needed acquisition time for V<sub>P</sub> /V<sub>N</sub> as follows:
 ```math
 t_{ACQ} = 9 \times ( 100 + 140) \times 3 \times 10^{-12} = 6.5\mskip3muns
 ```
@@ -187,7 +180,7 @@ t_{ACQ} = 9 \times ( 100 + 140) \times 3 \times 10^{-12} = 6.5\mskip3muns
 This would allow us to use a sampling rate of 1 Msps because, with the ADCCLK frequency of 26&nbsp;MHz and 4 ADCCLKs allowed for the acquisition, we get 150&nbsp;ns acquisition time, which is more than enough.
 
 However, in our design, we are limited to using an ADCCLK frequency of 23.84&nbsp;MHz (95.363&nbsp;MHz divided by 4) because we must use an XADC clock of 95.363&nbsp;MHz to achieve the 629&nbsp;ns acquisition time for the unipolar input as described in the previous chapter.  
-The resulting sampling rate will be, therefore, 917 ksps (a single conversion cycle will take 26 ADCLKs).
+Therefore, the resulting sampling rate will be 917 ksps (a single conversion cycle will take 26 ADCLKs).
 
 ## Calibration
 
@@ -197,7 +190,7 @@ From [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Status-Registers), 
 
 I'm using a Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual) board, which doesn't provide external voltage references. VREFP and VREFN are connected to ADCGND on this board. Therefore, the internal FPGA voltage references are utilized for calibration.
 
-From [this post](https://support.xilinx.com/s/article/53586?language=en_US), I know that with internal references, the Gain Calibration Coefficient will always be 0x7F.
+From [this post](https://support.xilinx.com/s/article/53586?language=en_US), I know that the Gain Calibration Coefficient will always be 0x7F with internal references.
 
 When the default mode is enabled, both ADCs are calibrated. The XADC also operates in default mode after initial power-up and during FPGA configuration. See the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Sequencer-Modes), chapter Default Mode, page 48.
 
