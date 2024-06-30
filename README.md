@@ -167,6 +167,9 @@ We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa
 t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000 }} + 140 + 845) \times 1 \times 10^{-9} = 15.17 \mskip3mu \mu s
 ```
 The term $\` \mu \`$
+
+This sentence uses $\` and \`$ delimiters to show math inline:  $`\sqrt{3x-1}+(1+x)^2`$
+
 > [!IMPORTANT]
 >
 > **TODO:**  
