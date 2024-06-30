@@ -126,15 +126,32 @@ Therefore, we must ensure that the ADCCLK frequency is set so that 26 or 32 ADCC
 
 This is not a problem for acquisition times of unipolar auxiliary input (540 ns) and bipolar dedicated input (2.7 ns), which we calculated using [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) or [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2).
 
-The maximum possible ADCLK frequency is 26 MHz. 26 clocks of this frequency take 1 &mu;s, which is more than the needed acquisition time. Therefore, we can run the XADC at the maximum sampling rate of 1&nbsp;Msps.  
-Please note that this may not be the case in circuits with higher resistances in the path of analog inputs.
+The maximum possible ADCLK frequency is 26 MHz. 26 clocks of this frequency take 1 &mu;s, which is more than the needed acquisition time. In this case, we could run the XADC at the maximum sampling rate of 1&nbsp;Msps.  
+Please note that this may not be the case in circuits with higher resistances in the path of analog inputs.  
+**TODO example of higher resistance:** [link](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs)
 
 
 ### Unipolar input acquisition time of Cora Z7
 
-In the case of Cora Z7, we need to take into account the unipolar input circuitry on the board as depicted in Figure 13.2.1 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io):
+Let's analyze the acquisition time of unipolar analog input circuitry of the Digilent [Cora Z7](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/) development board.
+
+The following picture is a copy of Figure 13.2.1 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io). It depicts the circuit used for board pins labeled A0-A5.
 
 <img src="pictures\cora-analog-single-ended.png" title=""  width="550">
+
+Pins A0-A5 of Cora Z7 can be used as either digital I/O pins or as analog input pins for the auxiliary channels.  
+The following table lists assignment of Cora Z7 pins to the XADC auxiliary channels.
+
+| Cora Z7 pin | Associated XADC channel |
+| ----------- | ----------------------- |
+| A0          | VAUX[1]                 |
+| A1          | VAUX[9]                 |
+| A2          | VAUX[6]                 |
+| A3          | VAUX[15]                |
+| A4          | VAUX[5]                 |
+| A5          | VAUX[13]                |
+
+xxxxxxx
 
 In our case, R<sub>MUX</sub> equals to 10 kΩ because we are using the auxiliary input VAUX[1] (which is connected to pin A0 on the Cora Z7 board).  
 In addition to R<sub>MUX</sub>, we must include resistors in the signal path on the Cora Z7 board: 2.32&nbsp;kΩ, 140&nbsp;Ω, and 845&nbsp;Ω.  
