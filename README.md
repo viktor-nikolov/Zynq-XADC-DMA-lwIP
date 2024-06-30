@@ -135,12 +135,8 @@ Please note that this may not be the case in circuits with higher resistances in
 
 Let's analyze the acquisition time of unipolar analog input circuitry of the Digilent [Cora Z7](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/) development board.
 
-The following picture is a copy of Figure 13.2.1 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io). It depicts the circuit used for board pins labeled A0-A5.
-
-<img src="pictures\cora-analog-single-ended.png" title=""  width="550">
-
-Pins A0-A5 of Cora Z7 can be used as either digital I/O pins or as analog input pins for the auxiliary channels.  
-The following table lists assignment of Cora Z7 pins to the XADC auxiliary channels.
+The pins labeled A0-A5 on the Cora Z7 board can be used as digital I/O pins or analog input pins for the auxiliary channels. How the given pin is used (digital vs. analog) is controlled by a constraint specified in the HW design.  
+The following table lists the assignment of Cora Z7 pins to the XADC auxiliary channels.
 
 | Cora Z7 pin | Associated XADC channel |
 | ----------- | ----------------------- |
@@ -150,6 +146,28 @@ The following table lists assignment of Cora Z7 pins to the XADC auxiliary chann
 | A3          | VAUX[15]                |
 | A4          | VAUX[5]                 |
 | A5          | VAUX[13]                |
+
+The following picture is a copy of Figure 13.2.1 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io). It depicts the circuit used for pins A0-A5.
+
+<img src="pictures\cora-analog-single-ended.png" title=""  width="550">
+
+We see that the analog input circuit on Cora Z7 consists of a voltage divider and a low-pass anti-aliasing filter (AAF).  
+The voltage divider allows voltage up to 3.3 V to be connected to pins A0-A5. The voltage is reduced to the 1.0 V limit of the XADC.  
+The analog inputs A0-A5 act as single-ended inputs because negative signals VAUXN[] are tied to the board's ground.  
+The low-pass filter formed by the circuit has a cut-off frequency of 134 kHz.
+
+This circuit on Cora Z7 is basically the same as the one discussed in the Application Guidelines chapter [External Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) of UG480.  
+The AAF contains a 1 nF capacitor, which is orders of magnitude larger capacitance than the 3 pF sampling capacitor inside the XADC. Therefore, we can ignore the XADC sampling capacitor when determining the acquisition time.
+
+We need to determine the so-called settling time of the AAF circuit, which is the needed acquisition time for the XADC. 
+
+We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/8erAzNpWEDQ8zWWH_EdtFg?section=XREF_11532_Equation2_5) from [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) to adapt it to the impedances of Cora Z7 analog input:
+
+```math
+t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000 }} + 140 + 845) \times 1 \times 10^{-9} = 15.17\mskip3mu\mus
+```
+
+
 
 xxxxxxx
 
