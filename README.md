@@ -126,7 +126,7 @@ Therefore, we must ensure that the ADCCLK frequency is set so that 26 or 32 ADCC
 
 This is not a problem for acquisition times of unipolar auxiliary input (540 ns) and bipolar dedicated input (2.7 ns), which we calculated using [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) or [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2).
 
-The maximum possible ADCLK frequency is 26 MHz. 26 clocks of this frequency take 1 &mu;s, which is more than the needed acquisition time.  
+The maximum possible ADCLK frequency is 26 MHz. 26 clocks of this frequency take 1 &mu;s, which is more than the needed acquisition time. Therefore, we can run the XADC at the maximum sampling rate of 1&nbsp;Msps.  
 Please note that this may not be the case in circuits with higher resistances in the path of analog inputs.
 
 
