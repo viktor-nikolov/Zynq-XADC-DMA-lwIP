@@ -166,15 +166,23 @@ We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa
 ```math
 t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000 }} + 140 + 845) \times 1 \times 10^{-9} = 15.17 \mskip3mu \mu s
 ```
-The term $`\ln(2^{12+1})`$ is xxx
-The term $`{2320 \times 1000} \over {2300 + 1000 }`$ is xxx
+The term $`\ln(2^{12+1})`$ is the number of time constants needed for 12-bit resolution.
+
+The term $`{2320 \times 1000} \over {2300 + 1000 }`$ is the output impedance of the voltage divider.
+
+Further details on how the equation was constructed can be found in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) "Driving the Xilinx Analog-to-Digital Converter".
 
 > [!IMPORTANT]
 >
-> **TODO:**  
-> Beware of the impedance of the circuit you connect to the A0 pin.
+> Please note that any additional resistance of circuitry you connect to the Cora Z7's pins A0-A5 can further increase the acquisition time needed.  
+> In order to achieve a reliable measurement, the voltage source connected to pins A0-A5 must act as having low internal resistance.
+
+
 
 **TODO:**  
+
+**Determine the DCLK and ADCLK**
+
 We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898&nbsp;MHz. 
 We need to find an XADC input frequency DCLK, which, divided by an integer, results in a frequency close to 15.898&nbsp;MHz.
 
