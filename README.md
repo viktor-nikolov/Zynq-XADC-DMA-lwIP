@@ -88,7 +88,7 @@ Xilinx is giving us [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ
 t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}
 ```
 R<sub>MUX</sub> for an auxiliary input is 10 kΩ.  
-$C_{SAMPLE}$ C<sub>SAMPLE</sub> is specified by Xilinx as 3 pF.  
+C<sub>SAMPLE</sub> is specified by Xilinx as 3 pF.  
 Therefore, we calculate the minimum acquisition time t<sub>ACQ</sub> for an unipolar auxiliary input as follows:
 
 ```math
@@ -108,7 +108,7 @@ t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7\mskip3muns
 >
 > In the next chapters, we will see a real-life example of calculating acquisition times for the development board  [Cora Z7-07S](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/), which has additional resistances in the circuitry outside the Zynq XADC. 
 
-To understand how the calculated acquisition time translates to XADC configuration we need to see how the XADC works in terms of input clock and timing.
+To understand how the calculated acquisition time translates to XADC configuration, we need to see how the XADC works in terms of input clock and timing.
 
 **TODO**  
 **How the input clock DCLK translates to ADCCLK.**
@@ -120,12 +120,13 @@ XADC can be configured to extend the settling period to 10 ADCCLK cycles (thus r
 
 After the settling period follows 22 ADCCLK cycles of the so-called conversion phase during which the XADC does the conversion and generates the output value.
 
-The minimum acquisition time, which we calculated using [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) or [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) must fit into the settling period.  
-Therefore, we must make sure to set the ADCCLK frequency in the way that 4 or 10 ADCCLK cycles are at least acquisition time t<sub>ACQ</sub> long.
+The minimum acquisition time, which we calculated using [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) or [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2), must fit into the settling period.  
+Therefore, we must ensure that the ADCCLK frequency is set so that 4 or 10 ADCCLK cycles are at least acquisition time t<sub>ACQ</sub> long.
 
 Let's take the unipolar auxiliary input as an example:  
 We determined the minimum acquisition time for an unipolar auxiliary input as 540 ns.  
-To achieve the fastest possible sampling rate we will use the settling period of 10 ADCCLK cycles. We then calculate the ADCCLK frequency as
+We will use the settling period of 10 ADCCLK cycles to achieve the fastest possible sampling rate. We then calculate the ADCCLK frequency as
+
 ```math
 f_{ADCCLK} ={ 1 \over {540 \times 10^{-9} \over 10} } = 18.519\mskip3muMhz
 ```
@@ -133,7 +134,7 @@ this will give us the sampling rate
 ```math
 f_S ={ 1 \over { {1 \over f_{ADCCLK}} \times 32} } = 578.7\mskip3muksps
 ```
-Please note that f<sub>ADCCLK</sub> and f<sub>S</sub> we calculated here are theoretical values. We probably won't be able to achieve f<sub>ADCCLK</sub> of exactly 18.519 MHz in the actual HW design. The Clocking Wizard IP can't generate any frequency we want, nevertheless, it can generate a frequency close to the desired value. We just need to make sure that the f<sub>ADCCLK</sub> in the actual HW design is <ins>lower or equal</ins> to the theoretical value calculated by a formula. 
+Please note that the f<sub>ADCCLK</sub> and f<sub>S</sub> we calculated here are theoretical values. We probably won't be able to achieve f<sub>ADCCLK</sub> of exactly 18.519 MHz in the actual HW design. The Clocking Wizard IP can't generate any frequency we want, nevertheless, it can generate a frequency close to the desired value. We just need to make sure that the f<sub>ADCCLK</sub> in the actual HW design is <ins>lower or equal</ins> to the theoretical value calculated by a formula. 
 
 
 ### Unipolar input acquisition time of Cora Z7
@@ -142,11 +143,11 @@ In the case of Cora Z7, we need to take into account the unipolar input circuitr
 
 <img src="pictures\cora-analog-single-ended.png" title=""  width="550">
 
-In our case, $R_{MUX}$ equals to 10 kΩ because we are using the auxiliary input VAUX1 (which is connected to pin A0 on the Cora Z7 board).  
-In addition to $R_{MUX}$, we must include resistors in the signal path on the Cora Z7 board: 2.32&nbsp;kΩ, 140&nbsp;Ω, and 845&nbsp;Ω.  
-$C_{SAMPLE}$ is specified by Xilinx as 3 pF.
+In our case, R<sub>MUX</sub> equals to 10 kΩ because we are using the auxiliary input VAUX[1] (which is connected to pin A0 on the Cora Z7 board).  
+In addition to R<sub>MUX</sub>, we must include resistors in the signal path on the Cora Z7 board: 2.32&nbsp;kΩ, 140&nbsp;Ω, and 845&nbsp;Ω.  
+C<sub>SAMPLE</sub>is specified by Xilinx as 3 pF.
 
-We now calculate the needed acquisition time for VAUX1 as follows:
+We now calculate the needed acquisition time for VAUX[1] as follows:
 ```math
 t_{ACQ} = 9 \times ( 10000 + 10000 + 2320 + 140 + 845 ) \times 3 \times 10^{-12} = 629\mskip3muns
 ```
@@ -174,13 +175,14 @@ On Cora Z7, we need to take into account the bipolar input circuitry for dedicat
 
 <img src="pictures\cora-analog-dedicated.png"  width="400">
 
-The $R_{MUX}$ for a dedicated analog input is 100 Ω.  
-In addition to $R_{MUX}$, we must include the 140 Ω resistor in the signal path on the Cora&nbsp;Z7 board  
-$C_{SAMPLE}$ is 3 pF.
+The R<sub>MUX</sub>for a dedicated analog input is 100 Ω.  
+In addition to R<sub>MUX</sub>, we must include the 140 Ω resistor in the signal path on the Cora&nbsp;Z7 board  
+C<sub>SAMPLE</sub> is 3 pF.
 
 We now calculate the needed acquisition time for V_P/V_N as follows:
-$$t_{ACQ} = 9 \times ( 100 + 140) \times 3 \times 10^{-12} = 6.5\mskip3muns$$
-
+```math
+t_{ACQ} = 9 \times ( 100 + 140) \times 3 \times 10^{-12} = 6.5\mskip3muns
+```
 **TODO:**  
 This would allow us to use a sampling rate of 1 Msps because, with the ADCCLK frequency of 26&nbsp;MHz and 4 ADCCLKs allowed for the acquisition, we get 150&nbsp;ns acquisition time, which is more than enough.
 
