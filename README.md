@@ -152,8 +152,9 @@ The following picture is a copy of Figure 13.2.1 from the Cora Z7 [Reference Man
 
 We see that the analog input circuit on Cora Z7 consists of a voltage divider and a low-pass anti-aliasing filter (AAF).  
 The voltage divider allows voltage up to 3.3 V to be connected to pins A0-A5. The voltage is reduced to the 1.0 V limit of the XADC.  
+**TODO: Voltage divider not ideal, it should be 2.3 kOhm**  
 The analog inputs A0-A5 act as single-ended inputs because negative signals VAUXN[] are tied to the board's ground.  
-The low-pass filter formed by the circuit has a cut-off frequency of 134 kHz.
+The low-pass filter formed by the circuit has a cut-off frequency of 134 kHz (I simulated the circuit's frequency response in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html)).
 
 This circuit on Cora Z7 is basically the same as the one discussed in the Application Guidelines chapter [External Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) of UG480.  
 The AAF contains a 1 nF capacitor, which is orders of magnitude larger capacitance than the 3 pF sampling capacitor inside the XADC. Therefore, we can ignore the XADC sampling capacitor when determining the acquisition time.
