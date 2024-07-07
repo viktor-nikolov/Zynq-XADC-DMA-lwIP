@@ -8,6 +8,11 @@ The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain.
 
 ## TODOs, to be removed
 
+- [Zynq-7000 SoC (Z-7007S, Z-7012S, Z-7014S, Z-7010, Z-7015, and Z-7020): DC and AC Switching Characteristics Data Sheet(DS187) • Viewer • AMD Technical Information Portal](https://docs.amd.com/v/u/en-US/ds187-XC7Z010-XC7Z020-Data-Sheet)
+  - Auxiliary Channel Full Resolution Bandwidth is 250 kHz
+
+- [Getting the XADC Running on the MicroZed: Adam Taylor’s MicroZed Chronicles Part 7 (xilinx.com)](https://support.xilinx.com/s/article/380989?language=en_US)
+- [Adam Taylor’s MicroZed Chronicles, Part 104: XADC with Real World Signals (xilinx.com)](https://support.xilinx.com/s/article/659668?language=en_US)
 - [Real Digital Signal Processing - Hackster.io](https://www.hackster.io/adam-taylor/real-digital-signal-processing-0bea44)
 - [Signal Processing with XADC and PYNQ - Hackster.io](https://www.hackster.io/adam-taylor/signal-processing-with-xadc-and-pynq-3c716c)
 - calibration:
@@ -79,6 +84,8 @@ If you don't give the internal XADC capacitor enough time to charge, the input v
 The next picture is a copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_26771_X_Ref_Target) from Zynq 7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480).
 
 <img src="pictures\UG480_fig_2-5.png" title=""  width="650">
+
+**TODO: For AUX it forms low pass filter of 250 kHz**
 
 We see in the picture that in the unipolar mode the current to the capacitor goes through two internal resistances R<sub>MUX</sub>. In bipolar mode, two capacitors are used, and the current into them goes through a single internal resistance R<sub>MUX</sub>.  
 R<sub>MUX</sub> is the resistance of the analog multiplexer circuit inside the Zynq XADC. Please note that the value of R<sub>MUX</sub> for a dedicated analog input is different from the R<sub>MUX</sub> of the auxiliary inputs.  
@@ -182,7 +189,7 @@ Further details on how the equation was constructed can be found in the Applicat
 **TODO:**  
 
 **Determine the DCLK and ADCLK**  
-We need ADCLK 1713.6 kHz.
+We need ADCCLK 1713.6 kHz.
 
 We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898&nbsp;MHz. 
 We need to find an XADC input frequency DCLK, which, divided by an integer, results in a frequency close to 15.898&nbsp;MHz.
@@ -243,3 +250,21 @@ Connected precise 2.5 V voltage reference to A0 (2.50026 V).
 Without averaging, the mean value over 10,000 samples was 2.492 V. 
 
 Beware of the precision of the resistors in the Cora Z7 voltage dividers.
+
+---------------------------------
+
+XADC: How many ADCCLK clocks is the acquisition time?
+
+I'm confused by the AMD documentation about XADC acquisition time.
+
+I'm using the continuous sampling mode with a so-called settling period of 4 ADCCLK clock cycles. I.e. 26 ADCCLK clocks between the conversions.
+
+According to the timing diagram in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling), the acquisition time is 22 ADCCLK clocks. See the attached screenshot.
+
+Does it mean that the settling period (4 or 10 ADCCLK clocks, depending on configuration) doesn't count into the acquisition time? That doesn't make sense. I expect they gave us the option to configure a longer settling period for the ability to extend the acquisition time.
+
+Another [source](https://support.xilinx.com/s/article/659668?language=en_US) says, "The architecture of the XADC allocates 75% of the sampling period for settling time.". But 22 clocks out of a total of 26 is 85%, not 75%.
+
+Another confusing figure is the Auxiliary Channel Full Resolution Bandwidth of only 250 kHz, as specified in [DS187](https://docs.amd.com/v/u/en-US/ds187-XC7Z010-XC7Z020-Data-Sheet). Where is 250 kHz coming from? That doesn't match with acquisition time calculated by [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) in UG480. For unipolar auxiliary input, the equation gives 540 ns acquisition time. That should be more than enough for a 1 Msps sampling rate, i.e., 500 kHz bandwidth.
+
+Last but not least, I did the practical test. The attached picture is a plot of a 33 kHz square wave signal digitized by auxiliary unipolar input on Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io) with XADC configured for 1 Msps. The plot exactly matches my simulation in LTspice. The anti-aliasing filter for the given channel on Cora Z7 has a settling time of 15.2  μs. The XADC captured the waveform correctly at 1 Msps. It doesn't seem to suffer from insufficient acquisition time.
