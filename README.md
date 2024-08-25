@@ -10,11 +10,6 @@ The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain.
 
 - [Zynq-7000 SoC (Z-7007S, Z-7012S, Z-7014S, Z-7010, Z-7015, and Z-7020): DC and AC Switching Characteristics Data Sheet(DS187) • Viewer • AMD Technical Information Portal](https://docs.amd.com/v/u/en-US/ds187-XC7Z010-XC7Z020-Data-Sheet)
   - Auxiliary Channel Full Resolution Bandwidth is 250 kHz
-
-- [Getting the XADC Running on the MicroZed: Adam Taylor’s MicroZed Chronicles Part 7 (xilinx.com)](https://support.xilinx.com/s/article/380989?language=en_US)
-- [Adam Taylor’s MicroZed Chronicles, Part 104: XADC with Real World Signals (xilinx.com)](https://support.xilinx.com/s/article/659668?language=en_US)
-- [Real Digital Signal Processing - Hackster.io](https://www.hackster.io/adam-taylor/real-digital-signal-processing-0bea44)
-- [Signal Processing with XADC and PYNQ - Hackster.io](https://www.hackster.io/adam-taylor/signal-processing-with-xadc-and-pynq-3c716c)
 - calibration:
 
   - [53586 - Zynq and 7-Series XADC Gain Calibration Behaviour with Internal Voltage Reference (xilinx.com)](https://support.xilinx.com/s/article/53586?language=en_US)
@@ -24,8 +19,6 @@ Cora Z7 has VREFP and VREFN connected to ADCGND
 
 - The XADC also has an on-chip reference option which is selected by connecting VREFP and VREFN to ADCGND as shown in Figure 6-1. Due to reduced accuracy, the on-chip reference does impact the measurement performance of the XADC as explained previously
 
-[Configuring the Zynq TTC to schedule FreeRTOS tasks : r/FPGA (reddit.com)](https://www.reddit.com/r/FPGA/comments/16bfugb/configuring_the_zynq_ttc_to_schedule_freertos/)
-
 ## A short introduction to Zynq 7000 XADC
 
 The XADC is a feature of an analog-to-digital converter integrated on selected Xilinx FPGA chips, including Zynq 7000. This ADC has two basic capabilities
@@ -33,11 +26,11 @@ The XADC is a feature of an analog-to-digital converter integrated on selected X
 1.  The System Monitor (SYSMON) reads the Zynq chip temperature and voltages of various Zynq power rails.
 1.  The XADC reads voltages from external inputs, which are called channels.
 
-In this tutorial, we will focus solely on XADC. But don't be confused, Xilinx library functions for controlling XADC are defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h).
+In this tutorial, we will focus solely on XADC. But please don't get confused, Xilinx library functions for controlling XADC are defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h).
 
 XADC can read one external input (channel) at a time and provides a means for switching between channels.  
 The Zynq 7000 XADC has one dedicated analog input channel called V<sub>P</sub> /V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0..15].
-Each channel has two input signals because they are differential input channels. A positive differential input is denoted V<sub>P</sub> or VAUXP, and a negative one is denoted V<sub>N</sub> or VAUXN.
+Each channel has two input signals because it is a differential input channel. A positive differential input is denoted V<sub>P</sub> or VAUXP, and a negative one is denoted V<sub>N</sub> or VAUXN.
 
 > [!WARNING]
 >
@@ -62,7 +55,7 @@ See the chapter [Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/
 
 **TODO: number of bits in output reg**
 
-For using the XADC you need to instantiate an [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) in your HW design.  
+To use the XADC, you need to instantiate an [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) in your HW design.  
 If you don't need to modify the XADC configuration during runtime, you can do all the needed setup in the XADC Wizzard IP configuration.  
 Alternatively, you can configure XADC by calling functions defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). This allows you to change the configuration during runtime (e.g., switching between the channels). We will use this method of configuration in this tutorial.
 
@@ -79,13 +72,13 @@ We will also configure the XADC for Continuous Sampling. In this timing mode, th
 > The XADC sampling frequency must be carefully determined to allow sufficient acquisition time, given the properties of the circuit you are using. It requires a bit of math, as we explain in this chapter.
 
 The principle of XADC operation is charging an internal capacitor to a voltage equal to the voltage of the analog input being measured. Any electrical resistance between the input voltage and the internal capacitor will, of course, slow down the charging of the capacitor.  
-If you don't give the internal XADC capacitor enough time to charge, the input voltage determined by the XADC will be lower than the actual voltage of the input.
+If you don't give the internal XADC capacitor enough time to charge, the input voltage determined by the XADC will be lower than the actual input voltage.
 
 The next picture is a copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_26771_X_Ref_Target) from Zynq 7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480).
 
 <img src="pictures\UG480_fig_2-5.png" title=""  width="650">
 
-**TODO: For AUX it forms low pass filter of 250 kHz**
+**TODO: For AUX it forms low pass filter of 250 kHz. Really???**
 
 We see in the picture that in the unipolar mode the current to the capacitor goes through two internal resistances R<sub>MUX</sub>. In bipolar mode, two capacitors are used, and the current into them goes through a single internal resistance R<sub>MUX</sub>.  
 R<sub>MUX</sub> is the resistance of the analog multiplexer circuit inside the Zynq XADC. Please note that the value of R<sub>MUX</sub> for a dedicated analog input is different from the R<sub>MUX</sub> of the auxiliary inputs.  
@@ -111,7 +104,7 @@ t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7 \mskip3mu ns
 ```
 > [!IMPORTANT]
 >
-> The calculation of the acquisition times we did above is valid only for an ideal case when the only resistance present in the circuit is the resistance of the internal analog multiplexer of the Zynq XADC.
+> The calculation of the acquisition times we did above is valid only for an ideal case when the only resistance present in the circuit is the resistance of the Zynq XADC's internal analog multiplexer.
 >
 > In the next chapters, we will see a real-life example of calculating acquisition times for the development board  [Cora Z7-07S](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/), which has additional resistances in the circuitry outside the Zynq XADC. 
 
@@ -127,6 +120,8 @@ XADC can be configured to extend the settling period to 10 ADCCLK cycles (thus r
 
 Charging of the internal capacitor starts at the beginning of the conversion phase. I.e., the XADC does the conversion in parallel with sampling input voltage for the next conversion.  
 This is possible because the XADC has a separate track-and-hold amplifier (T/H). Thus, when the XADC starts to convert an input voltage, the T/H is free to start charging to the next voltage to be converted.
+
+**TODO: explain that as per documentation greater than 75% of the overall sample time being available for acquisition. See [Driving the Xilinx Analog-to-Digital Converter Application Note (XAPP795) • Viewer • AMD Technical Information Portal](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) page 4**
 
 The minimum acquisition time must fit within ADCCLK cycles of the settling and conversion phase. I.e., within 26 or 32 ADCCLK cycles.  
 Therefore, we must ensure that the ADCCLK frequency is set so that 26 or 32 ADCCLK cycles are at least acquisition time t<sub>ACQ</sub> long.
@@ -157,13 +152,15 @@ The following picture is a copy of Figure 13.2.1 from the Cora Z7 [Reference Man
 
 <img src="pictures\cora-analog-single-ended.png" title=""  width="550">
 
-We see that the analog input circuit on Cora Z7 consists of a voltage divider and a low-pass anti-aliasing filter (AAF).  
-The voltage divider allows voltage up to 3.3 V to be connected to pins A0-A5. The voltage is reduced to the 1.0 V limit of the XADC.  
-**TODO: Voltage divider not ideal, it should be 2.3 kOhm**  
+We see that the analog input circuit on Cora Z7 consists of a voltage divider and a low-pass anti-aliasing filter (AAF).   
+The voltage divider allows voltage up to 3.3 V to be connected to pins A0-A5. The voltage is reduced to the 1.0 V limit of the XADC.
+
+- To be precise, an input voltage of 3.3 V  is reduced to 0.994 V. The exact value may vary depending on how much the resistors on your particular board deviate within the tolerances. 
+
 The analog inputs A0-A5 act as single-ended inputs because negative signals VAUXN[] are tied to the board's ground.  
 The low-pass filter formed by the circuit has a cut-off frequency of 134 kHz (I simulated the circuit's frequency response in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html)).
 
-This circuit on Cora Z7 is basically the same as the one discussed in the Application Guidelines chapter [External Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) of UG480.  
+This circuit on Cora Z7 is basically the same as the one discussed in the Application Guidelines chapter [External Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) in UG480.  
 The AAF contains a 1 nF capacitor, which is orders of magnitude larger capacitance than the 3 pF sampling capacitor inside the XADC. Therefore, we can ignore the XADC sampling capacitor when determining the acquisition time.
 
 We need to determine the AAF circuit's settling time, which is the acquisition time needed for the XADC. 
@@ -251,20 +248,3 @@ Without averaging, the mean value over 10,000 samples was 2.492 V.
 
 Beware of the precision of the resistors in the Cora Z7 voltage dividers.
 
----------------------------------
-
-XADC: How many ADCCLK clocks is the acquisition time?
-
-I'm confused by the AMD documentation about XADC acquisition time.
-
-I'm using the continuous sampling mode with a so-called settling period of 4 ADCCLK clock cycles. I.e. 26 ADCCLK clocks between the conversions.
-
-According to the timing diagram in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling), the acquisition time is 22 ADCCLK clocks. See the attached screenshot.
-
-Does it mean that the settling period (4 or 10 ADCCLK clocks, depending on configuration) doesn't count into the acquisition time? That doesn't make sense. I expect they gave us the option to configure a longer settling period for the ability to extend the acquisition time.
-
-Another [source](https://support.xilinx.com/s/article/659668?language=en_US) says, "The architecture of the XADC allocates 75% of the sampling period for settling time.". But 22 clocks out of a total of 26 is 85%, not 75%.
-
-Another confusing figure is the Auxiliary Channel Full Resolution Bandwidth of only 250 kHz, as specified in [DS187](https://docs.amd.com/v/u/en-US/ds187-XC7Z010-XC7Z020-Data-Sheet). Where is 250 kHz coming from? That doesn't match with acquisition time calculated by [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) in UG480. For unipolar auxiliary input, the equation gives 540 ns acquisition time. That should be more than enough for a 1 Msps sampling rate, i.e., 500 kHz bandwidth.
-
-Last but not least, I did the practical test. The attached picture is a plot of a 33 kHz square wave signal digitized by auxiliary unipolar input on Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io) with XADC configured for 1 Msps. The plot exactly matches my simulation in LTspice. The anti-aliasing filter for the given channel on Cora Z7 has a settling time of 15.2  μs. The XADC captured the waveform correctly at 1 Msps. It doesn't seem to suffer from insufficient acquisition time.
