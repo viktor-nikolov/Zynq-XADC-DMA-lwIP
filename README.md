@@ -8,6 +8,7 @@ The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain.
 
 ## TODOs, to be removed
 
+- Oversampling: https://www.silabs.com/documents/public/application-notes/an118.pdf
 - [Zynq-7000 SoC (Z-7007S, Z-7012S, Z-7014S, Z-7010, Z-7015, and Z-7020): DC and AC Switching Characteristics Data Sheet(DS187) • Viewer • AMD Technical Information Portal](https://docs.amd.com/v/u/en-US/ds187-XC7Z010-XC7Z020-Data-Sheet)
   - Auxiliary Channel Full Resolution Bandwidth is 250 kHz
 - calibration:
@@ -248,3 +249,4 @@ Without averaging, the mean value over 10,000 samples was 2.492 V.
 
 Beware of the precision of the resistors in the Cora Z7 voltage dividers.
 
+<img src="pictures\test.png" title="" >
