@@ -249,4 +249,8 @@ Without averaging, the mean value over 10,000 samples was 2.492 V.
 
 Beware of the precision of the resistors in the Cora Z7 voltage dividers.
 
-<img src="pictures\test.png" title="" >
+<img src="pictures\test.png"  >
+
+bla bla bla
+
+<img src="pictures\test2.png">
