@@ -46,7 +46,7 @@ A channel may operate in unipolar or bipolar mode.
 - The voltage on V<sub>P</sub> (measured with respect to V<sub>N</sub>) must always be positive. I.e., the XADC output is a value between 0 V and 1.0 V
 - V<sub>N</sub> is typically connected to a local ground or common mode signal.
 
-#### Bipolar mode
+##### Bipolar mode
 
 - This mode can accommodate input signals driven from a true differential source.
 - The differential analog input (V<sub>P</sub> &minus; V<sub>N</sub>) can have a maximum input range of ±0.5V. I.e., the XADC output has a value between &minus;0.5 V and 0.5 V.
