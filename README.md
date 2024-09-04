@@ -83,10 +83,17 @@ The ADC circuitry within the XADC is driven by the clock ADCCLK, which is derive
 The divider ratio can be configured dynamically by the function [XSysMon_SetAdcClkDivisor()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L1089).
 
 In the default XADC setup of Continuous Sampling mode, 26 ADCCLK cycles are required to acquire an analog signal and perform a conversion.  
-The 26 ADCCLK cycle period can be extended to 32 cycles by configuration. See the boolean parameter IncreaseAcqCycles of the [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586). The parameter controls duration of so called settling period (this is how <u>only</u> [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) calls it) which is 4 ADCCLK cycles by default and can be extended to 10 cycles.
+The 26 ADCCLK cycle period can be extended to 32 cycles by configuration. See the boolean parameter IncreaseAcqCycles of the [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586). The parameter controls the duration of the so-called settling period (this is what [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) calls it), which is 4 ADCCLK cycles by default and can be extended to 10 cycles.
 
-The first 4 ADCCLK cycles are the so-called settling period, and they are followed by 22 ADCCLK cycles of the so-called conversion phase, during which the XADC does the conversion and generates the output value.  
-XADC can be configured to extend the settling period to 10 ADCCLK cycles (thus resulting in a total of 32 ADCCLK cycles for acquisition and conversion).
+> [!NOTE]
+>
+> Don't be confused by the different vocabulary used in Xillinx products regarding this 4 or 10 ADCCLK period within the XADC's acquisition and conversion cycle.  
+> [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) calls it a "settling period," but it is called "Acquisition Time" in the UI of XADC Wizard IP in Vivado and in comments in the [xsysmon.c](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c).  
+> However, Figure 4 in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) clearly shows that the acquisition time is longer than 4 or 10 ADCCLK clocks.
+>
+> The "settling period" is probably the best term for the reasons I explain later in this text.
+
+
 
 ## Acquisition time
 
