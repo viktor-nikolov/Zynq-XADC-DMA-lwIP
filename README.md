@@ -22,6 +22,8 @@ Cora Z7 has VREFP and VREFN connected to ADCGND
 
 ## A short introduction to Zynq 7000 XADC
 
+### What is XADC
+
 The XADC is a feature of an analog-to-digital converter integrated on selected Xilinx FPGA chips, including Zynq 7000. This ADC has two basic capabilities
 
 1.  The System Monitor (SYSMON) reads the Zynq chip temperature and voltages of various Zynq power rails.
@@ -40,13 +42,13 @@ Each channel has two input signals because it is a differential input channel. A
 
 A channel may operate in unipolar or bipolar mode.
 
-#### Unipolar mode
+#### Unipolar mode channel
 
 - The differential analog inputs (V<sub>P</sub> and V<sub>N</sub>) have an input range of 0 V to 1.0 V.
 - The voltage on V<sub>P</sub> (measured with respect to V<sub>N</sub>) must always be positive. I.e., the XADC output is a value between 0 V and 1.0 V
 - V<sub>N</sub> is typically connected to a local ground or common mode signal.
 
-##### Bipolar mode
+#### Bipolar mode channel
 
 - This mode can accommodate input signals driven from a true differential source.
 - The differential analog input (V<sub>P</sub> &minus; V<sub>N</sub>) can have a maximum input range of ±0.5V. I.e., the XADC output has a value between &minus;0.5 V and 0.5 V.
@@ -54,10 +56,7 @@ A channel may operate in unipolar or bipolar mode.
 
 See the chapter [Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) of [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC) for more details on unipolar and bipolar inputs.
 
-Zynq 7000 XADC is a 12-bit ADC. However, the XADC [status registers](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Status-Registers) storing the conversion result are 16-bit, and the function [XSysMon_GetAdcData](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L331) also returns a 16-bit value.
-In general, the 12 most significant bits of the register are the converted XADC sample. Do ignore the 4 least significant bits.
-
-It is possible to configure the XADC to do an averaging of consecutive 16, 64 or 256 samples (function [XSysMon_SetAvg](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L488)). I.e., to do the oversampling. The 4 least significant bits are then used to represent the averaged value with enhanced precision, i.e., the whole 16 bits of a status register can be used.
+### Configuration
 
 To use the XADC, you need to instantiate an [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) in your HW design.  
 If you don't need to modify the XADC configuration during runtime, you can do all the needed setup in the XADC Wizzard IP configuration.  
@@ -66,6 +65,17 @@ Alternatively, you can configure XADC by calling functions defined in [xsysmon.h
 The Zynq 7000 XADC can run in several operating modes, see the [relevant chapter](https://docs.amd.com/r/en-US/ug480_7Series_XADC/XADC-Operating-Modes) of the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC).  
 In this tutorial, we will use the simplest one, the Single Channel Mode.  
 We will also configure the XADC for Continuous Sampling. In this timing mode, the XADC performs the conversions one after another, generating a stream of data that we will process through the DMA.
+
+### Bit resolution
+
+Zynq 7000 XADC is a 12-bit ADC. However, the XADC [status registers](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Status-Registers) storing the conversion result are 16-bit, and the function [XSysMon_GetAdcData](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L331) also returns a 16-bit value.
+In general, the 12 most significant bits of the register are the converted XADC sample. Do ignore the 4 least significant bits.
+
+It is possible to configure the XADC to do an averaging of consecutive 16, 64 or 256 samples (function [XSysMon_SetAvg](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L488)). I.e., to do the oversampling. The 4 least significant bits are then used to represent the averaged value with enhanced precision, i.e., the whole 16 bits of a status register can be used.
+
+### Clocking and sampling rate
+
+bla bla bla
 
 ## Acquisition time
 
