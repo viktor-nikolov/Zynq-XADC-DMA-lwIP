@@ -60,7 +60,8 @@ See the chapter [Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/
 
 To use the XADC, you need to instantiate an [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) in your HW design.  
 If you don't need to modify the XADC configuration during runtime, you can do all the needed setup in the XADC Wizzard IP configuration.  
-Alternatively, you can configure XADC by calling functions defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). This allows you to change the configuration during runtime (e.g., switching between the channels). We will use this method of configuration in this tutorial.
+Alternatively, you can configure XADC by calling functions defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h) (this applies to programs running in PS and XADC Wizard configured to have AXI4Lite interface). Functions from [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h) allow you to change the configuration during runtime (e.g., switching between the channels). We will use this method of configuration in this tutorial.
+If you need to control the XADC from FPGA logic, the use of the [dynamic reconfiguration port](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Dynamic-Reconfiguration-Port-DRP-Timing) (DRP) interface is recommended. DRP is outside of the scope of this tutorial.
 
 The Zynq 7000 XADC can run in several operating modes, see the [relevant chapter](https://docs.amd.com/r/en-US/ug480_7Series_XADC/XADC-Operating-Modes) of the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC).  
 In this tutorial, we will use the simplest one, the Single Channel Mode.  
@@ -73,9 +74,19 @@ In general, the 12 most significant bits of the register are the converted XADC 
 
 It is possible to configure the XADC to do an averaging of consecutive 16, 64 or 256 samples (function [XSysMon_SetAvg](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L488)). I.e., to do the oversampling. The 4 least significant bits are then used to represent the averaged value with enhanced precision, i.e., the whole 16 bits of a status register can be used.
 
-### Clocking and sampling rate
+### Clocking, sampling rate, and bandwidth
 
-bla bla bla
+The XADC is driven by the input clock DCLK.  
+When the XADC Wizard is configured to have an AIX4Lite interface (which is what we will do), the DCLK is driven by the s_axi_aclk clock of the AXI interface.
+
+The ADC circuitry within the XADC is driven by the clock ADCCLK, which is derived from DCLK by a configurable ratio divider. The minimum possible divider ratio is 2, and the maximal divider ratio is 255.  
+The divider ratio can be configured dynamically by the function [XSysMon_SetAdcClkDivisor()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L1089).
+
+In the default XADC setup of Continuous Sampling mode, 26 ADCCLK cycles are required to acquire an analog signal and perform a conversion.  
+The 26 ADCCLK cycle period can be extended to 32 cycles by configuration. See the boolean parameter IncreaseAcqCycles of the [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586). The parameter controls duration of so called settling period (this is how <u>only</u> [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) calls it) which is 4 ADCCLK cycles by default and can be extended to 10 cycles.
+
+The first 4 ADCCLK cycles are the so-called settling period, and they are followed by 22 ADCCLK cycles of the so-called conversion phase, during which the XADC does the conversion and generates the output value.  
+XADC can be configured to extend the settling period to 10 ADCCLK cycles (thus resulting in a total of 32 ADCCLK cycles for acquisition and conversion).
 
 ## Acquisition time
 
@@ -123,14 +134,6 @@ t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7 \mskip3mu ns
 > In the next chapters, we will see a real-life example of calculating acquisition times for the development board  [Cora Z7-07S](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/), which has additional resistances in the circuitry outside the Zynq XADC. 
 
 To understand how the calculated acquisition time translates to XADC configuration, we need to see how the XADC works in terms of input clock and timing.
-
-**TODO**  
-**How the input clock DCLK translates to ADCCLK.**
-
-In the default XADC setup of Continuous Sampling mode, 26 ADCCLK cycles are required to acquire an analog signal and perform a conversion.
-
-The first 4 ADCCLK cycles are the so-called settling period, and they are followed by 22 ADCCLK cycles of the so-called conversion phase, during which the XADC does the conversion and generates the output value.  
-XADC can be configured to extend the settling period to 10 ADCCLK cycles (thus resulting in a total of 32 ADCCLK cycles for acquisition and conversion).
 
 Charging of the internal capacitor starts at the beginning of the conversion phase. I.e., the XADC does the conversion in parallel with sampling input voltage for the next conversion.  
 This is possible because the XADC has a separate track-and-hold amplifier (T/H). Thus, when the XADC starts to convert an input voltage, the T/H is free to start charging to the next voltage to be converted.
