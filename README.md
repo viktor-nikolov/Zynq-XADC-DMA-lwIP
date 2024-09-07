@@ -128,8 +128,6 @@ Xilinx is giving us [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ
 ```math
 t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}\newline
 ```
-&nbsp;
-
 Factor 9 is the so-called time constant. It is derived from $`TC=\ln(2^{N+m})`$ , where $`N=12`$ for a 12-bit system and $m=1$ additional resolution bit.  
 R<sub>MUX</sub> for an auxiliary input is 10 kΩ.  
 C<sub>SAMPLE</sub> is specified by Xilinx as 3 pF.
@@ -138,6 +136,8 @@ Therefore, we calculate the minimum acquisition time t<sub>ACQ</sub> for an unip
 ```math
 t_{ACQ} = 9 \times ( 10000 + 10000 ) \times 3 \times 10^{-12} = 540 \mskip3mu ns
 ```
+&nbsp;
+
 For minimum acquisition time in bipolar mode, Xilinx is giving the [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs):
 ```math
 t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}
