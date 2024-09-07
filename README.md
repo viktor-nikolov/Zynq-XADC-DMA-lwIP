@@ -109,7 +109,7 @@ You can sample an auxiliary channel at 1 Msps. However, signals with a frequency
 
 The data sheet doesn't mention the bandwidth of the dedicated analog input channel V<sub>P</sub> /V<sub>N</sub>. We can assume that it is at least 500 kHz (i.e., the [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) for 1 Msps ADC).
 
-## Acquisition time
+## Acquisition and settling time—the theory
 
 The principle of XADC operation is charging an internal capacitor to a voltage equal to the voltage of the analog input being measured. Any electrical resistance between the input voltage and the internal capacitor will, of course, slow down the charging of the capacitor.  
 If you don't give the internal XADC capacitor enough time to charge, the input voltage determined by the XADC will be lower than the actual input voltage.
