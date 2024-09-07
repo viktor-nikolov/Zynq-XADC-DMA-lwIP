@@ -137,10 +137,13 @@ Therefore, we calculate the minimum acquisition time t<sub>ACQ</sub> for an unip
 ```math
 t_{ACQ} = 9 \times ( 10000 + 10000 ) \times 3 \times 10^{-12} = 540 \mskip3mu ns
 ```
+
 For minimum acquisition time in bipolar mode, Xilinx is giving the [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs):
 ```math
 t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}
 ```
+
+
 For a dedicated analog input, R<sub>MUX</sub> equals 100 Ω. This gives us the following value of the minimum acquisition time of a bipolar dedicated input:
 ```math
 t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7 \mskip3mu ns
@@ -150,8 +153,6 @@ t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7 \mskip3mu ns
 > The calculation of the acquisition times we did above is valid only for an ideal case when the only resistance present in the circuit is the resistance of the Zynq XADC's internal analog multiplexer.
 >
 > In most cases, this is not true because you need an [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter), i.e., a low pass filter, which will eliminate frequencies higher than the [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) in the input signal.
-
-
 
 **TODO: explain that as per documentation greater than 75% of the overall sample time being available for acquisition. See [Driving the Xilinx Analog-to-Digital Converter Application Note (XAPP795) • Viewer • AMD Technical Information Portal](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) page 4**
 
