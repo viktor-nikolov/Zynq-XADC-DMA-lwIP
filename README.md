@@ -128,7 +128,7 @@ Xilinx is giving us [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ
 ```math
 t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}
 ```
-Factor 9 is the time constant. It is derived from $`\TC=ln(2^{N+m})`$ TC = Ln 2(N + m), where N = 12 for a 12-bit system and m = 1 additional resolution bit.
+Factor 9 is the time constant. It is derived from $`TC=\ln(2^{N+m})`$ , where $`N=12`$  N = 12 for a 12-bit system and m = 1 additional resolution bit.
 R<sub>MUX</sub> for an auxiliary input is 10 kΩ.  
 C<sub>SAMPLE</sub> is specified by Xilinx as 3 pF.  
 Therefore, we calculate the minimum acquisition time t<sub>ACQ</sub> for an unipolar auxiliary input as follows:
