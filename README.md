@@ -130,7 +130,8 @@ t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}
 ```
 Factor 9 is the so-called time constant. It is derived from $`TC=\ln(2^{N+m})`$ , where $`N=12`$ for a 12-bit system and $m=1$ additional resolution bit.  
 R<sub>MUX</sub> for an auxiliary input is 10 kΩ.  
-C<sub>SAMPLE</sub> is specified by Xilinx as 3 pF.  
+C<sub>SAMPLE</sub> is specified by Xilinx as 3 pF.
+
 Therefore, we calculate the minimum acquisition time t<sub>ACQ</sub> for an unipolar auxiliary input as follows:
 
 ```math
@@ -148,22 +149,15 @@ t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7 \mskip3mu ns
 >
 > The calculation of the acquisition times we did above is valid only for an ideal case when the only resistance present in the circuit is the resistance of the Zynq XADC's internal analog multiplexer.
 >
-> In the next chapters, we will see a real-life example of calculating acquisition times for the development board  [Cora Z7-07S](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/), which has additional resistances in the circuitry outside the Zynq XADC. 
+> In most cases, this is not true because you need an [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter), i.e., a low pass filter, which will eliminate frequencies higher than the [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) in the input signal.
 
-To understand how the calculated acquisition time translates to XADC configuration, we need to see how the XADC works in terms of input clock and timing.
 
-Charging of the internal capacitor starts at the beginning of the conversion phase. I.e., the XADC does the conversion in parallel with sampling input voltage for the next conversion.  
-This is possible because the XADC has a separate track-and-hold amplifier (T/H). Thus, when the XADC starts to convert an input voltage, the T/H is free to start charging to the next voltage to be converted.
 
 **TODO: explain that as per documentation greater than 75% of the overall sample time being available for acquisition. See [Driving the Xilinx Analog-to-Digital Converter Application Note (XAPP795) • Viewer • AMD Technical Information Portal](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) page 4**
 
-The minimum acquisition time must fit within ADCCLK cycles of the settling and conversion phase. I.e., within 26 or 32 ADCCLK cycles.  
-Therefore, we must ensure that the ADCCLK frequency is set so that 26 or 32 ADCCLK cycles are at least acquisition time t<sub>ACQ</sub> long.
+TBD
 
 This is not a problem for acquisition times of unipolar auxiliary input (540 ns) and bipolar dedicated input (2.7 ns), which we calculated using [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) or [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2).
-
-The maximum possible ADCCLK frequency is 26 MHz. 26 clocks of this frequency take 1 &mu;s, which is more than the needed acquisition time. In this case, we could run the XADC at the maximum sampling rate of 1&nbsp;Msps.  
-Please note that this may not be the case in circuits with additional resistances in the path of analog inputs. As we will see in the next chapter, a low-pass anti-aliasing filter can significantly increase the required acquisition time.
 
 
 ### Unipolar input acquisition time of Cora Z7
