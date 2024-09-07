@@ -1,7 +1,7 @@
 # Tutorial: Xilinx Zynq XADC using DMA and network streaming
-This tutorial shows how to do a HW design and code a SW application to make use of AMD Xilinx Zynq 7000 [XADC](https://www.xilinx.com/products/technology/analog-mixed-signal.html). We will also see how to use the [DMA](https://www.xilinx.com/products/intellectual-property/axi_dma.html) to transfer data from the XADC into Zynq CPU's memory and stream data to a remote server over the network.
+This tutorial shows how to do a HW design and code a SW application to make use of AMD Xilinx Zynq-7000 [XADC](https://www.xilinx.com/products/technology/analog-mixed-signal.html). We will also see how to use the [DMA](https://www.xilinx.com/products/intellectual-property/axi_dma.html) to transfer data from the XADC into Zynq CPU's memory and stream data to a remote server over the network.
 
-In this tutorial, I'm using the Digilent board [Cora Z7-07S](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/). However, all the principles described here can be used on any other Zynq 7000 board. I will highlight aspects specific to Cora Z7 in the text.  
+In this tutorial, I'm using the Digilent board [Cora Z7-07S](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/). However, all the principles described here can be used on any other Zynq-7000 board. I will highlight aspects specific to Cora Z7 in the text.  
 The Cora Z7 is a suitable board for testing the Zynq XADC because it has analog inputs that are usable in a practical way.
 
 The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain.
@@ -9,10 +9,7 @@ The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain.
 ## TODOs, to be removed
 
 - Oversampling: https://www.silabs.com/documents/public/application-notes/an118.pdf
-- [Zynq-7000 SoC (Z-7007S, Z-7012S, Z-7014S, Z-7010, Z-7015, and Z-7020): DC and AC Switching Characteristics Data Sheet(DS187) • Viewer • AMD Technical Information Portal](https://docs.amd.com/v/u/en-US/ds187-XC7Z010-XC7Z020-Data-Sheet)
-  - Auxiliary Channel Full Resolution Bandwidth is 250 kHz
 - calibration:
-
   - [53586 - Zynq and 7-Series XADC Gain Calibration Behaviour with Internal Voltage Reference (xilinx.com)](https://support.xilinx.com/s/article/53586?language=en_US)
   - [The analog input for XADC calibration in 7 series FPGA (xilinx.com)](https://support.xilinx.com/s/question/0D52E00006hpPXlSAM/the-analog-input-for-xadc-calibration-in-7-series-fpga?language=en_US)
 
@@ -20,11 +17,11 @@ Cora Z7 has VREFP and VREFN connected to ADCGND
 
 - The XADC also has an on-chip reference option which is selected by connecting VREFP and VREFN to ADCGND as shown in Figure 6-1. Due to reduced accuracy, the on-chip reference does impact the measurement performance of the XADC as explained previously
 
-## A short introduction to Zynq 7000 XADC
+## A short introduction to Zynq-7000 XADC
 
 ### What is XADC
 
-The XADC is a feature of an analog-to-digital converter integrated on selected Xilinx FPGA chips, including Zynq 7000. This ADC has two basic capabilities
+The XADC is a feature of an analog-to-digital converter integrated on selected Xilinx FPGA chips, including Zynq-7000. This ADC has two basic capabilities
 
 1.  The System Monitor (SYSMON) reads the Zynq chip temperature and voltages of various Zynq power rails.
 1.  The XADC reads voltages from external inputs, which are called channels.
@@ -32,7 +29,7 @@ The XADC is a feature of an analog-to-digital converter integrated on selected X
 In this tutorial, we will focus solely on XADC. But please don't get confused, Xilinx library functions for controlling XADC are defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h).
 
 XADC can read one external input (channel) at a time and provides a means for switching between channels.  
-The Zynq 7000 XADC has one dedicated analog input channel called V<sub>P</sub> /V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0..15].
+The Zynq-7000 XADC has one dedicated analog input channel called V<sub>P</sub> /V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0..15].
 Each channel has two input signals because it is a differential input channel. A positive differential input is denoted V<sub>P</sub> or VAUXP, and a negative one is denoted V<sub>N</sub> or VAUXN.
 
 > [!WARNING]
@@ -63,13 +60,13 @@ If you don't need to modify the XADC configuration during runtime, you can do al
 Alternatively, you can configure XADC by calling functions defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h) (this applies to programs running in PS and XADC Wizard configured to have AXI4Lite interface). Functions from [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h) allow you to change the configuration during runtime (e.g., switching between the channels). We will use this method of configuration in this tutorial.  
 If you need to control the XADC from FPGA logic, the use of the [dynamic reconfiguration port](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Dynamic-Reconfiguration-Port-DRP-Timing) (DRP) interface is recommended. DRP is outside of the scope of this tutorial.
 
-The Zynq 7000 XADC can run in several operating modes, see the [relevant chapter](https://docs.amd.com/r/en-US/ug480_7Series_XADC/XADC-Operating-Modes) of the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC).  
+The Zynq-7000 XADC can run in several operating modes, see the [relevant chapter](https://docs.amd.com/r/en-US/ug480_7Series_XADC/XADC-Operating-Modes) of the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC).  
 In this tutorial, we will use the simplest one, the Single Channel Mode.  
 We will also configure the XADC for Continuous Sampling. In this timing mode, the XADC performs the conversions one after another, generating a stream of data that we will process through the DMA.
 
 ### Bit resolution
 
-Zynq 7000 XADC is a 12-bit ADC. However, the XADC [status registers](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Status-Registers) storing the conversion result are 16-bit, and the function [XSysMon_GetAdcData](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L331) also returns a 16-bit value.
+Zynq-7000 XADC is a 12-bit ADC. However, the XADC [status registers](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Status-Registers) storing the conversion result are 16-bit, and the function [XSysMon_GetAdcData](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L331) also returns a 16-bit value.
 In general, the 12 most significant bits of the register are the converted XADC sample. Do ignore the 4 least significant bits.
 
 It is possible to configure the XADC to do an averaging of consecutive 16, 64 or 256 samples (see function [XSysMon_SetAvg](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L488)). I.e., to do the oversampling. The 4 least significant bits are then used to represent the averaged value with enhanced precision, i.e., the whole 16 bits of a status register can be used.  
@@ -94,20 +91,30 @@ The 26 ADCCLK cycle period can be extended to 32 cycles by configuration. See th
 >
 > The "settling period" is probably the best term for the reasons I explain later in this text.
 
-
-
-## Acquisition time
+The XADC maximum sampling rate is 1&nbsp;Msps.  
+This is achieved by having 104 MHz DCLK and the divider ratio set to 4. This results in the highest possible ADCCLK frequency of 26 MHz. Using 26 ADCCLK cycles for single conversion then gives 1 Msps.
 
 > [!IMPORTANT]
 >
-> The XADC's rated maximum sampling frequency is 1 Msps. But it doesn't mean that you can run the XADC on 1&nbsp;Msps in all circumstances!
+> XADC can run at 1 Msps, but that doesn't mean it's wise to run it at 1&nbsp;Msps in all circumstances. It very much depends on the circuitry before the XADC and the characteristics of the input signal.
+> I will explore this topic in the next chapters.
+
+> [!IMPORTANT]
 >
-> The XADC sampling frequency must be carefully determined to allow sufficient acquisition time, given the properties of the circuit you are using. It requires a bit of math, as we explain in this chapter.
+> The guaranteed analog bandwidth of auxiliary channels is only 250 kHz.
+> The Zynq-7000 SoC [Data Sheet DS187](https://docs.amd.com/v/u/en-US/ds187-XC7Z010-XC7Z020-Data-Sheet) states on page 68 that Auxiliary Channel Full
+> Resolution Bandwidth is 250 kHz.
+
+You can sample an auxiliary channel at 1 Msps. However, signals with a frequency higher than 250 kHz are not guaranteed to be precisely recorded. This seems to be an analog bandwidth limitation of Zynq-7000 circuits related to auxiliary channels.
+
+The data sheet doesn't mention the bandwidth of the dedicated analog input channel V<sub>P</sub> /V<sub>N</sub>. We can assume that it is at least 500 kHz (i.e., the [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) for 1 Msps ADC).
+
+## Acquisition time
 
 The principle of XADC operation is charging an internal capacitor to a voltage equal to the voltage of the analog input being measured. Any electrical resistance between the input voltage and the internal capacitor will, of course, slow down the charging of the capacitor.  
 If you don't give the internal XADC capacitor enough time to charge, the input voltage determined by the XADC will be lower than the actual input voltage.
 
-The next picture is a copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_26771_X_Ref_Target) from Zynq 7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480).
+The next picture is a copy of [Figure 2-5](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_26771_X_Ref_Target) from Zynq-7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC), chapter "Analog Input Description" (page 22 of the PDF version of UG480).
 
 <img src="pictures\UG480_fig_2-5.png" title=""  width="650">
 
@@ -153,7 +160,7 @@ Therefore, we must ensure that the ADCCLK frequency is set so that 26 or 32 ADCC
 
 This is not a problem for acquisition times of unipolar auxiliary input (540 ns) and bipolar dedicated input (2.7 ns), which we calculated using [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) or [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2).
 
-The maximum possible ADCLK frequency is 26 MHz. 26 clocks of this frequency take 1 &mu;s, which is more than the needed acquisition time. In this case, we could run the XADC at the maximum sampling rate of 1&nbsp;Msps.  
+The maximum possible ADCCLK frequency is 26 MHz. 26 clocks of this frequency take 1 &mu;s, which is more than the needed acquisition time. In this case, we could run the XADC at the maximum sampling rate of 1&nbsp;Msps.  
 Please note that this may not be the case in circuits with additional resistances in the path of analog inputs. As we will see in the next chapter, a low-pass anti-aliasing filter can significantly increase the required acquisition time.
 
 
@@ -210,7 +217,7 @@ Further details on how the equation was constructed can be found in the Applicat
 
 **TODO:**  
 
-**Determine the DCLK and ADCLK**  
+**Determine the DCLK and ADCCLK**  
 We need ADCCLK 1713.6 kHz.
 
 We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898&nbsp;MHz. 
@@ -219,7 +226,7 @@ We need to find an XADC input frequency DCLK, which, divided by an integer, resu
 Using a Clocking Wizard, we are able to generate an output frequency of 95.363 MHz (with the Wizard clocked by 50&nbsp;MHz from the Zynq FCLK_CLK0).  
 95.363 MHz divided by 6 gives us a DCLK of 15.894 MHz, which is very close to the value we desire.
 
-With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 ksps (a single conversion cycle will take 32 ADCLKs).
+With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 ksps (a single conversion cycle will take 32 ADCCLKs).
 
 ### Bipolar input acquisition time of Cora Z7
 
@@ -243,7 +250,7 @@ t_{ACQ} = 9 \times ( 100 + 140) \times 3 \times 10^{-12} = 6.5\mskip3muns
 This would allow us to use a sampling rate of 1 Msps because, with the ADCCLK frequency of 26&nbsp;MHz and 4 ADCCLKs allowed for the acquisition, we get 150&nbsp;ns acquisition time, which is more than enough.
 
 However, in our design, we are limited to using an ADCCLK frequency of 23.84&nbsp;MHz (95.363&nbsp;MHz divided by 4) because we must use an XADC clock of 95.363&nbsp;MHz to achieve the 629&nbsp;ns acquisition time for the unipolar input as described in the previous chapter.  
-Therefore, the resulting sampling rate will be 917 ksps (a single conversion cycle will take 26 ADCLKs).
+Therefore, the resulting sampling rate will be 917 ksps (a single conversion cycle will take 26 ADCCLKs).
 
 ## Calibration
 
