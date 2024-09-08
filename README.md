@@ -242,9 +242,9 @@ The following picture is a copy of Figure 13.2.3 from the Cora Z7 [Reference Man
 >
 > The dedicated analog input channel on Cora Z7 is less protected than auxiliary channels A0-A5. There is no voltage divider. Therefore, both V<sub>P</sub> and V<sub>N</sub> must always be within a range from 0 V to 1.0 V with respect to the board's GND. Also, the differential V<sub>P</sub> &minus; V<sub>N</sub> must be within the range of ±0.5V.
 
-The capacitor and the resistors form a low-pass filter with a cutoff frequency of 569 kHz (which is almost an AAF for the 500 kHz Nyquist frequency).
+The capacitor and the resistors form a low-pass filter with a cutoff frequency of 802 kHz (I simulated the circuit's frequency response in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html)).
 
-**TODO: LT spice simulated 801 kHz.** in contrary to [cutoff frequency of low pass filter with two resistors (differential signal) - Electrical Engineering Stack Exchange](https://electronics.stackexchange.com/questions/219202/cutoff-frequency-of-low-pass-filter-with-two-resistors-differential-signal)
+**TODO: this formula calculated 569 kHz.** in contrary to [cutoff frequency of low pass filter with two resistors (differential signal) - Electrical Engineering Stack Exchange](https://electronics.stackexchange.com/questions/219202/cutoff-frequency-of-low-pass-filter-with-two-resistors-differential-signal)
 
 
 
