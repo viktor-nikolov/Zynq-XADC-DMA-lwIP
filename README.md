@@ -17,6 +17,16 @@ Cora Z7 has VREFP and VREFN connected to ADCGND
 
 - The XADC also has an on-chip reference option which is selected by connecting VREFP and VREFN to ADCGND as shown in Figure 6-1. Due to reduced accuracy, the on-chip reference does impact the measurement performance of the XADC as explained previously
 
+
+
+We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898&nbsp;MHz. 
+We need to find an XADC input frequency DCLK, which, divided by an integer, results in a frequency close to 15.898&nbsp;MHz.
+
+Using a Clocking Wizard, we are able to generate an output frequency of 95.363 MHz (with the Wizard clocked by 50&nbsp;MHz from the Zynq FCLK_CLK0).  
+95.363 MHz divided by 6 gives us a DCLK of 15.894 MHz, which is very close to the value we desire.
+
+With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 ksps (a single conversion cycle will take 32 ADCCLKs).
+
 ## A short introduction to Zynq-7000 XADC
 
 ### What is XADC
@@ -192,7 +202,8 @@ The low-pass filter formed by the circuit has a cut-off frequency of 134 kHz (I 
 This circuit on Cora Z7 is basically the same as the one discussed in the Application Guidelines chapter [External Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) in UG480.  
 The AAF contains a 1 nF capacitor, which is orders of magnitude larger capacitance than the 3 pF sampling capacitor inside the XADC. Therefore, we can ignore the XADC sampling capacitor when determining the acquisition time.
 
-We need to determine the AAF circuit's settling time, which is the acquisition time needed for the XADC to acquire the input signal with the desired precision.
+We need to determine the AAF circuit's settling time, which is the acquisition time needed for the XADC to acquire the input signal with the desired precision.  
+When the input analog signal changes to a new value, the settling time is the time it takes the circuit to settle to this new value on its output. Meaning, settle close enough for acquiring the new value with 12-bit precision.
 
 We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/8erAzNpWEDQ8zWWH_EdtFg?section=XREF_11532_Equation2_5) from [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) to adapt it to the resistances of Cora Z7 analog input:
 
@@ -205,31 +216,20 @@ The term $`{2320 \times 1000} \over {2300 + 1000 }`$ is the output impedance of 
 
 The terms 140 and 845 are the resistors on the analog inputs.
 
+The factor $`1 \times 10^{-9}`$ is capacitance of AAF's capacitor.
+
 Further details on how the equation was constructed can be found in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc).
+
+In theory, the settling time of 15.1725 μs allows for a 65.909 kHz sampling rate. In the later chapter, we will explore how the circuit behaves in practice.
 
 > [!IMPORTANT]
 >
-> Please note that any additional resistance of circuitry you connect to the Cora Z7's pins A0-A5 can further increase the acquisition time needed.  
+> Please note that any additional resistance of circuitry you connect to the Cora Z7's pins A0-A5 can further increase the settling time needed.  
 > In order to achieve a reliable measurement, the voltage source connected to pins A0-A5 must act as having low internal resistance.
 
+### Settling time of bipolar input of Cora Z7
 
-
-**TODO:**  
-
-**Determine the DCLK and ADCCLK**  
-We need ADCCLK 1713.6 kHz.
-
-We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898&nbsp;MHz. 
-We need to find an XADC input frequency DCLK, which, divided by an integer, results in a frequency close to 15.898&nbsp;MHz.
-
-Using a Clocking Wizard, we are able to generate an output frequency of 95.363 MHz (with the Wizard clocked by 50&nbsp;MHz from the Zynq FCLK_CLK0).  
-95.363 MHz divided by 6 gives us a DCLK of 15.894 MHz, which is very close to the value we desire.
-
-With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 ksps (a single conversion cycle will take 32 ADCCLKs).
-
-### Bipolar input acquisition time of Cora Z7
-
-Equation 2-1 from UG480 for acquisition time in unipolar mode:
+Equation 2-1 from UG480  [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) for acquisition time in unipolar mode:
 ```math
 t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}
 ```
