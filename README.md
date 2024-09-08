@@ -153,16 +153,16 @@ t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7 \mskip3mu ns
 >
 > In most cases, this is not true because you need an [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter), i.e., a low pass filter, which will eliminate frequencies higher than the [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) in the input signal.
 
-**TODO: explain that as per documentation greater than 75% of the overall sample time being available for acquisition. See [Driving the Xilinx Analog-to-Digital Converter Application Note (XAPP795) • Viewer • AMD Technical Information Portal](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) page 4**
+But how does the calculated acquisition time translate to the possible sampling rate?  
+The hint for that can be found in the Driving the Xilinx Analog-to-Digital Converter Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc). This note explains on page 4 that XADC is able to acquire the next sample (i.e., charge the internal capacitor) during the conversion of the current sample. At least 75% of the overall sample time is available for the acquisition.
 
-TBD
+When the XADC runs at a maximum sample rate of 1 Msps, the duration of a single sample is 1 μs, and 75% of that is 750 ns.  
+[Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) and [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) gave us an acquisition time of unipolar auxiliary input of 540 ns and bipolar dedicated input of 2.7 ns. This is well below the 750 ns. So there seems to be no problem until you add an [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter) (AAF) on the input. The next chapter explains how AAF changes the acquisition time requirements.
 
-This is not a problem for acquisition times of unipolar auxiliary input (540 ns) and bipolar dedicated input (2.7 ns), which we calculated using [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) or [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2).
 
+### Settling time of unipolar input AAF of Cora Z7
 
-### Unipolar input acquisition time of Cora Z7
-
-Let's analyze the acquisition time of unipolar analog input circuitry of the Digilent [Cora Z7](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/) development board.
+In this chapter, I will discuss the unipolar analog input circuitry of the Digilent [Cora Z7](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/) development board. Nevertheless, the very same principles apply to any Zynq-7000 board with a passive [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter) (AAF) on analog inputs.
 
 The pins labeled A0-A5 on the Cora Z7 board can be used as digital I/O pins or analog input pins for the auxiliary channels. How the given pin is used (digital vs. analog) is controlled by a constraint specified in the HW design.  
 The following table lists the assignment of Cora Z7 pins to the XADC auxiliary channels.
@@ -191,7 +191,7 @@ The low-pass filter formed by the circuit has a cut-off frequency of 134 kHz (I 
 This circuit on Cora Z7 is basically the same as the one discussed in the Application Guidelines chapter [External Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) in UG480.  
 The AAF contains a 1 nF capacitor, which is orders of magnitude larger capacitance than the 3 pF sampling capacitor inside the XADC. Therefore, we can ignore the XADC sampling capacitor when determining the acquisition time.
 
-We need to determine the AAF circuit's settling time, which is the acquisition time needed for the XADC. 
+We need to determine the AAF circuit's settling time, which is the acquisition time needed for the XADC to acquire the input signal with the desired precision.
 
 We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/8erAzNpWEDQ8zWWH_EdtFg?section=XREF_11532_Equation2_5) from [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) to adapt it to the resistances of Cora Z7 analog input:
 
@@ -202,7 +202,9 @@ The term $`\ln(2^{12+1})`$ is the number of time constants needed for 12-bit res
 
 The term $`{2320 \times 1000} \over {2300 + 1000 }`$ is the output impedance of the voltage divider.
 
-Further details on how the equation was constructed can be found in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) "Driving the Xilinx Analog-to-Digital Converter".
+The terms 140 and 845 are the resistors on the analog inputs.;
+
+Further details on how the equation was constructed can be found in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc).
 
 > [!IMPORTANT]
 >
