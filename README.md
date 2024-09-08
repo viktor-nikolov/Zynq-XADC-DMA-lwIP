@@ -128,7 +128,8 @@ Xilinx is giving us [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ
 ```math
 t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}
 ```
-Factor 9 is the so-called time constant. It is derived from $`TC=\ln(2^{N+m})`$ , where $`N=12`$ for a 12-bit system and $m=1$ additional resolution bit.  
+Factor 9 is the so-called time constant. It is derived from $`TC=\ln(2^{N+m})`$ , where $`N=12`$ for a 12-bit system and $m=1$ additional resolution bit.
+
 R<sub>MUX</sub> for an auxiliary input is 10 kΩ.  
 C<sub>SAMPLE</sub> is specified by Xilinx as 3 pF.
 
@@ -198,8 +199,10 @@ We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa
 ```math
 t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000 }} + 140 + 845) \times 1 \times 10^{-9} = 15.1725 \mskip3mu \mu s
 ```
-The term $`\ln(2^{12+1})`$ is the number of time constants needed for 12-bit resolution.  
-The term $`{2320 \times 1000} \over {2300 + 1000 }`$ is the output impedance of the voltage divider.  
+The term $`\ln(2^{12+1})`$ is the number of time constants needed for 12-bit resolution.
+
+The term $`{2320 \times 1000} \over {2300 + 1000 }`$ is the output impedance of the voltage divider.
+
 The terms 140 and 845 are the resistors on the analog inputs.
 
 Further details on how the equation was constructed can be found in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc).
