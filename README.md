@@ -128,6 +128,7 @@ Xilinx is giving us [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ
 ```math
 \begin{equation}
 t_{ACQ} = 9 \times ( R_{MUX} + R_{MUX} ) \times C_{SAMPLE}
+\label{second_order_full}
 \end{equation}
 ```
 Factor 9 is the so-called time constant. It is derived from $`TC=\ln(2^{N+m})`$ , where $`N=12`$ for a 12-bit system and $m=1$ additional resolution bit.  
