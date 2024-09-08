@@ -1,5 +1,5 @@
 # Tutorial: Xilinx Zynq XADC using DMA and network streaming
-This tutorial shows how to do a HW design and code a SW application to make use of AMD Xilinx Zynq-7000 [XADC](https://www.xilinx.com/products/technology/analog-mixed-signal.html). We will also see how to use the [DMA](https://www.xilinx.com/products/intellectual-property/axi_dma.html) to transfer data from the XADC into Zynq CPU's memory and stream data to a remote server over the network.
+This tutorial shows how to do an HW design and code a SW application to make use of AMD Xilinx Zynq-7000 [XADC](https://www.xilinx.com/products/technology/analog-mixed-signal.html). We will also see how to use the [DMA](https://www.xilinx.com/products/intellectual-property/axi_dma.html) to transfer data from the XADC into Zynq CPU's memory and stream data to a remote server over the network.
 
 In this tutorial, I'm using the Digilent board [Cora Z7-07S](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/). However, all the principles described here can be used on any other Zynq-7000 board. I will highlight aspects specific to Cora Z7 in the text.  
 The Cora Z7 is a suitable board for testing the Zynq XADC because it has analog inputs that are usable in a practical way.
@@ -26,6 +26,11 @@ Using a Clocking Wizard, we are able to generate an output frequency of 95.363 M
 95.363 MHz divided by 6 gives us a DCLK of 15.894 MHz, which is very close to the value we desire.
 
 With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 ksps (a single conversion cycle will take 32 ADCCLKs).
+
+This would allow us to use a sampling rate of 1 Msps because, with the ADCCLK frequency of 26&nbsp;MHz and 4 ADCCLKs allowed for the acquisition, we get 150&nbsp;ns acquisition time, which is more than enough.
+
+However, in our design, we are limited to using an ADCCLK frequency of 23.84&nbsp;MHz (95.363&nbsp;MHz divided by 4) because we must use an XADC clock of 95.363&nbsp;MHz to achieve the 629&nbsp;ns acquisition time for the unipolar input as described in the previous chapter.  
+Therefore, the resulting sampling rate will be 917 ksps (a single conversion cycle will take 26 ADCCLKs).
 
 ## A short introduction to Zynq-7000 XADC
 
@@ -216,7 +221,7 @@ The term $`{2320 \times 1000} \over {2300 + 1000 }`$ is the output impedance of 
 
 The terms 140 and 845 are the resistors on the analog inputs.
 
-The factor $`1 \times 10^{-9}`$ is capacitance of AAF's capacitor.
+The factor $`1 \times 10^{-9}`$ is the capacitance of AAF's capacitor.
 
 Further details on how the equation was constructed can be found in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc).
 
@@ -229,27 +234,19 @@ In theory, the settling time of 15.1725 μs allows for a 65.909 kHz sampling rat
 
 ### Settling time of bipolar input of Cora Z7
 
-Equation 2-1 from UG480  [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) for acquisition time in unipolar mode:
-```math
-t_{ACQ} = 9 \times R_{MUX} \times C_{SAMPLE}
-```
-On Cora Z7, we need to take into account the bipolar input circuitry for dedicated V<sub>P</sub> /V<sub>N</sub> input on the board, as depicted in Figure 13.2.3 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io):
+The following picture is a copy of Figure 13.2.3 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io). It depicts the circuit used for the dedicated analog input channel V<sub>P</sub> /V<sub>N</sub> (the pins are labeled V_P and V_N on the Cora Z7 board):
 
 <img src="pictures\cora-analog-dedicated.png"  width="400">
 
-The R<sub>MUX</sub>for a dedicated analog input is 100 Ω.  
-In addition to R<sub>MUX</sub>, we must include the 140 Ω resistor in the signal path on the Cora&nbsp;Z7 board  
-C<sub>SAMPLE</sub> is 3 pF.
+> [!CAUTION]
+>
+> The dedicated analog input channel on Cora Z7 is less protected than auxiliary channels A0-A5. There is no voltage divider. Therefore, both V<sub>P</sub> and V<sub>N</sub> must always be within a range from 0 V to 1.0 V with respect to the board's GND. Also, the differential V<sub>P</sub> &minus; V<sub>N</sub> must be within the range of ±0.5V.
 
-We now calculate the needed acquisition time for V<sub>P</sub> /V<sub>N</sub> as follows:
-```math
-t_{ACQ} = 9 \times ( 100 + 140) \times 3 \times 10^{-12} = 6.5\mskip3muns
-```
-**TODO:**  
-This would allow us to use a sampling rate of 1 Msps because, with the ADCCLK frequency of 26&nbsp;MHz and 4 ADCCLKs allowed for the acquisition, we get 150&nbsp;ns acquisition time, which is more than enough.
+The capacitor and the resistors form a low-pass filter with a cutoff frequency of 569 kHz (which is almost an AAF for the 500 kHz Nyquist frequency).
 
-However, in our design, we are limited to using an ADCCLK frequency of 23.84&nbsp;MHz (95.363&nbsp;MHz divided by 4) because we must use an XADC clock of 95.363&nbsp;MHz to achieve the 629&nbsp;ns acquisition time for the unipolar input as described in the previous chapter.  
-Therefore, the resulting sampling rate will be 917 ksps (a single conversion cycle will take 26 ADCCLKs).
+**TODO: LT spice simulated 801 kHz.** in contrary to [cutoff frequency of low pass filter with two resistors (differential signal) - Electrical Engineering Stack Exchange](https://electronics.stackexchange.com/questions/219202/cutoff-frequency-of-low-pass-filter-with-two-resistors-differential-signal)
+
+
 
 ## Calibration
 
