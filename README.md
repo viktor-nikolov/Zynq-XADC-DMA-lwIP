@@ -100,7 +100,7 @@ The 26 ADCCLK cycle period can be extended to 32 cycles by configuration. See th
 
 > [!NOTE]
 >
-> Don't be confused by the different vocabulary used in Xillinx products regarding this 4 or 10 ADCCLK period within the XADC's acquisition and conversion cycle.  
+> Don't be confused by the different vocabulary used in Xillinx documents regarding this 4 or 10 ADCCLK period within the XADC's acquisition and conversion cycle.  
 > [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) calls it a "settling period," but it is called "Acquisition Time" in the UI of XADC Wizard IP in Vivado and comments in the [xsysmon.c](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c).  
 > However, [Figure 5-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/4MmXaAzpjJTjs~BpjCs4Rw?section=XREF_95899_X_Ref_Target) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) clearly shows that the acquisition time is longer than 4 or 10 ADCCLK clocks.
 >
