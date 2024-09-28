@@ -272,16 +272,16 @@ It does. :smiley: I reproduced the scenario on a physical Cora Z7 board and meas
 
 <img src="pictures\Cora_Z7_stair_signal_reading.png">
 
-As you can see, the real-life measurement on physical HW matches the simulation pretty well.
+As you can see, the real-life measurement on the physical HW matches the simulation pretty well.
 
-What is happening here? The XADC auxiliary unipolar input, which has an acquisition time of 540 ns, precisely digitized a signal after AAF, which has a settling time of 15.17 μs.
+What is happening here? The XADC auxiliary unipolar input, which has an acquisition time of 540 ns, precisely digitized a signal after AAF, with a settling time of 15.17 μs.
 
-I mentioned before that the settling time of 15.17 μs allows for a 65.9 kHz theoretical sampling rate. This is what [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) says. Let's see in the following figure what would happen if I blindly followed XAPP795's advice and used 65.9 ksps instead of 1 Msps.
+I mentioned before that the settling time of 15.17 μs allows for a 65.9 kHz theoretical sampling rate. This is what [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) says. Let's see in the following figure what would happen if I mindlessly followed XAPP795's advice and used 65.9 ksps instead of 1 Msps.
 
 <img src="pictures\Cora_Z7_stair_signal_reading_simulation.png">
 
-We see that at 65.9 ksps, the digitized signal looks nothing like the input signal. This is not a useful result.  
-At 1 Msps, we could use some digital processing, e.g., identify local maxima and minima of the signal and thus get some understanding of the characteristics of the square wave signal on the input. That is not a possibility at 65.9 ksps.
+We see that at 65.9 ksps, the digitized signal looks nothing like the input signal. This is not a helpful result.  
+At 1 Msps, we could apply some digital processing, e.g., identify local maxima and minima of the signal and thus get some understanding of the characteristics of the square wave signal on the input. That is not a possibility at 65.9 ksps.
 
 TODO
 
