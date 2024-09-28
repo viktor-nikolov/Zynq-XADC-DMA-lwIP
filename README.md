@@ -280,7 +280,8 @@ I mentioned before that the settling time of 15.17 μs allows for a 65.9 kHz the
 
 <img src="pictures\Cora_Z7_stair_signal_reading_simulation.png">
 
-We see that at 65.9 ksps, the digitized signal looks nothing like the input signal.
+We see that at 65.9 ksps, the digitized signal looks nothing like the input signal. This is not a useful result.  
+At 1 Msps, we could use some digital processing, e.g., identify local maxima and minima of the signal and thus get some understanding of the characteristics of the square wave signal on the input. That is not a possibility at 65.9 ksps.
 
 TODO
 
