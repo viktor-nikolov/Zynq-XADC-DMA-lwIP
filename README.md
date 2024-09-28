@@ -104,7 +104,7 @@ The 26 ADCCLK cycle period can be extended to 32 cycles by configuration. See th
 > [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) calls it a "settling period," but it is called "Acquisition Time" in the UI of XADC Wizard IP in Vivado and comments in the [xsysmon.c](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c).  
 > However, [Figure 5-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/4MmXaAzpjJTjs~BpjCs4Rw?section=XREF_95899_X_Ref_Target) in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) clearly shows that the acquisition time is longer than 4 or 10 ADCCLK clocks.
 >
-> The "settling period" is probably the best term for the reasons I explain later in this text.
+> The "settling period" is probably the best term for the reasons I explain later in this article.
 
 The XADC maximum sampling rate is 1&nbsp;Msps.  
 This is achieved by having 104 MHz DCLK and the divider ratio set to 4. This results in the highest possible ADCCLK frequency of 26 MHz. Using 26 ADCCLK cycles for single conversion then gives 1 Msps.
@@ -202,7 +202,7 @@ The voltage divider allows voltage up to 3.3 V to be connected to pins A0-A5. Th
 - To be precise, an input voltage of 3.3 V  is reduced to 0.994 V. The exact value may vary depending on how much the resistors on your particular board deviate within the tolerances. 
 
 The analog inputs A0-A5 act as single-ended inputs because negative signals VAUXN[] are tied to the board's ground.  
-The low-pass filter formed by the circuit has a cut-off frequency of 94 kHz **(I simulated the circuit's frequency response in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html))**.
+The low-pass filter formed by the circuit has a cut-off frequency of 94.6 kHz.
 
 This circuit on Cora Z7 is basically the same as the one discussed in the Application Guidelines chapter [External Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) in UG480.  
 The AAF contains a 1 nF capacitor, which is orders of magnitude larger capacitance than the 3 pF sampling capacitor inside the XADC. Therefore, we can ignore the XADC sampling capacitor when determining the acquisition time.
@@ -242,7 +242,7 @@ The following picture is a copy of Figure 13.2.3 from the Cora Z7 [Reference Man
 >
 > The dedicated analog input channel on Cora Z7 is less protected than auxiliary channels A0-A5. There is no voltage divider. Therefore, both V<sub>P</sub> and V<sub>N</sub> must always be within a range from 0 V to 1.0 V with respect to the board's GND. Also, the differential V<sub>P</sub> &minus; V<sub>N</sub> must be within the range of ±0.5V.
 
-The capacitor and the resistors form a low-pass filter with a cutoff frequency of 569 kHz.
+The capacitor and the resistors form a low-pass filter with a cutoff frequency of 568.7 kHz.
 
 ## Calibration
 
