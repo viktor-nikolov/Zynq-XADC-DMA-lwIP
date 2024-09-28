@@ -257,9 +257,21 @@ In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. I
 ### Behavior of unipolar input AAF of Cora Z7
 
 Let's see what the low-pass AAF does to a signal.  
-I simulated a square signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the previous chapter. The result of the simulation is in the following figure.
+I simulated a square wave signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the previous chapter. The result of the simulation is in the following figure.
 
-<img src="pictures\Cora_Z7_stair_signal_simulation.png"  >
+<img src="pictures\Cora_Z7_stair_signal_simulation.png">
+
+A square wave signal is actually a high-frequency signal (see an explanation for example [here](https://www.allaboutcircuits.com/textbook/alternating-current/chpt-7/square-wave-signals/)). The AAF on Cora Z7 unipolar input attenuates frequencies above 94.6 kHz. This manifests as the "rounding of edges" of the square wave signal.  
+We see that the simulation is consistent with the settling time we calculated in the previous chapter. It takes exactly 15.17 μs for the output signal to reach a new level after the input changes.  
+Please note that the settling time does not depend on the magnitude of the input signal change. In this simulation, the change in each step is 0.5 V. However, if I changed the steps to only 0.05 V, it would still take the output signal 15.17 μs to settle on the new level. The shape of the chart would be the same.
+
+So, the simulation matches the theory. But does it really work in practice?  
+It does. :smiley: I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using software app shared in this repository.  
+**TODO: link to the SW app**
+
+<img src="pictures\Cora_Z7_stair_signal_reading.png">
+
+ddd
 
 ## Calibration
 
@@ -288,5 +300,4 @@ Connected precise 2.5 V voltage reference to A0 (2.50026 V).
 Without averaging, the mean value over 10,000 samples was 2.492 V. 
 
 Beware of the precision of the resistors in the Cora Z7 voltage dividers.
-
 
