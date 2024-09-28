@@ -221,7 +221,7 @@ The term $`{2320 \times 1000} \over {2300 + 1000 }`$ is the output impedance of 
 
 The terms 140 and 845 are the resistors on the analog inputs.
 
-The factor $`1 \times 10^{-9}`$ is the capacitance of AAF's capacitor.
+The factor $`1 \times 10^{-9}`$ is the capacitance of the AAF's capacitor.
 
 Further details on how the equation was constructed can be found in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc).
 
@@ -243,6 +243,20 @@ The following picture is a copy of Figure 13.2.3 from the Cora Z7 [Reference Man
 > The dedicated analog input channel on Cora Z7 is less protected than auxiliary channels A0-A5. There is no voltage divider. Therefore, both V<sub>P</sub> and V<sub>N</sub> must always be within a range from 0 V to 1.0 V with respect to the board's GND. Also, the differential V<sub>P</sub> &minus; V<sub>N</sub> must be within the range of ±0.5V.
 
 The capacitor and the resistors form a low-pass filter with a cutoff frequency of 568.7 kHz.
+
+We can calculate the settling time of this circuit as follows:
+
+```math
+t_{settling} = \ln(2^{12+1}) \times ( 140 + 140 ) \times 1 \times 10^{-9} = 2.52 \mskip3mu \mu s
+```
+
+In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. In the later chapter, we will explore how the circuit behaves in practice.
+
+## Acquisition and settling time—the practice
+
+### Behavior of unipolar input AAF of Cora Z7
+
+
 
 ## Calibration
 
