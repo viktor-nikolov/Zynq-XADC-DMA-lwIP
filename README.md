@@ -173,7 +173,7 @@ But how does the calculated acquisition time translate to the possible sampling 
 The hint for that can be found in the Driving the Xilinx Analog-to-Digital Converter Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc). This note explains on page 4 that XADC is able to acquire the next sample (i.e., charge the internal capacitor) during the conversion of the current sample. At least 75% of the overall sample time is available for the acquisition.
 
 When the XADC runs at a maximum sample rate of 1 Msps, the duration of a single sample is 1 μs, and 75% of that is 750 ns.  
-[Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) and [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) gave us an acquisition time of unipolar auxiliary input of 540 ns and bipolar dedicated input of 2.7 ns. This is well below the 750 ns. So there seems to be no problem until you add an [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter) (AAF) on the input. The next chapter explains how AAF changes the acquisition time requirements.
+[Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) and [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) gave us an acquisition time of unipolar auxiliary input of 540 ns and bipolar dedicated input of 2.7 ns. This is well below the 750 ns. So there seems to be no problem, right? This is valid only until you add an [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter) (AAF) to the input. The next chapter explains how AAF changes the acquisition time requirements.
 
 
 ### Settling time of unipolar input AAF of Cora Z7
@@ -261,17 +261,28 @@ I simulated a square wave signal passing through the Cora Z7 unipolar input AAF 
 
 <img src="pictures\Cora_Z7_stair_signal_simulation.png">
 
-A square wave signal is actually a high-frequency signal (see an explanation for example [here](https://www.allaboutcircuits.com/textbook/alternating-current/chpt-7/square-wave-signals/)). The AAF on Cora Z7 unipolar input attenuates frequencies above 94.6 kHz. This manifests as the "rounding of edges" of the square wave signal.  
+A square wave signal is actually a high-frequency signal (see an explanation for example [here](https://www.allaboutcircuits.com/textbook/alternating-current/chpt-7/square-wave-signals/)). The AAF on Cora Z7 unipolar input attenuates frequencies above 94.6 kHz. This manifests as the "rounding of edges" of the square wave signal.
+
 We see that the simulation is consistent with the settling time we calculated in the previous chapter. It takes exactly 15.17 μs for the output signal to reach a new level after the input changes.  
 Please note that the settling time does not depend on the magnitude of the input signal change. In this simulation, the change in each step is 0.5 V. However, if I changed the steps to only 0.05 V, it would still take the output signal 15.17 μs to settle on the new level. The shape of the chart would be the same.
 
 So, the simulation matches the theory. But does it really work in practice?  
-It does. :smiley: I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using software app shared in this repository.  
+It does. :smiley: I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using the software app shared in this repository. See the following figure.  
 **TODO: link to the SW app**
 
 <img src="pictures\Cora_Z7_stair_signal_reading.png">
 
-ddd
+As you can see, the real-life measurement on physical HW matches the simulation pretty well.
+
+What is happening here? The XADC auxiliary unipolar input, which has an acquisition time of 540 ns, precisely digitized a signal after AAF, which has a settling time of 15.17 μs.
+
+I mentioned before that the settling time of 15.17 μs allows for a 65.9 kHz theoretical sampling rate. This is what [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) says. Let's see in the following figure what would happen if I blindly followed XAPP795's advice and used 65.9 ksps instead of 1 Msps.
+
+<img src="pictures\Cora_Z7_stair_signal_reading_simulation.png">
+
+We see that at 65.9 ksps, the digitized signal looks nothing like the input signal.
+
+TODO
 
 ## Calibration
 
