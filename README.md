@@ -256,7 +256,10 @@ In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. I
 
 ### Behavior of unipolar input AAF of Cora Z7
 
+Let's see what the low-pass AAF does to a signal.  
+I simulated a square signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the previous chapter. The result of the simulation is in the following figure.
 
+<img src="pictures\Cora_Z7_stair_signal_simulation.png"  >
 
 ## Calibration
 
@@ -286,8 +289,4 @@ Without averaging, the mean value over 10,000 samples was 2.492 V.
 
 Beware of the precision of the resistors in the Cora Z7 voltage dividers.
 
-<img src="pictures\test.png"  >
 
-bla bla bla
-
-<img src="pictures\test2.png">
