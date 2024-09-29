@@ -225,8 +225,10 @@ The factor $`1 \times 10^{-9}`$ is the capacitance of the AAF's capacitor.
 
 Further details on how the equation was constructed can be found in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc).
 
-In theory, the settling time of 15.1725 μs allows for a 65.909 kHz sampling rate. In the later chapter, we will explore how the circuit behaves in practice and to which use cases the 65.909 kHz sampling rate applies well.  
-One controversy is already apparent: According to the [Nyquist theorem](https://www.techtarget.com/whatis/definition/Nyquist-Theorem), the 65.9 kHz sampling rate allows correct sampling of input signal frequency up to 33 kHz. However, the cut-off frequency of the AAF on the Cora Z7 unipolar input is 94.6 kHz.
+In theory, the settling time of 15.1725 μs allows for a 65.909 kHz sampling rate. In the later chapter, we will explore how the circuit behaves in practice and to which use cases the 65.909 kHz sampling rate applies well.
+
+One "controversy" is already apparent: According to the [Nyquist theorem](https://www.techtarget.com/whatis/definition/Nyquist-Theorem), the 65.9 kHz sampling rate allows correct sampling of an input signal of frequency up to 33 kHz. However, the cut-off frequency of the AAF on the Cora Z7 unipolar input is 94.6 kHz. So, by running the XADC at 65.9 ksps, we risk that an imprecise digitalization of the so-called [alias](https://en.wikipedia.org/wiki/Aliasing) will happen if frequencies above 33 kHz are present in the input signal. We would need an AAF with a cutoff frequency of 33 kHz. However, such an AAF would have an even longer settling time.  
+There is no universal solution for this issue. How you compromise between sampling rate and settling time depends on the characteristics of the input signal and on what you want to achieve by digitizing it.
 
 > [!IMPORTANT]
 >
@@ -243,7 +245,7 @@ The following picture is a copy of Figure 13.2.3 from the Cora Z7 [Reference Man
 >
 > The dedicated analog input channel on Cora Z7 is less protected than auxiliary channels A0-A5. There is no voltage divider. Therefore, both V<sub>P</sub> and V<sub>N</sub> must always be within a range from 0 V to 1.0 V with respect to the board's GND. Also, the differential V<sub>P</sub> &minus; V<sub>N</sub> must be within the range of ±0.5V.
 
-The capacitor and the resistors form a low-pass filter with a cutoff frequency of 568.7 kHz.
+The capacitor and the resistors form a low-pass filter with a cutoff frequency of 568.7 kHz (which is close to the 500 kHz [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) of the XADC running at 1 Msps).
 
 We can calculate the settling time of this circuit as follows:
 
