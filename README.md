@@ -225,12 +225,13 @@ The factor $`1 \times 10^{-9}`$ is the capacitance of the AAF's capacitor.
 
 Further details on how the equation was constructed can be found in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc).
 
-In theory, the settling time of 15.1725 μs allows for a 65.909 kHz sampling rate. In the later chapter, we will explore how the circuit behaves in practice.
+In theory, the settling time of 15.1725 μs allows for a 65.909 kHz sampling rate. In the later chapter, we will explore how the circuit behaves in practice and to which use cases the 65.909 kHz sampling rate applies well.  
+One controversy is already apparent: According to the [Nyquist theorem](https://www.techtarget.com/whatis/definition/Nyquist-Theorem), the 65.9 kHz sampling rate allows correct sampling of input signal frequency up to 33 kHz. However, the cut-off frequency of the AAF on the Cora Z7 unipolar input is 94.6 kHz.
 
 > [!IMPORTANT]
 >
 > Please note that any additional resistance of circuitry you connect to the Cora Z7's pins A0-A5 can further increase the settling time needed.  
-> In order to achieve a reliable measurement, the voltage source connected to pins A0-A5 must act as having low internal resistance.
+> To achieve a reliable measurement, the voltage source connected to pins A0-A5 must act as having low internal resistance.
 
 ### Settling time of bipolar input of Cora Z7
 
@@ -250,7 +251,7 @@ We can calculate the settling time of this circuit as follows:
 t_{settling} = \ln(2^{12+1}) \times ( 140 + 140 ) \times 1 \times 10^{-9} = 2.52 \mskip3mu \mu s
 ```
 
-In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. In the later chapter, we will explore how the circuit behaves in practice.
+In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. The later chapter will explore how the circuit behaves in practice and to which use cases the 396.3 kHz sampling rate applies well.
 
 ## Acquisition and settling time—the practice
 
