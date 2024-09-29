@@ -277,7 +277,7 @@ It does. :smiley: I reproduced the scenario on a physical Cora Z7 board and meas
 
 As you can see, the real-life measurement on the physical HW matches the simulation pretty well.
 
-What is happening here? The XADC auxiliary unipolar input, which has an acquisition time of 540 ns, precisely digitized a signal after AAF, with a settling time of 15.17 μs.
+What is happening here? The XADC auxiliary input, which has an acquisition time of 540 ns, precisely digitized a signal after AAF, which has a settling time of 15.17 μs.
 
 I mentioned before that the settling time of 15.17 μs allows for a 65.9 kHz theoretical sampling rate. This is what [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) says. Let's see in the following figure what would happen if I mindlessly followed XAPP795's advice and used 65.9 ksps instead of 1 Msps.
 
