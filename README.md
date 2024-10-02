@@ -257,7 +257,7 @@ In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. T
 
 ## Acquisition and settling time—the practice
 
-### Behavior of unipolar input AAF of Cora Z7
+### Behavior of unipolar auxiliary input AAF of Cora Z7
 
 Let's see what the low-pass AAF does to a signal.  
 I simulated a square wave signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the previous chapter. The result of the simulation is in the following figure.
@@ -286,7 +286,21 @@ I mentioned before that the settling time of 15.17 μs allows for a 65.9 kHz the
 We see that at 65.9 ksps, the digitized signal looks nothing like the input signal. This is not a helpful result.  
 At 1 Msps, we could apply some digital processing, e.g., identify local maxima and minima of the signal and thus get some understanding of the characteristics of the square wave signal on the input. That is not a possibility at 65.9 ksps.
 
-TODO
+We saw that a square wave signal is a challenge for the XADC. What about something more "reasonable," for example, an 8 kHz sine signal? The following figure shows the effect of Cora Z7 auxiliary channel AAF on such a signal.
+
+<img src="pictures\Cora_Z7_sine_signal_simulation.png">
+
+8 kHz is very well below the 94.6 kHz cutoff frequency of the AAF, so we see only a very minor impact of the filter on the output signal. There is very slight attenuation and a small phase shift (i.e., delay of the output signal as compared to the input).
+
+The next figure shows an example of what the 65.9 ksps digitization of the 8 kHz signal may look like.
+
+<img src="pictures\Cora_Z7_sine_signal_reading_simulation.png">
+
+At 65.9 ksps the shape of the signal is generally well recorded. You may miss the exact local maxima and minima, though. If you needed to calculate the [RMS](https://en.wikipedia.org/wiki/Root_mean_square) of the input signal, it would be better to use a higher sample rate, ideally 1 Msps, to get a more precise approximation of the signal curve and, thus, a more precise RMS. 
+
+#### The bottom line
+
+bla bla
 
 ## Calibration
 
