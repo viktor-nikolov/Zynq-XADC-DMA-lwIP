@@ -296,11 +296,18 @@ The next figure shows an example of what the 65.9 ksps digitization of the 8 kHz
 
 <img src="pictures\Cora_Z7_sine_signal_reading_simulation.png">
 
-At 65.9 ksps the shape of the signal is generally well recorded. You may miss the exact local maxima and minima, though. If you needed to calculate the [RMS](https://en.wikipedia.org/wiki/Root_mean_square) of the input signal, it would be better to use a higher sample rate, ideally 1 Msps, to get a more precise approximation of the signal curve and, thus, a more precise RMS. 
+At 65.9 ksps the shape of the signal is generally well recorded. You may miss the exact local maxima and minima, though. If you needed to calculate the [RMS](https://en.wikipedia.org/wiki/Root_mean_square) of the input signal, it would be better to use a higher sample rate, ideally 1 Msps, to get a more precise approximation of the signal curve and, thus, a more accurate RMS. 
 
 #### The bottom line
 
-The settling time, which you can calculate using formulas in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc), tells you how long it takes for the output signal to settle to a new value (for 12-bit digitization precision) when the input signal undergoes a <ins>step change</ins> to a new value.
+The settling time, which you can calculate using formulas in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) and the User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs), tells you how long it takes for the output signal to settle to a new value (for the 12-bit digitization precision) when the input signal undergoes a <ins>step change</ins> to a new value. Nothing else.
+
+Knowing the settling time is crucial in cases when the input voltage undergoes sudden changes, such as when a [multiplexer](https://en.wikipedia.org/wiki/Multiplexer) is used. When the input signal is switched to a new source, you must wait at least the settling time before taking a sample by the XADC.
+
+When you measure slowly changing signals (e.g., a voltage from a temperature sensor) and are not very concerned by noise in the input signal, it's probably enough to sample the input with the period equal to the settling time.
+
+I think that in all other cases, the proper digitization setup depends on the circumstances.  You need to understand your task and your input signal. And you definitely have to do a lot of testing.  
+There will be cases when it's beneficial to sample a low-frequency signal with a high XADC sample rate to use some kind of averaging or other digital signal processing algorithm (e.g., to reduce the noise component of the input signal).
 
 ## Calibration
 
