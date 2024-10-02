@@ -309,6 +309,10 @@ When you measure slowly changing signals (e.g., a voltage from a temperature sen
 I think that in all other cases, the proper digitization setup depends on the circumstances.  You need to understand your task and your input signal. And you definitely have to do a lot of testing.  
 There will be cases when it's beneficial to sample a low-frequency signal with a high XADC sample rate to use some kind of averaging or other digital signal processing algorithm (e.g., to reduce the noise component of the input signal).
 
+### Behavior of unipolar auxiliary input AAF of Cora Z7
+
+
+
 ## Calibration
 
 TODO
