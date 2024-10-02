@@ -300,7 +300,7 @@ At 65.9 ksps the shape of the signal is generally well recorded. You may miss th
 
 #### The bottom line
 
-The settling time, which you can calculate using formulas in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc), tells you how long it takes for the output signal to settle to a new value (for 12-bit digitization precision) when the input signal undergoes a <u>step change</u> to a new value.
+The settling time, which you can calculate using formulas in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc), tells you how long it takes for the output signal to settle to a new value (for 12-bit digitization precision) when the input signal undergoes a <ins>step change</ins> to a new value.
 
 ## Calibration
 
