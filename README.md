@@ -311,7 +311,9 @@ There will be cases when it's beneficial to sample a low-frequency signal with a
 
 ### Behavior of unipolar auxiliary input AAF of Cora Z7
 
+**TODO**
 
+<img src="pictures\Cora_Z7_diff_signal_simulation.png">
 
 ## Calibration
 
