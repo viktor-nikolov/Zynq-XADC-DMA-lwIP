@@ -333,11 +333,15 @@ When the default mode is enabled, both ADCs are calibrated. The XADC also operat
 
 So unless you want to recalibrate the XADC during runtime, you never need to care about calibration by initiating a conversion on channel 8. It's done during FPGA configuration, which happens also when you re-run the PS code. 
 
-
-
 no averaging: Mean Value: 2.49800 V
 
+<img src="pictures\Cora_Z7_2.495V_reading.png">
+
 with 64 averaging: Mean Value: 2.49815 V
+
+<img src="pictures\Cora_Z7_2.495V_64avg_reading.png">
+
+bla
 
 ## DMA
 
