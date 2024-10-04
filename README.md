@@ -315,6 +315,10 @@ There will be cases when it's beneficial to sample a low-frequency signal with a
 
 <img src="pictures\Cora_Z7_diff_signal_simulation.png">
 
+bla
+
+<img src="pictures\Cora_Z7_diff_signal_reading.png">
+
 ## Calibration
 
 TODO
