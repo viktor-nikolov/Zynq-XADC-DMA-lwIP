@@ -332,9 +332,26 @@ I reproduced the scenario on a physical Cora Z7 board and measured the signal by
 
 ### XADC autocalibration
 
-TODO
+The Zynq-7000 XADC is equipped with autocalibration capability, which automatically sets Offset and Gain Calibration Coefficients in the XADC registers. XADC may or may not apply these coefficients to the measurements it performs depending on the configuration, which is set by [XSysMon_SetCalibEnables()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L828).
 
-From [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Status-Registers), I understood that the calibration coefficients are calculated by initiating a conversion on channel 8. 
+The XADC performs the calibration automatically at startup. This is because after powering up and during FPGA configuration (i.e., when the bitstream is written into the FPGA or when the PS code is rerun), the XADC starts its operation in so-called default mode. In the default mode, the XADC calibration is done automatically. See details in the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Sequencer-Modes), chapter Default Mode.  
+Even if you change the XADC mode afterward, the calibration done during the default mode will remain valid.
+
+If you need to repeat the calibration later during the runtime (e.g., to make a correction for the temperature changes of the board), you can do that by initiating a conversion on channel 8. This is a special channel that is not connected to any analog input.
+
+The XADC does the calibration using a voltage reference external to the Zynq-7000 chip (if present in the board's circuit) or an internal voltage reference within the Zynq-7000 chip.  
+Using an external voltage reference allows the board designer to achieve higher precision of XADC measurements.
+
+> [!IMPORTANT]
+>
+> There is a "catch" regarding gain calibration:  
+> It shouldn't be used when the XADC calibration is done by internal voltage reference of the Zynq-7000 chip (see details explained [here](https://adaptivesupport.amd.com/s/article/53586?language=en_US)).
+>
+> This is the case for the Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual) board, which I'm using in this tutorial.
+>
+> You need to correctly handle this in the PS code, as I explain in the next paragraphs.
+
+TODO
 
 I'm using a Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual) board, which doesn't provide external voltage references. VREFP and VREFN are connected to ADCGND on this board. Therefore, the internal FPGA voltage references are utilized for calibration.
 
@@ -342,7 +359,7 @@ From [this post](https://support.xilinx.com/s/article/53586?language=en_US), I k
 
 When the default mode is enabled, both ADCs are calibrated. The XADC also operates in default mode after initial power-up and during FPGA configuration. See the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Sequencer-Modes), chapter Default Mode, page 48.
 
-So unless you want to recalibrate the XADC during runtime, you never need to care about calibration by initiating a conversion on channel 8. It's done during FPGA configuration, which happens also when you re-run the PS code. 
+### Voltage reference measurement example
 
 no averaging: Mean Value: 2.49800 V
 
