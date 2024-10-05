@@ -354,12 +354,24 @@ Using an external voltage reference allows the board designer to achieve higher 
 
 When you know exactly what Zynq-7000 board your code will run on, you can hard-code the configuration, understanding whether the external or internal reference is used. See the schematics of your board to check what is connected to Zynq-7000 [reference input pins VREFP and VREFN](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Reference-Inputs-VREFP-and-VREFN). The internal voltage reference is used if they are connected to the ADCGND (i.e., the ground of XADC circuitry).
 
-Use these commands when the internal voltage reference is used to enable only Offset Calibration Coefficient use for XADC and Zynq power supply measurements:
+Use the following call (after you initialize the XADC instance) when the internal voltage reference is used to enable only Offset Calibration Coefficient used for XADC and Zynq power supply measurements:
 
 `XSysMon_SetCalibEnables( &XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK );`
 
+When the  Zynq-7000 board you are using provides an external voltage reference, then use the following code to enable both Gain and Offset Calibration Coefficients used for XADC and Zynq power supply measurements:
+
+`XSysMon_SetCalibEnables( &XADCInstance, XSM_CFR1_CAL_ADC_GAIN_OFFSET_MASK | XSM_CFR1_CAL_PS_GAIN_OFFSET_MASK );`
+
+TODO
+
 ```c
-XSysMon_SetCalibEnables( &XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK );
+u16 GainCoeff = XSysMon_GetCalibCoefficient(&XADCInstance, XSM_CALIB_GAIN_ERROR_COEFF);
+u16 CalibrationEnables;
+	if( GainCoeff != 0x007F ) // True when external voltage references are used
+		CalibrationEnables = XSM_CFR1_CAL_ADC_GAIN_OFFSET_MASK | XSM_CFR1_CAL_PS_GAIN_OFFSET_MASK; // Use both Offset and Gain Coefficients
+	else
+		CalibrationEnables = XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK;           // Use only Offset Coefficients
+	XSysMon_SetCalibEnables(&XADCInstance, CalibrationEnables );
 ```
 
 TODO
