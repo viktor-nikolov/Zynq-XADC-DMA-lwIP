@@ -44,7 +44,7 @@ The XADC is a feature of an analog-to-digital converter integrated on selected X
 In this tutorial, we will focus solely on XADC. But please don't get confused, Xilinx library functions for controlling XADC are defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h).
 
 XADC can read one external input (channel) at a time and provides a means for switching between channels.  
-The Zynq-7000 XADC has one dedicated analog input channel called V<sub>P</sub> /V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0..15].
+The Zynq-7000 XADC has one dedicated analog input channel called V<sub>P</sub>/V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0..15].
 Each channel has two input signals because it is a differential input channel. A positive differential input is denoted V<sub>P</sub> or VAUXP, and a negative one is denoted V<sub>N</sub> or VAUXN.
 
 > [!WARNING]
@@ -121,7 +121,7 @@ This is achieved by having 104 MHz DCLK and the divider ratio set to 4. This res
 
 You can sample an auxiliary channel at 1 Msps. However, signals with a frequency higher than 250 kHz are not guaranteed to be precisely recorded. This seems to be an analog bandwidth limitation of Zynq-7000 circuits related to auxiliary channels.
 
-The data sheet doesn't mention the bandwidth of the dedicated analog input channel V<sub>P</sub> /V<sub>N</sub>. We can assume it is at least 500 kHz (i.e., the [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) for 1 Msps ADC).
+The data sheet doesn't mention the bandwidth of the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>. We can assume it is at least 500 kHz (i.e., the [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) for 1 Msps ADC).
 
 ## Acquisition and settling time—the theory
 
@@ -180,7 +180,7 @@ When the XADC runs at a maximum sample rate of 1 Msps, the duration of a single 
 
 In this chapter, I will discuss the unipolar analog input circuitry of the Digilent [Cora Z7](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/) development board. Nevertheless, the very same principles apply to any Zynq-7000 board with a passive [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter) (AAF) on analog inputs.
 
-The pins labeled A0-A5 on the Cora Z7 board can be used as digital I/O pins or analog input pins for the auxiliary channels. How the given pin is used (digital vs. analog) is controlled by a constraint specified in the HW design.  
+The pins labeled A0-A5 on the Cora Z7 board can be used as digital I/O pins or analog input pins for the auxiliary single-ended channels. How the given pin is used (digital vs. analog) is controlled by a constraint specified in the HW design.  
 The following table lists the assignment of Cora Z7 pins to the XADC auxiliary channels.
 
 | Cora Z7 pin | Associated XADC channel |
@@ -235,13 +235,15 @@ There is no universal solution for this issue. How you compromise between sampli
 > Please note that any additional resistance of circuitry you connect to the Cora Z7's pins A0-A5 can further increase the settling time needed.  
 > To achieve a reliable measurement, the voltage source connected to pins A0-A5 must act as having low internal resistance.
 
-### Settling time of dedicated channel V<sub>P</sub>/V<sub>N</sub> of Cora Z7
+### Settling time of dedicated channel V<sub>P</sub>/V<sub>N</sub> AAF of Cora Z7
 
 The following picture is a copy of Figure 13.2.3 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io). It depicts the circuit used for the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub> (the pins are labeled V_P and V_N on the Cora Z7 board):
 
 <img src="pictures\cora-analog-dedicated.png"  width="400">
 
-The Cora Z7 V<sub>P</sub> /V<sub>N</sub> 
+The Cora Z7 V<sub>P</sub>/V<sub>N</sub> channel can be used in both bipolar and unipolar modes.
+
+- Note: The Cora Z7 also provides pins labeled A6-A11, which can be used as differential auxiliary channels. See the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io) for details.
 
 > [!CAUTION]
 >
@@ -259,7 +261,7 @@ In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. T
 
 ## Acquisition and settling time—the practice
 
-### Behavior of unipolar auxiliary input AAF of Cora Z7
+### The behavior of unipolar auxiliary channel AAF of Cora Z7
 
 Let's see what the low-pass AAF does to a signal.  
 I simulated a square wave signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the previous chapter. The result of the simulation is in the following figure.
@@ -311,9 +313,9 @@ When you measure slowly changing signals (e.g., a voltage from a temperature sen
 I think that in all other cases, the proper digitization setup depends on the circumstances.  You need to understand your task and your input signal. And you definitely have to do a lot of testing.  
 There will be cases when it's beneficial to sample a low-frequency signal with a high XADC sample rate to use some kind of averaging or other digital signal processing algorithm (e.g., to reduce the noise component of the input signal).
 
-### Behavior of unipolar auxiliary input AAF of Cora Z7
+### The behavior of dedicated channel V<sub>P</sub>/V<sub>N</sub> AAF of Cora Z7
 
-**TODO**
+For completeness, let's quickly look also at a practical example using the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>.
 
 <img src="pictures\Cora_Z7_diff_signal_simulation.png">
 
@@ -321,7 +323,7 @@ bla
 
 <img src="pictures\Cora_Z7_diff_signal_reading.png">
 
-## Calibration
+## Calibration, precision
 
 TODO
 
@@ -349,13 +351,5 @@ bla
 
 TODO
 
-## Measurements
 
-TODO
-
-Connected precise 2.5 V voltage reference to A0 (2.50026 V).
-
-Without averaging, the mean value over 10,000 samples was 2.492 V. 
-
-Beware of the precision of the resistors in the Cora Z7 voltage dividers.
 
