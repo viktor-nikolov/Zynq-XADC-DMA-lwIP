@@ -176,7 +176,7 @@ When the XADC runs at a maximum sample rate of 1 Msps, the duration of a single 
 [Equation 2-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_35025_Equation2_1) and [Equation 2-2](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/Jknshmzrw3DvMZgWJO73KQ?section=XREF_62490_Equation2_2) gave us an acquisition time of unipolar auxiliary input of 540 ns and bipolar dedicated input of 2.7 ns. This is well below the 750 ns. So there seems to be no problem, right? This is valid only until you add an [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter) (AAF) to the input. The next chapter explains how AAF changes the acquisition time requirements.
 
 
-### Settling time of unipolar input AAF of Cora Z7
+### Settling time of auxiliary unipolar channel AAF of Cora Z7
 
 In this chapter, I will discuss the unipolar analog input circuitry of the Digilent [Cora Z7](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/) development board. Nevertheless, the very same principles apply to any Zynq-7000 board with a passive [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter) (AAF) on analog inputs.
 
@@ -235,11 +235,13 @@ There is no universal solution for this issue. How you compromise between sampli
 > Please note that any additional resistance of circuitry you connect to the Cora Z7's pins A0-A5 can further increase the settling time needed.  
 > To achieve a reliable measurement, the voltage source connected to pins A0-A5 must act as having low internal resistance.
 
-### Settling time of bipolar input of Cora Z7
+### Settling time of dedicated channel V<sub>P</sub>/V<sub>N</sub> of Cora Z7
 
-The following picture is a copy of Figure 13.2.3 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io). It depicts the circuit used for the dedicated analog input channel V<sub>P</sub> /V<sub>N</sub> (the pins are labeled V_P and V_N on the Cora Z7 board):
+The following picture is a copy of Figure 13.2.3 from the Cora Z7 [Reference Manual](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual#shield_analog_io). It depicts the circuit used for the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub> (the pins are labeled V_P and V_N on the Cora Z7 board):
 
 <img src="pictures\cora-analog-dedicated.png"  width="400">
+
+The Cora Z7 V<sub>P</sub> /V<sub>N</sub> 
 
 > [!CAUTION]
 >
