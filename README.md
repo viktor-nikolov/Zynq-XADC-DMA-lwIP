@@ -315,15 +315,22 @@ There will be cases when it's beneficial to sample a low-frequency signal with a
 
 ### The behavior of dedicated channel V<sub>P</sub>/V<sub>N</sub> AAF of Cora Z7
 
-For completeness, let's quickly look also at a practical example using the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>.
+For completeness, let's look shortly also at a practical example using the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>.
+
+The V<sub>P</sub>/V<sub>N</sub> channel's AAF cutoff frequency is pretty high at 568.7 kHz. Let's see in the following figure what happens when we feed the inputs with two 50 kHz sine waves of opposing phases and measure the output differentially.
 
 <img src="pictures\Cora_Z7_diff_signal_simulation.png">
 
-bla
+There are no surprises. The 50 kHz signal is negligibly attenuated by the AAF, and there is a very slight phase shift in the output.
+
+I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using the software app shared in this repository. The resulting measurement shown in the following figure is exactly as expected.  
+**TODO: link to the SW app**
 
 <img src="pictures\Cora_Z7_diff_signal_reading.png">
 
 ## Calibration and precision
+
+### XADC autocalibration
 
 TODO
 
