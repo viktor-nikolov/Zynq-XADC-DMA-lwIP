@@ -323,7 +323,7 @@ bla
 
 <img src="pictures\Cora_Z7_diff_signal_reading.png">
 
-## Calibration, precision
+## Calibration and precision
 
 TODO
 
