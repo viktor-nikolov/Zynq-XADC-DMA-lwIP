@@ -339,7 +339,7 @@ Even if you change the XADC mode afterward, the calibration done during the defa
 
 If you need to repeat the calibration later during the runtime (e.g., to make a correction for the temperature changes of the board), you can do that by initiating a conversion on channel 8. This is a special channel that is not connected to any analog input.
 
-The XADC does the calibration using a voltage reference external to the Zynq-7000 chip (if present in the board's circuit) or an internal voltage reference within the Zynq-7000 chip.  
+The XADC calibrates using a 1.25 V voltage reference external to the Zynq-7000 chip (if present in the board's circuit) or an internal voltage reference within the Zynq-7000 chip.  
 Using an external voltage reference allows the board designer to achieve higher precision of XADC measurements.
 
 > [!IMPORTANT]
@@ -347,19 +347,24 @@ Using an external voltage reference allows the board designer to achieve higher 
 > There is a "catch" regarding gain calibration:  
 > It shouldn't be used when the XADC calibration is done by internal voltage reference of the Zynq-7000 chip (see details explained [here](https://adaptivesupport.amd.com/s/article/53586?language=en_US)).
 >
-> This is the case for the Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual) board, which I'm using in this tutorial.
+> This is the case for the Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual) board, which I use in this tutorial.  
+> Zynq-7000 reference input pins VREFP and VREFN are connected to ADCGND on this board. Therefore, the internal voltage references are utilized for calibration.
 >
 > You need to correctly handle this in the PS code, as I explain in the next paragraphs.
 
-TODO
+When you know exactly what Zynq-7000 board your code will run on, you can hard-code the configuration, understanding whether the external or internal reference is used. See the schematics of your board to check what is connected to Zynq-7000 [reference input pins VREFP and VREFN](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Reference-Inputs-VREFP-and-VREFN). The internal voltage reference is used if they are connected to the ADCGND (i.e., the ground of XADC circuitry).
 
-I'm using a Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual) board, which doesn't provide external voltage references. VREFP and VREFN are connected to ADCGND on this board. Therefore, the internal FPGA voltage references are utilized for calibration.
+Use these commands when the internal voltage reference is used to enable only Offset Calibration Coefficient use for XADC and Zynq power supply measurements:
+
+```c
+XSysMon_SetCalibEnables( &XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK );
+```
+
+TODO
 
 From [this post](https://support.xilinx.com/s/article/53586?language=en_US), I know that the Gain Calibration Coefficient will always be 0x7F with internal references.
 
-When the default mode is enabled, both ADCs are calibrated. The XADC also operates in default mode after initial power-up and during FPGA configuration. See the [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Sequencer-Modes), chapter Default Mode, page 48.
-
-### Voltage reference measurement example
+### Measurement precision example
 
 no averaging: Mean Value: 2.49800 V
 
