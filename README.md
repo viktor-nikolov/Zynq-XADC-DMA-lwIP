@@ -356,6 +356,8 @@ When you know exactly what Zynq-7000 board your code will run on, you can hard-c
 
 Use these commands when the internal voltage reference is used to enable only Offset Calibration Coefficient use for XADC and Zynq power supply measurements:
 
+`XSysMon_SetCalibEnables( &XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK );`
+
 ```c
 XSysMon_SetCalibEnables( &XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK );
 ```
