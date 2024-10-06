@@ -362,7 +362,7 @@ When the  Zynq-7000 board you are using provides an external voltage reference, 
 
 `XSysMon_SetCalibEnables(&XADCInstance, XSM_CFR1_CAL_ADC_GAIN_OFFSET_MASK | XSM_CFR1_CAL_PS_GAIN_OFFSET_MASK);`
 
-When the Zynq-7000 internal voltage reference is used for the calibration, the calibration of XADC gain is actually not done (only the XADC offset is calibrated). As explained [here](https://adaptivesupport.amd.com/s/article/53586?language=en_US), the value of the Gain Calibration Coefficient is set to 0x007F in such a case. 0x007F represents the maximum Gain Coefficient of 6.3%. Obviously, letting XADC apply this maximal Gain Coefficient would significantly reduce the precision of digitalization. That is why we need to pay attention to this aspect.
+When the Zynq-7000 internal voltage reference is used for the calibration, the calibration of XADC gain is actually not done (only the XADC offset is calibrated). As explained [here](https://adaptivesupport.amd.com/s/article/53586?language=en_US), the value of the Gain Calibration Coefficient is set to 0x007F in such a case. 0x007F represents the maximum Gain Coefficient of 6.3%. Obviously, letting XADC apply this maximal Gain Coefficient would significantly reduce the precision of digitalization. That is why we need to pay attention to what kind of voltage reference our Zynq-7000 board uses.
 
 We can write an XADC calibration setup code, which is portable between different Zynq-7000 boards, by checking the value of the Gain Calibration Coefficient. 
 
