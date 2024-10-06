@@ -1,7 +1,7 @@
 # Tutorial: Xilinx Zynq XADC using DMA and network streaming
 This tutorial shows how to do an HW design and code a SW application to make use of AMD Xilinx Zynq-7000 [XADC](https://www.xilinx.com/products/technology/analog-mixed-signal.html). We will also see how to use the [DMA](https://www.xilinx.com/products/intellectual-property/axi_dma.html) to transfer data from the XADC into Zynq CPU's memory and stream data to a remote server over the network.
 
-In this tutorial, I'm using the Digilent board [Cora Z7-07S](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/). However, all the principles described here can be used on any other Zynq-7000 board. I will highlight aspects specific to Cora Z7 in the text.  
+In this tutorial, I'm using the Digilent board [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start). However, all the principles described here can be used on any other Zynq-7000 board. I will highlight aspects specific to Cora Z7 in the text.  
 The Cora Z7 is a suitable board for testing the Zynq XADC because it has analog inputs that are usable in a practical way.
 
 The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain.
@@ -178,7 +178,7 @@ When the XADC runs at a maximum sample rate of 1 Msps, the duration of a single 
 
 ### Settling time of auxiliary unipolar channel AAF of Cora Z7
 
-In this chapter, I will discuss the unipolar analog input circuitry of the Digilent [Cora Z7](https://digilent.com/shop/cora-z7-zynq-7000-single-core-for-arm-fpga-soc-development/) development board. Nevertheless, the very same principles apply to any Zynq-7000 board with a passive [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter) (AAF) on analog inputs.
+In this chapter, I will discuss the unipolar analog input circuitry of the Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/start) development board. Nevertheless, the very same principles apply to any Zynq-7000 board with a passive [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter) (AAF) on analog inputs.
 
 The pins labeled A0-A5 on the Cora Z7 board can be used as digital I/O pins or analog input pins for the auxiliary single-ended channels. How the given pin is used (digital vs. analog) is controlled by a constraint specified in the HW design.  
 The following table lists the assignment of Cora Z7 pins to the XADC auxiliary channels.
@@ -347,7 +347,7 @@ Using an external voltage reference allows the board designer to achieve higher 
 > There is a "catch" regarding gain calibration:  
 > It shouldn't be used when the XADC calibration is done by internal voltage reference of the Zynq-7000 chip (see details explained [here](https://adaptivesupport.amd.com/s/article/53586?language=en_US)).
 >
-> This is the case for the Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual) board, which I use in this tutorial.  
+> This is the case for the Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/start) board, which I use in this tutorial.  
 > Zynq-7000 reference input pins VREFP and VREFN are connected to ADCGND on this board. Therefore, the internal voltage reference is utilized for calibration.
 >
 > You need to correctly handle this in the PS code, as I explain in the next paragraphs.
@@ -378,11 +378,13 @@ else
     // Use only Offset Coefficient
     CalibrationEnables = XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK;
 
-//Set the correct use of calibration coefficients
+//Set the correct use of the calibration coefficients
 XSysMon_SetCalibEnables( &XADCInstance, CalibrationEnables );
 ```
 
 ### Measurement precision example
+
+How precise can the XADC measurement be? Judging by my specimen of the [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/start) 
 
 no averaging: Mean Value: 2.49800 V
 
