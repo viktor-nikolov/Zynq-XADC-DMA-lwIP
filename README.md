@@ -274,8 +274,7 @@ We see that the simulation is consistent with the settling time we calculated in
 Please note that the settling time does not depend on the magnitude of the input signal change. In this simulation, the change in each step is 0.5 V. However, if I changed the steps to only 0.05 V, it would still take the output signal 15.17 μs to settle on the new level. The shape of the chart would be the same.
 
 So, the simulation matches the theory. But does it really work in practice?  
-It does. :smiley: I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using the software app shared in this repository. See the following figure.  
-**TODO: link to the SW app**
+It does. :smiley: I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using the [software app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) shared in this repository. See the following figure.
 
 <img src="pictures\Cora_Z7_stair_signal_reading.png">
 
@@ -323,8 +322,7 @@ The V<sub>P</sub>/V<sub>N</sub> channel's AAF cutoff frequency is pretty high at
 
 There are no surprises. The 50 kHz signal is negligibly attenuated by the AAF, and there is a very slight phase shift in the output.
 
-I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using the software app shared in this repository. The resulting measurement shown in the following figure is exactly as expected.  
-**TODO: link to the SW app**
+I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using the [software app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) shared in this repository. The resulting measurement shown in the following figure is exactly as expected.
 
 <img src="pictures\Cora_Z7_diff_signal_reading.png">
 
