@@ -380,9 +380,11 @@ else
 XSysMon_SetCalibEnables( &XADCInstance, CalibrationEnables );
 ```
 
-### Measurement precision example
+### Measurement precision—practical example
 
-How precise can the XADC measurement be? Judging by my specimen of the [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/start), it can be pretty precise if averaging is used.
+How precise can the XADC measurement be? Judging by my specimen of the [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/start), it can be pretty precise when you use averaging.
+
+I connected a voltage reference to the 
 
 no averaging: Mean Value: 2.49800 V
 
