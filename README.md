@@ -85,7 +85,7 @@ Zynq-7000 XADC is a 12-bit ADC. However, the XADC [status registers](https://doc
 In general, the 12 most significant bits of the register are the converted XADC sample. Do ignore the 4 least significant bits.
 
 It is possible to configure the XADC to do an averaging of consecutive 16, 64 or 256 samples (see function [XSysMon_SetAvg](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L488)). I.e., to do the oversampling. The 4 least significant bits are then used to represent the averaged value with enhanced precision, i.e., the whole 16 bits of a status register can be used.  
-Obviously, letting the XADC do the averaging makes sense for slowly changing input signals where noise is expected to be removed by the averaging. I show a practical example of the effect of averaging in the [Measurement precision—practical example](#measurement-precisionpractical-example) chapter of this tutorial.
+Obviously, letting the XADC do the averaging makes sense for slowly changing input signals where noise is expected to be removed by the averaging. I show a practical example of the effect of averaging in the [Measurement precision—a practical example](#measurement-precisiona-practical-example) chapter of this tutorial.
 
 ### Clocking, sampling rate, and bandwidth
 
