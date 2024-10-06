@@ -372,8 +372,10 @@ u16 GainCoeff = XSysMon_GetCalibCoefficient( &XADCInstance, XSM_CALIB_GAIN_ERROR
 
 u16 CalibrationEnables;
 if( GainCoeff != 0x007F ) // True when external voltage reference is used
+    // Use both Offset and Gain Coefficients
     CalibrationEnables = XSM_CFR1_CAL_ADC_GAIN_OFFSET_MASK | XSM_CFR1_CAL_PS_GAIN_OFFSET_MASK;
 else
+    // Use only Offset Coefficient
     CalibrationEnables = XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK;
 
 //Set the correct use of calibration coefficients
