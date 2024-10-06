@@ -384,7 +384,7 @@ XSysMon_SetCalibEnables( &XADCInstance, CalibrationEnables );
 
 ### Measurement precision example
 
-How precise can the XADC measurement be? Judging by my specimen of the [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/start) 
+How precise can the XADC measurement be? Judging by my specimen of the [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/start), it can be pretty precise if averaging is used.
 
 no averaging: Mean Value: 2.49800 V
 
@@ -399,6 +399,12 @@ bla
 ## DMA
 
 TODO
+
+[How AXI4-Stream Works • Vitis High-Level Synthesis User Guide (UG1399) • Reader • AMD Technical Information Portal](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works)
+
+This Verilog module is part of the XADC tutorial. It controls when the data from the slave AXI-Stream interface starts to be sent to the master AXI-Stream interface. It also controls how many data transfers are made and asserts the TLAST signal on the last transfer.
+
+
 
 
 
