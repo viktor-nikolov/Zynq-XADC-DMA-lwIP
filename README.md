@@ -368,7 +368,7 @@ We can write an XADC calibration setup code, which is portable between different
 
 ```c
 //Read value of the Gain Calibration Coefficient from the XADC register
-u16 GainCoeff = XSysMon_GetCalibCoefficient(&XADCInstance, XSM_CALIB_GAIN_ERROR_COEFF);
+u16 GainCoeff = XSysMon_GetCalibCoefficient( &XADCInstance, XSM_CALIB_GAIN_ERROR_COEFF );
 
 u16 CalibrationEnables;
 if( GainCoeff != 0x007F ) // True when external voltage reference is used
@@ -377,7 +377,7 @@ else
     CalibrationEnables = XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK;
 
 //Set the correct use of calibration coefficients
-XSysMon_SetCalibEnables(&XADCInstance, CalibrationEnables);
+XSysMon_SetCalibEnables( &XADCInstance, CalibrationEnables );
 ```
 
 ### Measurement precision example
