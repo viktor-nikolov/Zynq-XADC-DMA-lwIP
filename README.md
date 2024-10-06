@@ -348,13 +348,13 @@ Using an external voltage reference allows the board designer to achieve higher 
 > It shouldn't be used when the XADC calibration is done by internal voltage reference of the Zynq-7000 chip (see details explained [here](https://adaptivesupport.amd.com/s/article/53586?language=en_US)).
 >
 > This is the case for the Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/reference-manual) board, which I use in this tutorial.  
-> Zynq-7000 reference input pins VREFP and VREFN are connected to ADCGND on this board. Therefore, the internal voltage references are utilized for calibration.
+> Zynq-7000 reference input pins VREFP and VREFN are connected to ADCGND on this board. Therefore, the internal voltage reference is utilized for calibration.
 >
 > You need to correctly handle this in the PS code, as I explain in the next paragraphs.
 
 When you know exactly what Zynq-7000 board your code will run on, you can hard-code the configuration, understanding whether the external or internal reference is used. See the schematics of your board to check what is connected to Zynq-7000 [reference input pins VREFP and VREFN](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Reference-Inputs-VREFP-and-VREFN). The internal voltage reference is used if they are connected to the ADCGND (i.e., the ground of XADC circuitry).
 
-Use the following call (after you initialize the XADC instance) when the internal voltage reference is used to enable only Offset Calibration Coefficient used for XADC and Zynq power supply measurements:
+Use the following call (after you initialize the XADC instance) when the internal voltage reference is used to enable only the Offset Calibration Coefficient used for XADC and Zynq power supply measurements:
 
 `XSysMon_SetCalibEnables(&XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK);`
 
@@ -362,7 +362,9 @@ When the  Zynq-7000 board you are using provides an external voltage reference, 
 
 `XSysMon_SetCalibEnables(&XADCInstance, XSM_CFR1_CAL_ADC_GAIN_OFFSET_MASK | XSM_CFR1_CAL_PS_GAIN_OFFSET_MASK);`
 
-TODO
+When the Zynq-7000 internal voltage reference is used for the calibration, the calibration of XADC gain is actually not done (only the XADC offset is calibrated). As explained [here](https://adaptivesupport.amd.com/s/article/53586?language=en_US), the value of the Gain Calibration Coefficient is set to 0x007F in such a case. 0x007F represents the maximum Gain Coefficient of 6.3%. Obviously, letting XADC apply this maximal Gain Coefficient would significantly reduce the precision of digitalization.
+
+We can write an XADC calibration setup code, which is portable between different Zynq-7000 boards, by checking the value of the Gain Calibration Coefficient. 
 
 ```c
 u16 GainCoeff = XSysMon_GetCalibCoefficient(&XADCInstance, XSM_CALIB_GAIN_ERROR_COEFF);
@@ -371,12 +373,8 @@ if( GainCoeff != 0x007F ) // True when external voltage reference is used
     CalibrationEnables = XSM_CFR1_CAL_ADC_GAIN_OFFSET_MASK | XSM_CFR1_CAL_PS_GAIN_OFFSET_MASK;
 else
     CalibrationEnables = XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK;
-XSysMon_SetCalibEnables(&XADCInstance, CalibrationEnables );
+XSysMon_SetCalibEnables(&XADCInstance, CalibrationEnables);
 ```
-
-TODO
-
-From [this post](https://support.xilinx.com/s/article/53586?language=en_US), I know that the Gain Calibration Coefficient will always be 0x7F with internal references.
 
 ### Measurement precision example
 
