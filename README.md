@@ -387,7 +387,7 @@ How precise can the XADC measurement be? Judging by my specimen of the [Cora Z7]
 I connected a voltage reference to the unipolar auxiliary channel VAUX[1] of my Cora Z7. My freshly calibrated 6½ digits multimeter measured the reference as 2.495 V.  
 I let the XADC digitize 6400 samples at 1 Msps using the [software app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) shared in this repository. The mean value of the 6400 samples was 2.498 V.
 
-Only a 3 mV difference between a Cora Z7 and an expensive digital multimeter is an excellent result! Mind that the Cora Z7 board doesn't provide an external voltage reference for XADC calibration and that a voltage divider is placed before the VAUX[1] input.  
+Only a 3 mV difference between a Cora Z7 and an expensive digital multimeter is an excellent result! Mind that the Cora Z7 board doesn't provide an external voltage reference for XADC calibration and that two resistors forming a voltage divider are placed before the VAUX[1] input.  
 Doing the averaging is no "cheating." Every high-precision voltmeter does the same.
 
 The following figure shows the first 800 samples of my XADC measurement.
