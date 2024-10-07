@@ -387,20 +387,22 @@ How precise can the XADC measurement be? Judging by my specimen of the [Cora Z7]
 I connected a voltage reference to the unipolar auxiliary channel VAUX[1] of my Cora Z7. My freshly calibrated 6½ digits multimeter measured the reference as 2.495 V.  
 I let the XADC digitize 6400 samples at 1 Msps using the [software app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) shared in this repository. The mean value of the 6400 samples was 2.498 V.
 
-Only a 3 mV difference between a Cora Z7 and an expensive digital multimeter is an excellent result! Mind that the Cora Z7 board doesn't provide an external voltage reference for XADC calibration and that two resistors forming a voltage divider are placed before the VAUX[1] input.  
+Only a 3 mV difference between a Cora Z7 and an expensive digital multimeter is an excellent result! Mind that the Cora Z7 board doesn't provide an external voltage reference for XADC calibration and that two resistors forming a voltage divider are placed before the VAUX[1] input, i.e., tolerances of the resistors are at play here.  
 Doing the averaging is no "cheating." Every high-precision voltmeter does the same.
 
 The following figure shows the first 800 samples of my XADC measurement.
 
 <img src="pictures\Cora_Z7_2.495V_reading.png">
 
-We see that the noise makes most of the samples oscillate in an 8-bit interval of the 12-bit measurement. One bit represents a 0.81 mV change in the measured voltage.
+We see that the noise makes most of the samples oscillate in an interval of 8 bits (8 values) of the 12-bit measurement. One bit represents a 0.81 mV change in the measured voltage.
+
+I mentioned earlier that the XADC can be configured to do averaging of samples. Is set 64-sample averaging by calling `XSysMon_SetAvg(&XADCInstance, XSM_AVG_64_SAMPLES);` and caputed 100 samples, which are shown on the next figure. 
 
 with 64 averaging: Mean Value: 2.49815 V
 
 <img src="pictures\Cora_Z7_2.495V_64avg_reading.png">
 
-bla
+The signal is much cleaner now. Basic sample rate of the XADC is still 1 Msps, but it evarages 64 samples before it produces one sample as the output. The apparent sample rate is therefore 15.6 ksps ($`1000k/64´=15.6k`$ )
 
 ## DMA
 
