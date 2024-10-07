@@ -407,20 +407,17 @@ Of course, you can achieve 64-sample averaging (or any other type of averaging) 
 
 ## DMA (Direct Memory Access)
 
-I think that the most practical way to transfer large amounts of samples from the XADC for processing in the PS is by means of DMA (Direct Memory Access). This is achieved by including the [AXI Direct Memory Access IP](https://www.xilinx.com/products/intellectual-property/axi_dma.html) in the HW design.
+I think the most practical way to transfer large amounts of samples from the XADC for processing in the PS is by means of DMA (Direct Memory Access). This is achieved by including the [AXI Direct Memory Access IP](https://www.xilinx.com/products/intellectual-property/axi_dma.html) in the HW design.
 
 <img src="pictures\bd_axi_dma_ip.png" title=""  width="300">
 
-The "magic" of the DMA IP is that it gets input data from the AXI-Stream interface S_AXIX_S2MM and sends them via output AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM being involved.  
-In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appear in the `DataBuffer`.
+The "magic" of the AXI DMA IP is that it gets data from the [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) input interface S_AXIX_S2MM and sends them via output AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM cores being involved.  
+In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appears in the `DataBuffer` (I will explain all the details in a later chapter).
 
-TODO
+The [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) can be configured to have an output AXI-Stream interface. When you configure the XADC for continuous sampling, you will get the actual stream of data coming out from the XADC Wizard AXI-Stream interface. However, this stream of data is not ready to be connected directly to the AXI DMA IP.  
+The thing is that the AXI-Stream interface on the XADC Wizard IP doesn't contain an AXI-Stream signal TLAST. This signal is asserted to indicate the end of the data stream. The AXI DMA IP needs to receive the TLAST signal to know when to stop the DMA transfer.
 
-[How AXI4-Stream Works • Vitis High-Level Synthesis User Guide (UG1399) • Reader • AMD Technical Information Portal](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works)
-
+Therefore, we need an intermediate PL module to handle the AXI-Stream between the XADC Wizard IP and the AXI DMA IP. I wrote a module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) for use in this tutorial.   
 This Verilog module is part of the XADC tutorial. It controls when the data from the slave AXI-Stream interface starts to be sent to the master AXI-Stream interface. It also controls how many data transfers are made and asserts the TLAST signal on the last transfer.
-
-
-
 
 
