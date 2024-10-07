@@ -405,11 +405,14 @@ The output of XADC's averaging is a 16-bit value, so we see much finer differenc
 
 Of course, you can achieve 64-sample averaging (or any other type of averaging) by post-processing raw 12-bit samples with the PS code or PL logic. Nevertheless, 16, 64, or 256-sample averaging, which the XADC is able to do internally, can save you the coding effort.
 
-## DMA
+## DMA (Direct Memory Access)
 
-I think that the most practical way to transfer large amounts of samples from the XADC for processing in the PS is by means of DMA (direct memory access). This is achieved by including the [AXI Direct Memory Access IP](https://www.xilinx.com/products/intellectual-property/axi_dma.html) in the HW design.
+I think that the most practical way to transfer large amounts of samples from the XADC for processing in the PS is by means of DMA (Direct Memory Access). This is achieved by including the [AXI Direct Memory Access IP](https://www.xilinx.com/products/intellectual-property/axi_dma.html) in the HW design.
 
-<img src="pictures\bd_axi_dma_ip.png" title=""  width="250">
+<img src="pictures\bd_axi_dma_ip.png" title=""  width="300">
+
+The "magic" of the DMA IP is that it gets input data from the AXI-Stream interface S_AXIX_S2MM and sends them via output AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM being involved.  
+In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appear in the `DataBuffer`.
 
 TODO
 
