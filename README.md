@@ -394,18 +394,22 @@ The following figure shows the first 800 samples of my XADC measurement.
 
 <img src="pictures\Cora_Z7_2.495V_reading.png">
 
-We see that the noise makes most of the samples oscillate in an interval of 8 bits (8 values) of the 12-bit measurement. One bit represents a 0.81 mV change in the measured voltage.
+We see that the noise makes most of the samples oscillate in an interval of 8 bits (8 values) of the 12-bit measurements. One bit represents a 0.81 mV change in the measured voltage.
 
 I mentioned earlier that the XADC can be configured to do averaging of samples. It set 64-sample averaging by calling `XSysMon_SetAvg(&XADCInstance, XSM_AVG_64_SAMPLES);` and captured 100 samples shown in the next figure. 
 
 <img src="pictures\Cora_Z7_2.495V_64avg_reading.png">
 
 The signal looks much cleaner now. The basic sample rate of the XADC is still 1 Msps, but it averages 64 samples before it produces one sample as the output. Therefore, the apparent sample rate is 15.6 ksps ( $`1000/64\dot{=}15.6`$ ). The 100 data points shown in the figure are the result of 6400 samples done by the XADC.  
-The output of XADC's averaging is a 16-bit value, so we see much finer differences between the data points compared to raw 12-bit samples.
+The output of XADC's averaging is a 16-bit value, so we see much finer differences between the data points compared to raw 12-bit samples in the previous figure.
 
-Of course, you can achieve 64-sample averaging (or any other type of averaging) by post-processing raw 12-bit samples in the PS code or PL logic. Nevertheless, 16, 64, or 256-sample averaging, which the XADC is able to do internally, can save you the coding effort.
+Of course, you can achieve 64-sample averaging (or any other type of averaging) by post-processing raw 12-bit samples with the PS code or PL logic. Nevertheless, 16, 64, or 256-sample averaging, which the XADC is able to do internally, can save you the coding effort.
 
 ## DMA
+
+I think that the most practical way to transfer large amounts of samples from the XADC for processing in the PS is by means of DMA (direct memory access). This is achieved by including the [AXI Direct Memory Access IP](https://www.xilinx.com/products/intellectual-property/axi_dma.html) in the HW design.
+
+<img src="pictures\bd_axi_dma_ip.png" title=""  width="250">
 
 TODO
 
