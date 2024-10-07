@@ -400,7 +400,7 @@ I mentioned earlier that the XADC can be configured to do averaging of samples. 
 
 <img src="pictures\Cora_Z7_2.495V_64avg_reading.png">
 
-The signal looks much cleaner now. The basic sample rate of the XADC is still 1 Msps, but it averages 64 samples before it produces one sample as the output. Therefore, the apparent sample rate is 15.6 ksps ($`1000/64\dot{=}15.6`$ ). The 100 data points shown in the figure are the result of 6400 samples done by the XADC.  
+The signal looks much cleaner now. The basic sample rate of the XADC is still 1 Msps, but it averages 64 samples before it produces one sample as the output. Therefore, the apparent sample rate is 15.6 ksps ( $`1000/64\dot{=}15.6`$ ). The 100 data points shown in the figure are the result of 6400 samples done by the XADC.  
 The output of XADC's averaging is a 16-bit value, so we see much finer differences between the data points compared to raw 12-bit samples.
 
 Of course, you can achieve 64-sample averaging (or any other type of averaging) by post-processing raw 12-bit samples in the PS code or PL logic. Nevertheless, 16, 64, or 256-sample averaging, which the XADC is able to do internally, can save you the coding effort.
