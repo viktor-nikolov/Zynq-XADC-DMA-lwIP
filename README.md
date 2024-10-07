@@ -6,6 +6,8 @@ The Cora Z7 is a suitable board for testing the Zynq XADC because it has analog 
 
 The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain. **TODO**
 
+Before we dive into drawing a block diagram in Vivado and writing code in Vitis, we need to understand the basics of the XDAC and be aware of important aspects and limitations. Let me cover this in the first chapters of this tutorial.
+
 ## TODOs, to be removed
 
 - Oversampling: https://www.silabs.com/documents/public/application-notes/an118.pdf
@@ -26,7 +28,7 @@ The XADC is a feature of an analog-to-digital converter integrated on selected X
 1.  The System Monitor (SYSMON) reads the Zynq chip temperature and voltages of various Zynq power rails.
 1.  The XADC reads voltages from external inputs, which are called channels.
 
-In this tutorial, we will focus solely on XADC. But please don't get confused, Xilinx library functions for controlling XADC are defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h).
+In this tutorial, we will focus solely on XADC. But please don't get confused. Xilinx library functions for controlling XADC are defined in [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h).
 
 XADC can read one external input (channel) at a time and provides a means for switching between channels.  
 The Zynq-7000 XADC has one dedicated analog input channel called V<sub>P</sub>/V<sub>N</sub> and 16 so-called auxiliary channels named VAUX[0..15].
@@ -69,7 +71,7 @@ We will also configure the XADC for Continuous Sampling. In this timing mode, th
 Zynq-7000 XADC is a 12-bit ADC. However, the XADC [status registers](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Status-Registers) storing the conversion result are 16-bit, and the function [XSysMon_GetAdcData](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L331) also returns a 16-bit value.
 In general, the 12 most significant bits of the register are the converted XADC sample. Do ignore the 4 least significant bits.
 
-It is possible to configure the XADC to do an averaging of consecutive 16, 64 or 256 samples (see function [XSysMon_SetAvg](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L488)). I.e., to do the oversampling. The 4 least significant bits are then used to represent the averaged value with enhanced precision, i.e., the whole 16 bits of a status register can be used.  
+It is possible to configure the XADC to do an averaging of consecutive 16, 64, or 256 samples (see function [XSysMon_SetAvg](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L488)). I.e., to do the oversampling. The 4 least significant bits are then used to represent the averaged value with enhanced precision, i.e., the whole 16 bits of a status register can be used.  
 Obviously, letting the XADC do the averaging makes sense for slowly changing input signals where noise is expected to be removed by the averaging. I show a practical example of the effect of averaging in the [Measurement precision—a practical example](#measurement-precisiona-practical-example) chapter of this tutorial.
 
 ### Clocking, sampling rate, and bandwidth
@@ -242,14 +244,14 @@ We can calculate the settling time of this circuit as follows:
 t_{settling} = \ln(2^{12+1}) \times ( 140 + 140 ) \times 1 \times 10^{-9} = 2.52 \mskip3mu \mu s
 ```
 
-In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. The later chapter will explore how the circuit behaves in practice and to which use cases the 396.3 kHz sampling rate applies well.
+In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. In the next chapter, we will explore how the circuit behaves in practice and to which use cases the 396.3 kHz sampling rate applies well.
 
 ## Acquisition and settling time—the practice
 
 ### The behavior of unipolar auxiliary channel AAF of Cora Z7
 
 Let's see what the low-pass AAF does to a signal.  
-I simulated a square wave signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the previous chapter. The result of the simulation is in the following figure.
+I simulated a square wave signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the [previous chapter](#settling-time-of-auxiliary-unipolar-channel-aaf-of-cora-z7). The result of the simulation is in the following figure.
 
 <img src="pictures\Cora_Z7_stair_signal_simulation.png">
 
@@ -409,4 +411,4 @@ Therefore, we need an intermediate PL module to handle the AXI-Stream data betwe
 This Verilog module controls when the data from the slave AXI-Stream interface (connected to the XADC Wizard) starts to be sent to the master AXI-Stream interface (connected to the AXI DMA).  This happens when the input signal start is asserted.
 The module also controls how many data transfers are made (the input signal count defines this) and asserts the TLAST signal of the m_axis interface on the last transfer.
 
-We will control the input signals start and count from the PS (will connect them to the GPIO). First, we set the count, then call `XAxiDma_SimpleTransfer`, and lastly, assert the start signal so the data starts to flow into the AXI DMA IP and thus into the RAM. This will ensure full control of how many data points are transferred from the XADC into the RAM.
+We will control the input signals start and count from the PS (will connect them to the GPIO). First, we set the count, then call `XAxiDma_SimpleTransfer()`, and lastly, assert the start signal so the data starts to flow into the AXI DMA IP and thus into the RAM. This will ensure full control of how many data points are transferred from the XADC into the RAM.
