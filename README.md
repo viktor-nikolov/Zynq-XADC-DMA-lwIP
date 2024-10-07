@@ -1,10 +1,10 @@
 # Tutorial: Xilinx Zynq XADC using DMA and network streaming
-This tutorial shows how to do an HW design and code a SW application to make use of AMD Xilinx Zynq-7000 [XADC](https://www.xilinx.com/products/technology/analog-mixed-signal.html). We will also see how to use the [DMA](https://www.xilinx.com/products/intellectual-property/axi_dma.html) to transfer data from the XADC into Zynq CPU's memory and stream data to a remote server over the network.
+This tutorial shows how to do an HW design and code a SW application to make use of AMD Xilinx Zynq-7000 [XADC](https://www.xilinx.com/products/technology/analog-mixed-signal.html). We will also see how to use the [DMA](https://www.xilinx.com/products/intellectual-property/axi_dma.html) to transfer data from the XADC into Zynq CPU's memory and stream data to a remote PC over the network.
 
 In this tutorial, I'm using the Digilent board [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start). However, all the principles described here can be used on any other Zynq-7000 board. I will highlight aspects specific to Cora Z7 in the text.  
 The Cora Z7 is a suitable board for testing the Zynq XADC because it has analog inputs that are usable in a practical way.
 
-The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain.
+The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain. **TODO**
 
 ## TODOs, to be removed
 
@@ -15,24 +15,9 @@ The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain.
 
 Cora Z7 has VREFP and VREFN connected to ADCGND
 
-- The XADC also has an on-chip reference option which is selected by connecting VREFP and VREFN to ADCGND as shown in Figure 6-1. Due to reduced accuracy, the on-chip reference does impact the measurement performance of the XADC as explained previously
-
-
-
-We will set the XADC to use 10 ADCCLK clocks for the acquisition. For 10 clocks to have a duration of 629 ns, we would need to use a frequency of 15.898&nbsp;MHz. 
-We need to find an XADC input frequency DCLK, which, divided by an integer, results in a frequency close to 15.898&nbsp;MHz.
-
-Using a Clocking Wizard, we are able to generate an output frequency of 95.363 MHz (with the Wizard clocked by 50&nbsp;MHz from the Zynq FCLK_CLK0).  
-95.363 MHz divided by 6 gives us a DCLK of 15.894 MHz, which is very close to the value we desire.
-
-With ADCCLK of 15.894 MHz, we will achieve a sampling rate of 497 ksps (a single conversion cycle will take 32 ADCCLKs).
-
-This would allow us to use a sampling rate of 1 Msps because, with the ADCCLK frequency of 26&nbsp;MHz and 4 ADCCLKs allowed for the acquisition, we get 150&nbsp;ns acquisition time, which is more than enough.
-
-However, in our design, we are limited to using an ADCCLK frequency of 23.84&nbsp;MHz (95.363&nbsp;MHz divided by 4) because we must use an XADC clock of 95.363&nbsp;MHz to achieve the 629&nbsp;ns acquisition time for the unipolar input as described in the previous chapter.  
-Therefore, the resulting sampling rate will be 917 ksps (a single conversion cycle will take 26 ADCCLKs).
-
 ## A short introduction to Zynq-7000 XADC
+
+
 
 ### What is XADC
 
@@ -411,15 +396,17 @@ I think the most practical way to transfer large amounts of samples from the XAD
 
 <img src="pictures\bd_axi_dma_ip.png" title=""  width="300">
 
-The "magic" of the AXI DMA IP is that it gets data from the [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) input interface S_AXIX_S2MM and sends them via output AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM cores being involved.  
+The "magic" of the AXI DMA is that it gets data from the [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) input interface S_AXIX_S2MM and sends them via output AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM cores being involved.  
 In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appears in the `DataBuffer` (I will explain all the details in a later chapter).
 
-The [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) can be configured to have an output AXI-Stream interface. When you configure the XADC for continuous sampling, you will get the actual stream of data coming out from the XADC Wizard AXI-Stream interface. However, this stream of data is not ready to be connected directly to the AXI DMA IP.  
-The thing is that the AXI-Stream interface on the XADC Wizard IP doesn't contain an AXI-Stream signal TLAST. This signal is asserted to indicate the end of the data stream. The AXI DMA IP needs to receive the TLAST signal to know when to stop the DMA transfer.
+The [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) can be configured to have an output AXI-Stream interface. When you configure the XADC for continuous sampling, you will get the actual stream of data coming out from the XADC Wizard AXI-Stream interface. However, this stream of data is not ready to be connected directly to the AXI DMA.  
+The thing is that the AXI-Stream interface on the XADC Wizard doesn't contain an AXI-Stream signal TLAST. This signal is asserted to indicate the end of the data stream. The AXI DMA must receive the TLAST signal to know when to stop the DMA transfer.
 
-Therefore, we need an intermediate PL module to handle the AXI-Stream between the XADC Wizard IP and the AXI DMA IP. I wrote a module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) for use in this tutorial.
+Therefore, we need an intermediate PL module to handle the AXI-Stream data between the XADC Wizard and the DMA IP. I wrote a module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) for use in this tutorial.
 
 <img src="pictures\bd_tlaster.png" title=""  width="200">
 
-This Verilog module controls when the data from the slave AXI-Stream interface starts to be sent to the master AXI-Stream interface. It also controls how many data transfers are made and asserts the TLAST signal on the last transfer.
+This Verilog module controls when the data from the slave AXI-Stream interface (connected to the XADC Wizard) starts to be sent to the master AXI-Stream interface (connected to the AXI DMA).  This happens when the input signal start is asserted.
+The module also controls how many data transfers are made (the input signal count defines this) and asserts the TLAST signal of the m_axis interface on the last transfer.
 
+We will control the input signals start and count from the PS (will connect them to the GPIO). First, we set the count, then call `XAxiDma_SimpleTransfer`, and lastly, assert the start signal so the data starts to flow into the AXI DMA IP and thus into the RAM. This will ensure full control of how many data points are transferred from the XADC into the RAM.
