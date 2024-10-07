@@ -419,7 +419,7 @@ The thing is that the AXI-Stream interface on the XADC Wizard IP doesn't contain
 
 Therefore, we need an intermediate PL module to handle the AXI-Stream between the XADC Wizard IP and the AXI DMA IP. I wrote a module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) for use in this tutorial.
 
-<img src="pictures\bd_tlaster.png" title=""  width="250">
+<img src="pictures\bd_tlaster.png" title=""  width="200">
 
 This Verilog module controls when the data from the slave AXI-Stream interface starts to be sent to the master AXI-Stream interface. It also controls how many data transfers are made and asserts the TLAST signal on the last transfer.
 
