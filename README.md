@@ -402,7 +402,7 @@ with 64 averaging: Mean Value: 2.49815 V
 
 <img src="pictures\Cora_Z7_2.495V_64avg_reading.png">
 
-The signal is much cleaner now. Basic sample rate of the XADC is still 1 Msps, but it evarages 64 samples before it produces one sample as the output. The apparent sample rate is therefore 15.6 ksps ($`1000k/64´=15.6k`$ )
+The signal is much cleaner now. The basic sample rate of the XADC is still 1 Msps, but it averages 64 samples before it produces one sample as the output. The apparent sample rate is, therefore, 15.6 ksps ($`1000/64=15.6k`$ )
 
 ## DMA
 
