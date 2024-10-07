@@ -417,7 +417,9 @@ In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (U
 The [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) can be configured to have an output AXI-Stream interface. When you configure the XADC for continuous sampling, you will get the actual stream of data coming out from the XADC Wizard AXI-Stream interface. However, this stream of data is not ready to be connected directly to the AXI DMA IP.  
 The thing is that the AXI-Stream interface on the XADC Wizard IP doesn't contain an AXI-Stream signal TLAST. This signal is asserted to indicate the end of the data stream. The AXI DMA IP needs to receive the TLAST signal to know when to stop the DMA transfer.
 
-Therefore, we need an intermediate PL module to handle the AXI-Stream between the XADC Wizard IP and the AXI DMA IP. I wrote a module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) for use in this tutorial.   
-This Verilog module is part of the XADC tutorial. It controls when the data from the slave AXI-Stream interface starts to be sent to the master AXI-Stream interface. It also controls how many data transfers are made and asserts the TLAST signal on the last transfer.
+Therefore, we need an intermediate PL module to handle the AXI-Stream between the XADC Wizard IP and the AXI DMA IP. I wrote a module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) for use in this tutorial.
 
+<img src="pictures\bd_tlaster.png" title=""  width="250">
+
+This Verilog module controls when the data from the slave AXI-Stream interface starts to be sent to the master AXI-Stream interface. It also controls how many data transfers are made and asserts the TLAST signal on the last transfer.
 
