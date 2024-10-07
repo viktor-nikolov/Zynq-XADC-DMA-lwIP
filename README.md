@@ -396,13 +396,14 @@ The following figure shows the first 800 samples of my XADC measurement.
 
 We see that the noise makes most of the samples oscillate in an interval of 8 bits (8 values) of the 12-bit measurement. One bit represents a 0.81 mV change in the measured voltage.
 
-I mentioned earlier that the XADC can be configured to do averaging of samples. Is set 64-sample averaging by calling `XSysMon_SetAvg(&XADCInstance, XSM_AVG_64_SAMPLES);` and caputed 100 samples, which are shown on the next figure. 
-
-with 64 averaging: Mean Value: 2.49815 V
+I mentioned earlier that the XADC can be configured to do averaging of samples. It set 64-sample averaging by calling `XSysMon_SetAvg(&XADCInstance, XSM_AVG_64_SAMPLES);` and captured 100 samples shown in the next figure. 
 
 <img src="pictures\Cora_Z7_2.495V_64avg_reading.png">
 
-The signal is much cleaner now. The basic sample rate of the XADC is still 1 Msps, but it averages 64 samples before it produces one sample as the output. The apparent sample rate is, therefore, 15.6 ksps ($`1000/64=15.6k`$ )
+The signal looks much cleaner now. The basic sample rate of the XADC is still 1 Msps, but it averages 64 samples before it produces one sample as the output. Therefore, the apparent sample rate is 15.6 ksps ($`1000/64=15.6`$ ). The 100 data points shown in the figure are the result of 6400 samples done by the XADC.  
+The output of XADC's averaging is a 16-bit value, so we see much finer differences between the data points compared to raw 12-bit samples.
+
+Of course, you can achieve 64-sample averaging (or any other type of averaging) by post-processing raw 12-bit samples in the PS code or PL logic. Nevertheless, 16, 64, or 256-sample averaging, which the XADC is able to do internally, can save you the coding effort.
 
 ## DMA
 
