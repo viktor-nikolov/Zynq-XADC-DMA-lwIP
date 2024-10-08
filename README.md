@@ -112,7 +112,7 @@ The data sheet doesn't mention the bandwidth of the dedicated analog input chann
 
 ## Acquisition and settling time—the theory
 
-In this chapter, I will summarize what Zynq-7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC) and the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) tell us about acquisition and settling time.
+In this chapter, I will summarize what Zynq-7000 XADC User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC) and the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) tell us about the acquisition and settling time.
 
 ### Acquisition time
 
@@ -263,7 +263,7 @@ Please note that the settling time does not depend on the magnitude of the input
 So, the simulation matches the theory. But does it really work in practice?  
 It does. :smiley: I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using the [software app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) shared in this repository. See the following figure.
 
-<img src="pictures\Cora_Z7_stair_signal_reading.png">
+<img src="pictures\Cora_Z7_stair_signal_reading.png" alt="Zynq-7000 XADC square wave signal digitization">
 
 As you can see, the real-life measurement on the physical HW matches the simulation pretty well.
 
@@ -311,7 +311,7 @@ There are no surprises. The 50 kHz signal is negligibly attenuated by the AAF, a
 
 I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using the [software app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) shared in this repository. The resulting measurement shown in the following figure is exactly as expected. A 50 kHz differential is captured by the XADC with good precision.
 
-<img src="pictures\Cora_Z7_diff_signal_reading.png">
+<img src="pictures\Cora_Z7_diff_signal_reading.png" alt="Zynq-7000 XADC differential signal digitization">
 
 ## Calibration and precision
 
@@ -379,13 +379,13 @@ Doing the averaging is no "cheating." Every high-precision voltmeter does the sa
 
 The following figure shows the first 800 samples of my XADC measurement.
 
-<img src="pictures\Cora_Z7_2.495V_reading.png">
+<img src="pictures\Cora_Z7_2.495V_reading.png" alt="Zynq-7000 XADC constant signal digitization">
 
 We see that the noise makes most of the samples oscillate in an interval of 8 bits (8 values) of the 12-bit measurements. One bit represents a 0.81 mV change in the measured voltage.
 
 I mentioned earlier that the XADC can be configured to do averaging of samples. It set 64-sample averaging by calling `XSysMon_SetAvg(&XADCInstance, XSM_AVG_64_SAMPLES);` and captured 100 samples shown in the next figure. 
 
-<img src="pictures\Cora_Z7_2.495V_64avg_reading.png">
+<img src="pictures\Cora_Z7_2.495V_64avg_reading.png" alt="Zynq-7000 XADC constant signal digitization with averaging">
 
 The signal looks much cleaner now. The basic sample rate of the XADC is still 1 Msps, but it averages 64 samples before it produces one sample as the output. Therefore, the apparent sample rate is 15.6 ksps ( $`1000/64\dot{=}15.6`$ ). The 100 data points shown in the figure are the result of 6400 samples done by the XADC.  
 The output of XADC's averaging is a 16-bit value, so we see much finer differences between the data points compared to raw 12-bit samples in the previous figure.
