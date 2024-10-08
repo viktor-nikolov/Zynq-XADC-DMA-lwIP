@@ -418,8 +418,11 @@ We will control the input signals `start` and `count` from the PS (will connect 
 
 ## Hardware design in Vivado
 
+Note: I'm using the board Digilent [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start) in this tutorial. However, most of the steps are valid also for any other Zynq-7000 board.  
+I'm using Vivado 2024.1. Nevertheless, the same steps work also in Vivado 2023.1.
+
 Make sure you have Digilent board files installed. [This article](https://digilent.com/reference/programmable-logic/guides/install-board-files) provides instructions on how to install them.  
 
 - In short: Download the most recent [Master Branch ZIP Archive](https://github.com/Digilent/vivado-boards/archive/master.zip), open it, and extract the content of folder \vivado-boards-master\new\board_files into c:\Xilinx\Vivado\2024.1\data\boards\board_files\\. You may need to create the folder board_files at the destination.
 
-Create a new RTL Project in Vivado 2024.1.
+Create a new RTL Project in Vivado 2024.1. Select your version of Cora Z7 from the list of boards.
