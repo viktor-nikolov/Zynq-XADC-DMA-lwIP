@@ -294,7 +294,7 @@ The settling time, which you can calculate using formulas in the Application Not
 
 Knowing the settling time is crucial in cases when the input voltage undergoes sudden changes, such as when a [multiplexer](https://en.wikipedia.org/wiki/Multiplexer) is used. When the input signal is switched to a new source, you must wait at least the settling time before taking a sample by the XADC.
 
-When you measure slowly changing signals (e.g., a voltage from a temperature sensor) and are not very concerned by noise in the input signal, it's probably enough to sample the input with the period equal to the settling time.
+When you measure slowly changing signals (e.g., a voltage from a temperature sensor) and are not very concerned about noise in the input signal, it's probably enough to sample the input with the period equal to the settling time.
 
 I think that in all other cases, the proper digitization setup depends on the circumstances.  You need to understand your objective and your input signal. And you definitely have to do a lot of testing.  
 There will be cases when it's beneficial to sample a low-frequency signal with a high XADC sample rate to use some kind of averaging or other digital signal processing algorithm, e.g., to reduce the noise component of the input signal.
@@ -385,6 +385,8 @@ We see that the noise makes most of the samples oscillate in an interval of 8 bi
 
 I mentioned earlier that the XADC can be configured to do averaging of samples. It set 64-sample averaging by calling `XSysMon_SetAvg(&XADCInstance, XSM_AVG_64_SAMPLES);` and captured 100 samples shown in the next figure. 
 
+Zynq-7000 XADC constant signal digitization with averaging
+
 <img src="pictures\Cora_Z7_2.495V_64avg_reading.png" alt="Zynq-7000 XADC constant signal digitization with averaging">
 
 The signal looks much cleaner now. The basic sample rate of the XADC is still 1 Msps, but it averages 64 samples before it produces one sample as the output. Therefore, the apparent sample rate is 15.6 ksps ( $`1000/64\dot{=}15.6`$ ). The 100 data points shown in the figure are the result of 6400 samples done by the XADC.  
@@ -401,14 +403,17 @@ I think the most practical way to transfer large amounts of samples from the XAD
 The "magic" of the AXI DMA is that it gets data from the [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) input interface S_AXIX_S2MM and sends them via output AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM cores being involved.  
 In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appears in the `DataBuffer` (I will explain all the details in a later chapter).
 
-The [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) can be configured to have an output AXI-Stream interface. When you configure the XADC for continuous sampling, you will get the actual stream of data coming out from the XADC Wizard AXI-Stream interface. However, this stream of data is not ready to be connected directly to the AXI DMA.  
+The maximum amount of data that AXI DMA can move in a single transfer is 64 MB (exactly 0x3FFFFFF bytes). This is because the AXI DMA register to store buffer length can be, at most, 26 bits wide.  
+In our case, we will be transferring 16-bit values, i.e., we can transfer at most 33,554,431 samples in one go. That should be more than enough. We could record up to 33.6 seconds with the XADC running at 1 Msps.
+
+The [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) can be configured to have an output AXI-Stream interface. When you configure the XADC for continuous sampling, you will get the actual stream of data coming out from the XADC Wizard AXI-Stream interface. However, this data stream is not ready to be connected directly to the AXI DMA.  
 The thing is that the AXI-Stream interface on the XADC Wizard doesn't contain an AXI-Stream signal TLAST. This signal is asserted to indicate the end of the data stream. The AXI DMA must receive the TLAST signal to know when to stop the DMA transfer.
 
 Therefore, we need an intermediate PL module to handle the AXI-Stream data between the XADC Wizard and the DMA IP. I wrote a module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) for use in this tutorial.
 
 <img src="pictures\bd_tlaster.png" title=""  width="200">
 
-This Verilog module controls when the data from the slave AXI-Stream interface (connected to the XADC Wizard) starts to be sent to the master AXI-Stream interface (connected to the AXI DMA).  This happens when the input signal start is asserted.
-The module also controls how many data transfers are made (the input signal count defines this) and asserts the TLAST signal of the m_axis interface on the last transfer.
+This Verilog module controls when the data from the slave AXI-Stream interface (connected to the XADC Wizard) starts to be sent to the master AXI-Stream interface (connected to the AXI DMA).  This happens when the input signal `start` is asserted.
+The module also controls how many data transfers are made (the input signal `count` defines this) and asserts the TLAST signal of the m_axis interface on the last transfer.
 
-We will control the input signals start and count from the PS (will connect them to the GPIO). First, we set the count, then call `XAxiDma_SimpleTransfer()`, and lastly, assert the start signal so the data starts to flow into the AXI DMA IP and thus into the RAM. This will ensure full control of how many data points are transferred from the XADC into the RAM.
+We will control the input signals `start` and `count` from the PS (will connect them to the GPIO). First, we set the `count`, then call `XAxiDma_SimpleTransfer()`, and lastly, assert the `start` signal so the data starts to flow into the AXI DMA IP and thus into the RAM. This will ensure our complete control of how many data samples are transferred from the XADC into the RAM.
