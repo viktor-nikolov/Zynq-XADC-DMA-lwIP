@@ -19,8 +19,6 @@ Cora Z7 has VREFP and VREFN connected to ADCGND
 
 ## A short introduction to Zynq-7000 XADC
 
-
-
 ### What is XADC
 
 The XADC is a feature of an analog-to-digital converter integrated on selected Xilinx FPGA chips, including Zynq-7000. This ADC has two basic capabilities
@@ -404,7 +402,7 @@ The "magic" of the AXI DMA is that it gets data from the [AXI-Stream](https://do
 In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appears in the `DataBuffer` (I will explain all the details in a later chapter).
 
 The maximum amount of data that AXI DMA can move in a single transfer is 64 MB (exactly 0x3FFFFFF bytes). This is because the AXI DMA register to store buffer length can be, at most, 26 bits wide.  
-In our case, we will be transferring 16-bit values, i.e., we can transfer at most 33,554,431 samples in one go. That should be more than enough. We could record up to 33.6 seconds with the XADC running at 1 Msps.
+In our case, we will be transferring 16-bit values, i.e., we can transfer at most 33,554,431 samples in one go. That should be more than enough. We could record up to 33.6 seconds of the input signal with the XADC running at 1 Msps.
 
 The [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) can be configured to have an output AXI-Stream interface. When you configure the XADC for continuous sampling, you will get the actual stream of data coming out from the XADC Wizard AXI-Stream interface. However, this data stream is not ready to be connected directly to the AXI DMA.  
 The thing is that the AXI-Stream interface on the XADC Wizard doesn't contain an AXI-Stream signal TLAST. This signal is asserted to indicate the end of the data stream. The AXI DMA must receive the TLAST signal to know when to stop the DMA transfer.
@@ -416,4 +414,4 @@ Therefore, we need an intermediate PL module to handle the AXI-Stream data betwe
 This Verilog module controls when the data from the slave AXI-Stream interface (connected to the XADC Wizard) starts to be sent to the master AXI-Stream interface (connected to the AXI DMA).  This happens when the input signal `start` is asserted.
 The module also controls how many data transfers are made (the input signal `count` defines this) and asserts the TLAST signal of the m_axis interface on the last transfer.
 
-We will control the input signals `start` and `count` from the PS (will connect them to the GPIO). First, we set the `count`, then call `XAxiDma_SimpleTransfer()`, and lastly, assert the `start` signal so the data starts to flow into the AXI DMA IP and thus into the RAM. This will ensure our complete control of how many data samples are transferred from the XADC into the RAM.
+We will control the input signals `start` and `count` from the PS (will connect them to the GPIO). First, we set the `count`, then call `XAxiDma_SimpleTransfer()`, and lastly, assert the `start` signal so the data starts to flow into the AXI DMA and thus into the RAM. This will ensure our complete control of how many data samples are transferred from the XADC into the RAM.
