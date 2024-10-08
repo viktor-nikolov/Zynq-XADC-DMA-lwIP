@@ -398,7 +398,7 @@ I think the most practical way to transfer large amounts of samples from the XAD
 
 <img src="pictures\bd_axi_dma_ip.png" title=""  width="300">
 
-The "magic" of the AXI DMA is that it gets data from the [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) input interface S_AXIX_S2MM and sends them via output AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM cores being involved.  
+The "magic" of the AXI DMA is that it gets data from the [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) input interface S_AXIX_S2MM and sends them via output AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM cores being involved. (The S_AXI_LITE interface is used to control the AXI DMA by functions from [xaxidma.h](https://xilinx.github.io/embeddedsw.github.io/axidma/doc/html/api/xaxidma_8h.html).)  
 In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appears in the `DataBuffer` (I will explain all the details in a later chapter).
 
 The maximum amount of data that AXI DMA can move in a single transfer is 64 MB (exactly 0x3FFFFFF bytes). This is because the AXI DMA register to store buffer length can be, at most, 26 bits wide.  
@@ -415,3 +415,10 @@ This Verilog module controls when the data from the slave AXI-Stream interface (
 The module also controls how many data transfers are made (the input signal `count` defines this) and asserts the TLAST signal of the m_axis interface on the last transfer.
 
 We will control the input signals `start` and `count` from the PS (will connect them to the GPIO). First, we set the `count`, then call `XAxiDma_SimpleTransfer()`, and lastly, assert the `start` signal so the data starts to flow into the AXI DMA and thus into the RAM. This will ensure our complete control of how many data samples are transferred from the XADC into the RAM.
+
+## Hardware design in Vivado
+
+Make sure you have Digilent board files installed. [This article](https://digilent.com/reference/programmable-logic/guides/install-board-files) provides instructions on how to install them.  
+In short: Download the most recent [Master Branch ZIP Archive](https://github.com/Digilent/vivado-boards/archive/master.zip), open it, and extract the content of folder \vivado-boards-master\new\board_files into c:\Xilinx\Vitis\2024.1\data\boards\board_files\\. You may need to create the folder board_files at the destination.
+
+Create a new RTL Project in Vivado 2024.1.
