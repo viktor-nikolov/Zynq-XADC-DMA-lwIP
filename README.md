@@ -419,6 +419,7 @@ We will control the input signals `start` and `count` from the PS (will connect 
 ## Hardware design in Vivado
 
 Make sure you have Digilent board files installed. [This article](https://digilent.com/reference/programmable-logic/guides/install-board-files) provides instructions on how to install them.  
-In short: Download the most recent [Master Branch ZIP Archive](https://github.com/Digilent/vivado-boards/archive/master.zip), open it, and extract the content of folder \vivado-boards-master\new\board_files into c:\Xilinx\Vitis\2024.1\data\boards\board_files\\. You may need to create the folder board_files at the destination.
+
+- In short: Download the most recent [Master Branch ZIP Archive](https://github.com/Digilent/vivado-boards/archive/master.zip), open it, and extract the content of folder \vivado-boards-master\new\board_files into c:\Xilinx\Vivado\2024.1\data\boards\board_files\\. You may need to create the folder board_files at the destination.
 
 Create a new RTL Project in Vivado 2024.1.
