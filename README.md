@@ -472,4 +472,17 @@ There are 64 EMIO GPIO pins on Zynq-7000. The first 32 pins are in Bank 2 (EMIO 
 | 81              | input to Zynq PS  <br />connected to the board's button BTN0 |
 | 82              | input to Zynq PS  <br />connected to the board's button BTN1 |
 
-bla
+Let's connect the buttons.  
+Create input port btn[1:0].
+
+<img src="pictures\bd_btn.png" title=""  width="300">
+
+Since the buttons are the two most significant bits in the vector of GPIO signals, we need to concatenate them with a 26-bit zero value before we can connect them to the Zynq PS.  
+Add a 26-bit Constant with zero value to the diagram.
+
+<img src="pictures\bd_const.png" title=""  width="300">
+
+Add Concat to the diagram. Connect the constant to In0 and btn[1:0] to In1. Then, connect the dout of the Concat to GPIO_I of the Zynq PS. We now have the following diagram. (Don't be alarmed that Concat doesn't show the correct widths of the signals. Vivado will update this later.)
+
+
+
