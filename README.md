@@ -396,7 +396,7 @@ Of course, you can achieve 64-sample averaging (or any other type of averaging) 
 
 I think the most practical way to transfer large amounts of samples from the XADC for processing in the PS is by means of DMA (Direct Memory Access). This is achieved by including the [AXI Direct Memory Access IP](https://www.xilinx.com/products/intellectual-property/axi_dma.html) in the HW design.
 
-<img src="pictures\bd_axi_dma_ip.png" title=""  width="300">
+<img src="pictures\bd_axi_dma_ip.png" width="300">
 
 The "magic" of the AXI DMA is that it gets data from the [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) input interface S_AXIX_S2MM and sends them via output AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM cores being involved. (The S_AXI_LITE interface is used to control the AXI DMA by functions from [xaxidma.h](https://xilinx.github.io/embeddedsw.github.io/axidma/doc/html/api/xaxidma_8h.html).)  
 In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appears in the `DataBuffer` (I will explain all the details in a later chapter).
@@ -409,7 +409,7 @@ The thing is that the AXI-Stream interface on the XADC Wizard doesn't contain an
 
 Therefore, we need an intermediate PL module to handle the AXI-Stream data between the XADC Wizard and the DMA IP. I wrote a module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) for use in this tutorial.
 
-<img src="pictures\bd_tlaster.png" title=""  width="200">
+<img src="pictures\bd_tlaster.png" width="200">
 
 This Verilog module controls when the data from the slave AXI-Stream interface (connected to the XADC Wizard) starts to be sent to the master AXI-Stream interface (connected to the AXI DMA).  This happens when the input signal `start` is asserted.
 The module also controls how many data transfers are made (the input signal `count` defines this) and asserts the TLAST signal of the m_axis interface on the last transfer.
@@ -450,39 +450,40 @@ set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { vaux1_
 ```
 
 Create the block design.  
-Search for "zynq" in the IP Catalog and add the ZYNQ7 Processing System to the diagram. Vivado offers to run the block automation. Run it. DDR and FIXED_IO signals will be connected to the Zynq PS.  
-We need to configure the Zynq PS for our needs.
+Add the ZYNQ7 Processing System to the diagram. Vivado offers to run the block automation. Run it. DDR and FIXED_IO signals will be connected to the Zynq PS.
 
+We need to configure the Zynq PS for our needs.  
 Enable Slave AXI High-Performance interface 0. This is the interface AXI DMA will be connected to.
 
-<img src="pictures\bd_axi_hp0.png" title=""  width="500">
+<img src="pictures\bd_axi_hp0.png" width="500">
 
-We will need 28 EMIO GPIO pins. Let's enable them in Zynq PS configuration.
+We will need 28 EMIO GPIO pins. Let's enable them in the Zynq PS configuration.
 
-<img src="pictures\bd_gpio.png" title=""  width="400">
+<img src="pictures\bd_gpio.png" width="400">
 
 **Note:** After you close the Zynq PS configuration, Vivado will probably display a critical warning about negative DQS skew values. This warning can be ignored. I guess this is some glitch in the Cora Z7 board file. It has no negative effect.
 
-There are 64 EMIO GPIO pins on Zynq-7000. The first 32 pins are in Bank 2 (EMIO pin numbers 54 through 85). Let me explain how we will use the first 28 GPIO pins from Bank 2.
+There are 64 EMIO GPIO pins on Zynq-7000. The first 32 pins are in Bank 2 (EMIO pin numbers 54 through 85). Let me explain how we will use the first 28 GPIO pins from Bank 2 in our design.
 
 | EMIO pin number | Usage                                                        |
 | --------------- | :----------------------------------------------------------- |
-| 54              | output from Zynq PS  <br />`start` input signal to [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see the explanation in the [DMA chapter](#dma-direct-memory-access) |
-| 55-80           | output from Zynq PS  <br />25-bit value of the `count` input signal to [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see the explanation in the [DMA chapter](#dma-direct-memory-access) |
+| 54              | output from Zynq PS  <br />`start` input signal to the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see the explanation in the [DMA chapter](#dma-direct-memory-access) |
+| 55-80           | output from Zynq PS  <br />25-bit value of the `count` input signal to the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see the explanation in the [DMA chapter](#dma-direct-memory-access) |
 | 81              | input to Zynq PS  <br />connected to the board's button BTN0 |
 | 82              | input to Zynq PS  <br />connected to the board's button BTN1 |
 
 Let's connect the buttons.  
 Create input port btn[1:0].
 
-<img src="pictures\bd_btn.png" title=""  width="300">
+<img src="pictures\bd_btn.png" width="300">
 
 Since the buttons are the two most significant bits in the vector of GPIO signals, we need to concatenate them with a 26-bit zero value before we can connect them to the Zynq PS.  
 Add a 26-bit Constant with zero value to the diagram.
 
-<img src="pictures\bd_const.png" title=""  width="300">
+<img src="pictures\bd_const.png" width="300">
 
-Add Concat to the diagram. Connect the constant to In0 and btn[1:0] to In1. Then, connect the dout of the Concat to GPIO_I of the Zynq PS. We now have the following diagram. (Don't be alarmed that Concat doesn't show the correct widths of the signals. Vivado will update this later.)
+Add Concat to the diagram. Connect the constant to Concat's In0 and btn[1:0] to In1. Then, connect the dout of the Concat to GPIO_I of the Zynq PS. We now have the following diagram. (Don't be alarmed that Concat doesn't show the correct widths of the signals. Vivado will update this later.)
 
+<img src="pictures\bd_1.png" width="450">
 
-
+bla
