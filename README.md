@@ -449,4 +449,17 @@ set_property -dict { PACKAGE_PIN E17   IOSTANDARD LVCMOS33 } [get_ports { vaux1_
 set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { vaux1_n }]; #IO_L3N_T0_DQS_AD1N_35 Sch=ck_an_n[0]
 ```
 
+Create the block design.  
+Search for "zynq" in the IP Catalog and add the ZYNQ7 Processing System to the diagram. Vivado offers to run the block automation. Run it. DDR and FIXED_IO signals will be connected to the Zynq PS.  
+We need to configure the Zynq PS for our needs.
+
+Enable Slave AXI High-Performance interface 0. This is the interface AXI DMA will be connected to.
+
+<img src="pictures\bd_axi_hp0.png" title=""  width="500">
+
+We will need 28 EMIO GPIO pins. Let's enable them in Zynq PS configuration.
+
+<img src="pictures\bd_gpio.png" title=""  width="400">
+
 bla
+
