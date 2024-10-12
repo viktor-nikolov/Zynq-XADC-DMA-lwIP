@@ -466,12 +466,10 @@ We will need 28 EMIO GPIO pins. Let's enable them in Zynq PS configuration.
 There are 64 EMIO GPIO pins on Zynq-7000. The first 32 pins are in Bank 2 (EMIO pin numbers 54 through 85). Let me explain how we will use the first 28 GPIO pins from Bank 2.
 
 | EMIO pin number | Usage                                                        |
-| --------------- | ------------------------------------------------------------ |
-| 54              | `start` input signal for [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see details in the [DMA chapter](#dma-direct-memory-access) |
-|                 |                                                              |
-|                 |                                                              |
-|                 |                                                              |
-|                 |                                                              |
+| --------------- | :----------------------------------------------------------- |
+| 54              | output from Zynq PS  <br />`start` input signal to [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see the explanation in the [DMA chapter](#dma-direct-memory-access) |
+| 55-80           | output from Zynq PS  <br />25-bit value of the `count` input signal to [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see the explanation in the [DMA chapter](#dma-direct-memory-access) |
+| 81              | input to Zynq PS  <br />connected to the board's button BTN0 |
+| 82              | input to Zynq PS  <br />connected to the board's button BTN1 |
 
-
-
+bla
