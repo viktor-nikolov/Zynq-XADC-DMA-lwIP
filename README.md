@@ -461,5 +461,17 @@ We will need 28 EMIO GPIO pins. Let's enable them in Zynq PS configuration.
 
 <img src="pictures\bd_gpio.png" title=""  width="400">
 
-bla
+**Note:** After you close the Zynq PS configuration, Vivado will probably display a critical warning about negative DQS skew values. This warning can be ignored. I guess this is some glitch in the Cora Z7 board file. It has no negative effect.
+
+There are 64 EMIO GPIO pins on Zynq-7000. The first 32 pins are in Bank 2 (EMIO pin numbers 54 through 85). Let me explain how we will use the first 28 GPIO pins from Bank 2.
+
+| EMIO pin number | Usage                                                        |
+| --------------- | ------------------------------------------------------------ |
+| 54              | `start` input signal for [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see details in the [DMA chapter](#dma-direct-memory-access) |
+|                 |                                                              |
+|                 |                                                              |
+|                 |                                                              |
+|                 |                                                              |
+
+
 
