@@ -426,3 +426,27 @@ Make sure you have Digilent board files installed. [This article](https://digile
 - In short: Download the most recent [Master Branch ZIP Archive](https://github.com/Digilent/vivado-boards/archive/master.zip), open it, and extract the content of folder \vivado-boards-master\new\board_files into c:\Xilinx\Vivado\2024.1\data\boards\board_files\\. You may need to create the folder board_files at the destination.
 
 Create a new RTL Project in Vivado 2024.1. Select your version of Cora Z7 from the list of boards.
+
+Let's first set the constraints.  
+Download [Cora-Z7-07S-Master.xdc](https://github.com/Digilent/digilent-xdc/blob/master/Cora-Z7-07S-Master.xdc) from the [Digilent GitHub repository](https://github.com/Digilent/digilent-xdc/) and add it as a constraints source file to the project.
+
+We will use the two buttons, the dedicated analog input v_p/v_n (labeled V_P/V_N on the board) and the auxiliary input vaux1_p/vaux1_n (labeled A0 on the board; the vaux1_n is connected to ground, it doesn't have a pin on the board).  
+Uncomment these items in the constraints file.
+
+```
+## Buttons
+set_property -dict { PACKAGE_PIN D20   IOSTANDARD LVCMOS33 } [get_ports { btn[0] }]; #IO_L4N_T0_35 Sch=btn[0]
+set_property -dict { PACKAGE_PIN D19   IOSTANDARD LVCMOS33 } [get_ports { btn[1] }]; #IO_L4P_T0_35 Sch=btn[1]
+
+## Dedicated Analog Inputs
+set_property -dict { PACKAGE_PIN K9    IOSTANDARD LVCMOS33 } [get_ports { v_p }]; #VP_0 Sch=xadc_v_p
+set_property -dict { PACKAGE_PIN L10   IOSTANDARD LVCMOS33 } [get_ports { v_n }]; #VN_0 Sch=xadc_v_n
+
+## ChipKit Outer Analog Header - as Single-Ended Analog Inputs
+## NOTE: These ports can be used as single-ended analog inputs with voltages from 0-3.3V (ChipKit analog pins A0-A5) or as digital I/O.
+## WARNING: Do not use both sets of constraints at the same time!
+set_property -dict { PACKAGE_PIN E17   IOSTANDARD LVCMOS33 } [get_ports { vaux1_p }]; #IO_L3P_T0_DQS_AD1P_35 Sch=ck_an_p[0]
+set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { vaux1_n }]; #IO_L3N_T0_DQS_AD1N_35 Sch=ck_an_n[0]
+```
+
+bla
