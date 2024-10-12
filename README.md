@@ -489,4 +489,10 @@ Add Concat to the diagram. Connect the constant to Concat's In0 and btn[1:0] to 
 Now, we add a Clocking Wizard. It will generate the XADC input clock DCLK, i.e., the clock for AXI interfaces connected to the XADC, because, in our setup, the DCLK will be driven by the AXI clock.
 
 Add a Clocking Wizzard to the diagram and connect clk_in1 to the FCLK_CLK0 output clock of the Zynq PS.  
-Set the frequency of clk_out1 to 104 MHz. This frequency will allow us to run the XADC at 1 Msps. We will use a clock divider equal to 4, which gives ADCCLK of 26 MHz, which translates to the sampling rate of 1 Msps. See detailed explanation in the chapter [Clocking, sampling rate, and bandwidth](#clocking-sampling-rate-and-bandwidth).
+Set the frequency of clk_out1 to 104 MHz. This frequency will allow us to run the XADC at 1 Msps. We will use a clock divider equal to 4, which gives ADCCLK of 26 MHz, which translates to the sampling rate of 1 Msps. See detailed explanation in the chapter [Clocking, sampling rate, and bandwidth](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?tab=readme-ov-file#clocking-sampling-rate-and-bandwidth).  
+If you later want to experiment with slower XADC sampling rates, you can set the Clocing Wizard's output frequency and the clock divider differently so you achieve the desired sampling rate.
+
+Set the Reset Type of the Clocking Wizzard to Active Low (the setting is on the Output Clocks tab)  
+Connect the reset signal of the Clocking Wizard with the FCLK_RESET0_N of the Zynq PS.
+
+It's time for the XADC Wizard now. Add it to the diagram.  
