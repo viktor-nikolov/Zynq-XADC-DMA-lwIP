@@ -70,7 +70,7 @@ Zynq-7000 XADC is a 12-bit ADC. However, the XADC [status registers](https://doc
 In general, the 12 most significant bits of the register are the converted XADC sample. Do ignore the 4 least significant bits.
 
 It is possible to configure the XADC to do an averaging of consecutive 16, 64, or 256 samples (see function [XSysMon_SetAvg](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L488)). I.e., to do the oversampling. The 4 least significant bits are then used to represent the averaged value with enhanced precision, i.e., the whole 16 bits of a status register can be used.  
-Obviously, letting the XADC do the averaging makes sense for slowly changing input signals where noise is expected to be removed by the averaging. I show a practical example of the effect of averaging in the [Measurement precision—a practical example](#measurement-precisiona-practical-example) chapter of this tutorial.
+Obviously, letting the XADC do the averaging makes sense for slowly changing input signals where noise is expected to be removed by the averaging. I show a practical example of the effect of averaging in the [Measurement precision—a practical example](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?tab=readme-ov-file#measurement-precisiona-practical-example) chapter of this tutorial.
 
 ### Clocking, sampling rate, and bandwidth
 
@@ -249,7 +249,7 @@ In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. I
 ### The behavior of unipolar auxiliary channel AAF of Cora Z7
 
 Let's see what the low-pass AAF does to a signal.  
-I simulated a square wave signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the [previous chapter](#settling-time-of-auxiliary-unipolar-channel-aaf-of-cora-z7). The result of the simulation is in the following figure.
+I simulated a square wave signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the [previous chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?tab=readme-ov-file#settling-time-of-auxiliary-unipolar-channel-aaf-of-cora-z7). The result of the simulation is in the following figure.
 
 <img src="pictures\Cora_Z7_stair_signal_simulation.png">
 
@@ -495,4 +495,14 @@ If you later want to experiment with slower XADC sampling rates, you can set the
 Set the Reset Type of the Clocking Wizzard to Active Low (the setting is on the Output Clocks tab)  
 Connect the reset signal of the Clocking Wizard with the FCLK_RESET0_N of the Zynq PS.
 
-It's time for the XADC Wizard now. Add it to the diagram.  
+It's time for the XADC Wizard now. Add it to the diagram and open its configuration.  
+We will control the XADC from PS using functions from [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). Therefore, we will only do a bare minimum configuration of the XADC Wizard. 
+
+On the Basic tab, enable Enable AXI4Stream. We need the XADC Wizard to provide an AXI-Stream interface because this is how we get data into the RAM by means of AXI DMA.
+
+In the Startup Channel Selection, select Single Channel (if not selected already by default). Then go to the Single Channel tab and select "VAUXP1 VAUXN1" (i.e., the auxiliary channel 1).  
+Notice that the XADC Wizard now exposes both V<sub>P</sub>/V<sub>N</sub> and VAUX[1] channels as input signals (V<sub>P</sub>/V<sub>N</sub> is always available as the input signal in all configurations.)
+
+That's all the XADC Wizard configuration we need to do now.
+
+**TODO** In the Startup Channel Selection, select Channel Sequencer. This is a small "hack". We won't use Channel Sequencer mode. We will configure the XADC from PS to run in Single Channel mode. However, we want to be able to switch the Single Channel mode between channel V<sub>P</sub>/V<sub>N</sub> and VAUX[1]. For that we need the XADC Wizard to expose both channels on the IP. That is not possible 
