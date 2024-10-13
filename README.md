@@ -594,7 +594,7 @@ Last but not least, we need to export the hardware specification to an XSA file.
 
 ### Building the application
 
-I'm using Vitis Classic 2024.1 in thus tutorial. Nevertheless, the same steps work also in Vitis 2023.1 or Vitis Classic 2023.2.
+I'm using Vitis Classic 2024.1 in this tutorial. Nevertheless, the same steps work also in Vitis 2023.1 and Vitis Classic 2023.2.
 
 Start Vitis Classic 2024.1.  
 Create a new platform project using the HW export XSA file we just generated.  
@@ -626,9 +626,17 @@ Let me briefly explain, what source files we have:
 
 The project should be built without errors. You may see two or three warnings coming from the platform source files (not files in the app's src folder). These can be ignored.
 
+### How to use the application
 
+The HW design and the demo application from this tutorial allow 1 Msps digitalization on the differential dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>  (labeled V_P/V_N on the Cora Z7 board) and the unipolar auxiliary channel VAUX[1] (labeled A0 on the board).
 
+To see interesting results, you need to use a signal generator and connect a suitable differential signal to pins V_P/V_N (e.g., a signal I used in [this chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main#the-behavior-of-dedicated-channel-vpvn-aaf-of-cora-z7)) and a unipolar signal to pin A0.
 
+> [!CAUTION]
+>
+> **The voltage on the V_P and V_N pins must always be within a range from 0 V to 1.0 V with respect to the board's GND. Also, the differential V<sub>P</sub> &minus; V<sub>N</sub> must be within the range of ±0.5V.\**
+>
+> **The voltage on the pin A0 must always be positive and not greater than 3.3 V.**
 
 
 
