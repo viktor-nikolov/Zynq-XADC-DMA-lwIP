@@ -533,8 +533,21 @@ We now have the following diagram (I shuffled and rotated the IPs for better cla
 
 ### DMA
 
-As explained in the [DMA chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#dma-direct-memory-access), we need have the module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) between the XADC Wizard and AXI DMA, and we need to connect its input signals to Zynq PS GPIO.
+As explained in the [DMA chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#dma-direct-memory-access), we need to have the module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) between the XADC Wizard and AXI DMA, and we need to connect its input signals to Zynq PS GPIO.
 
+Add the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) as a design source to the project. Add the module to the block diagram.  
+Connect the module's input s_axis interface to the output M_AXIS interface of the XADC Wizard. Connect the module's input clock (signal clk) to the output clock of the Clocking Wizard.
+
+In order to connect the module's input signals start and count, we need to slice the 28-bit PS GPIO signal accordingly.  
+Add Slice twice to the diagram and connect both to the GPIO_O[27:0] of the Zynq PS.
+
+Configure xlslice_0 to extract the least significant bit and connect its output to the start signal of the stream_tlaster module.
+
+<img src="pictures\bd_slice0.png" width="400">
+
+Configure xlslice_1 to extract bits [25:1] and connect its output to the count signal of the stream_tlaster module.
+
+<img src="pictures\bd_slice1.png" width="400">
 
 
 
