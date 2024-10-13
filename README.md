@@ -579,12 +579,24 @@ HDL Wrapper for the diagram needs to be created: Go to Sources|Design Sources, r
 
 Now we create the design outputs: Click "Generate Bitstream" in the Flow Navigator on the left. Synthesis and Implementation will be run automatically before bitstream generation. There should be no errors.
 
-Last but not least, we need to export the hardware specification. Go to File|Export|Export Hardware, and select "Include Bitstream".
+Last but not least, we need to export the hardware specification to an XSA file. Go to File|Export|Export Hardware, and select "Include Bitstream".
 
+## Software
 
+Start Vitis Classic 2024.1.  
+Create a new platform project using the HW XSA file we just generated.  
+Make sure to select freertos_10_xilinx as the operating system.
 
+We will be using the lwIP library for streaming XADC data overto stream a network. Therefore, we must enable the lwIP in the Board Support Package settings (BSP).
 
+<img src="pictures\vt_bsp_lwip.png" width="400">
 
+The following settings are then needed in the lwIP BSP configuration:
+
+- Set api_mode to "SOCKET API" because this api_mode is required for a stand-alone application.
+- Set dhcp_options/lwip_dhcp to true because the app code is using DHCP to obtain an IP address.
+
+<img src="pictures\vt_bsp_lwip_conf.png" width="400">
 
 
 
