@@ -639,6 +639,12 @@ To see interesting results, you need to use a signal generator. Connect a suitab
 > **The voltage on the pin A0 must always be positive and not greater than 3.3 V.**
 
 The application sends data samples over the network to a server, which is the Python script [file_via_socket.py](https://github.com/viktor-nikolov/lwIP-file-via-socket/blob/main/file_via_socket.py).  
+You must specify IP address of the server in the constant in the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). It is this line at the beginning of the main.cpp:
+
+```c++
+const std::string SERVER_ADDR( "192.168.44.10" );
+```
+
 The server writes the samples (a list of voltage values) to a text file. Each set of samples is written to a new file.  
 The standard name of the file the server creates looks like this: via_socket_*240324_203824.6369*.txt  
 Part of the name in italics is the date and time stamp.
@@ -647,7 +653,8 @@ Depending on your Python installation, run the script with the command `python3 
 
 I tested the script on Ubuntu 22.04 and Windows 11.
 
-The default port the script listens on for connections is 65432, and the default bind IP address is 0.0.0.0 (i.e., the script listens on all the configured network interfaces).  
+The default port the script listens on for connections is 65432, and the default bind IP address is 0.0.0.0 (i.e., the script listens on all the configured network interfaces). **Make sure that the firewall on your PC allows incoming connections to Python on a given port.**
+
 In typical use, you will want to specify the output folder for the files. For example:
 
 `python file_via_socket.py --path c:\Temp\XADC_data`
@@ -655,6 +662,15 @@ In typical use, you will want to specify the output folder for the files. For ex
 To get the full list of available parameters, run `python file_via_socket.py --help`.
 
 
+
+To summarize. To run the application, you need to perform these steps:
+
+1. Connect a suitable signal from a signal generator to Cora Z7 pins V_P and V_N or to pin A0 (or to both).
+2. Connect network cable to the Cora Z7 board.
+3. Start the `python file_via_socket.py` as a server to receive digitized data samples.
+4. Connect a serial terminal application to the USB serial port of the
+5. Run the application from Vitis.
+6. 
 
 
 
