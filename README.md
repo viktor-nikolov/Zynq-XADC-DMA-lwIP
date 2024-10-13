@@ -639,10 +639,10 @@ To see interesting results, you need to use a signal generator. Connect a suitab
 > **The voltage on the pin A0 must always be positive and not greater than 3.3 V.**
 
 The application sends data samples over the network to a server, which is the Python script [file_via_socket.py](https://github.com/viktor-nikolov/lwIP-file-via-socket/blob/main/file_via_socket.py).  
-You must specify IP address of the server in the constant in the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). It is this line at the beginning of the main.cpp:
+You must specify IP address of the server in the constant in [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). It is this line at the beginning of the main.cpp:
 
 ```c++
-const std::string SERVER_ADDR( "192.168.44.10" );
+const std::string SERVER_ADDR( "192.168.44.10" ); // Specify your actual server IP address
 ```
 
 The server writes the samples (a list of voltage values) to a text file. Each set of samples is written to a new file.  
@@ -653,26 +653,49 @@ Depending on your Python installation, run the script with the command `python3 
 
 I tested the script on Ubuntu 22.04 and Windows 11.
 
-The default port the script listens on for connections is 65432, and the default bind IP address is 0.0.0.0 (i.e., the script listens on all the configured network interfaces). **Make sure that the firewall on your PC allows incoming connections to Python on a given port.**
+The default port the script listens on for connections is 65432, and the default bind IP address is 0.0.0.0 (i.e., the script listens on all the configured network interfaces). **Make sure that the firewall on your PC allows incoming connections to Python on the given port.**
 
 In typical use, you will want to specify the output folder for the files. For example:
 
 `python file_via_socket.py --path c:\Temp\XADC_data`
 
-To get the full list of available parameters, run `python file_via_socket.py --help`.
+(To get the full list of available parameters, run `python file_via_socket.py --help`.)
 
-
-
-To summarize. To run the application, you need to perform these steps:
+To summarize. To successfully run the application, you need to perform these steps:
 
 1. Connect a suitable signal from a signal generator to Cora Z7 pins V_P and V_N or to pin A0 (or to both).
-2. Connect network cable to the Cora Z7 board.
-3. Start the `python file_via_socket.py` as a server to receive digitized data samples.
-4. Connect a serial terminal application to the USB serial port of the
-5. Run the application from Vitis.
-6. 
+2. Connect the network cable to the Cora Z7 board.
+3. Start the `python file_via_socket.py` on your PC as the server to receive digitized data samples.
+4. Start a serial terminal application (e.g., [PuTTY](https://www.putty.org/)) and connect it to the USB serial port of the Cora Z7 board in your OS.
+5. Specify the IP address of your server in the constant `SERVER_ADDR` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
+6. Build and run the application in Vitis.
 
+After the application starts, you shall see output in the serial terminal similar to this:
 
+```
+*************** PROGRAM STARTED ***************
+
+------lwIP Socket Mode TCP Startup------
+Start PHY autonegotiation 
+Waiting for PHY to complete autonegotiation.
+autonegotiation complete 
+link speed for phy address 1: 1000
+DHCP request success
+Board IP:       192.168.44.39
+Netmask :       255.255.255.0
+Gateway :       192.168.44.1
+
+***** XADC THREAD STARTED *****
+will connect to the network address 192.168.44.10:65432
+samples per DMA transfer: 1000
+no averaging is used
+calib coefficient ADC offset: FF9A (-7)
+calib coefficient gain error: 007F (6.3 %)
+
+press BTN0 to start ADC conversion
+press BTN1 to switch between VAUX1 and VPVN inputs
+VAUX1 is activated as the input
+```
 
 
 
