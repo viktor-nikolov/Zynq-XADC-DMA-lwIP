@@ -520,7 +520,7 @@ We need to connect the analog channels.
 Right-click on the Vp_Vn input signal of the XADC Wizard and select Make External. Repeat the same for input signal Vaux1. This will create two analog differential input ports in the diagram. The ports in the constraint file are properly named to match the ports we just created.
 
 Vivado now offers Run Connection Automation. Run it.  
-Set all clocking sources to the Clocking Wizard (/clk_wiz_0/clk_out1). As explained earlier, we want to drive the XADC clock from the Clocking Wizard to have the flexibility of choosing the frequency.
+Set all clock sources to the Clocking Wizard (/clk_wiz_0/clk_out1). As explained earlier, we want to drive the XADC clock from the Clocking Wizard to have the flexibility of choosing the frequency.
 
 <img src="pictures\bd_conn_aut_axi_lite.png" width="520">
 
@@ -556,10 +556,25 @@ Our diagram now looks as follows.
 Now, add the AXI Direct Memory Access to the diagram and open its configuration.  
 We do not need to use AXI DMA [Scatter/Gather Mode](https://docs.amd.com/r/en-US/pg021_axi_dma/Scatter/Gather-Mode), so we disable the Enable Scatter Gather Engine option.  
 We set the Width of the Buffer Length Register to the value 26 (i.e., the maximum). This will allow us to transfer up to 33.5 million XADC data samples in one transfer (64 MB of data).  
-We are only writing to RAM so we disable the option Enable Read Channel.  
+We are only writing to RAM, so we disable the option Enable Read Channel.  
 We enable the Allow Unaligned Transfer option on the Write Channel and increase the Max Burst Size to 128.
 
 <img src="pictures\bd_dma.png" width="730">
+
+Connect S_AXIS_S2MM of AXI DMA with the m_axis of the stream_tlaster module.  
+Run Connection Automation which Vivado offers now. Set all clock sources to the Clocking Wizard (/clk_wiz_0/clk_out1).
+
+The automation connected the AXI DMA AXI-Lite interface to the Zynq PS via the existing AXI Interconnect. It created a new AXI Interconnect and used it to connect the DMA AXI master interface to the S_AXI_HP0 of Zynq PS. Also, the resets and clocks were connected accordingly.
+
+
+
+
+
+
+
+
+
+
 
 
 
