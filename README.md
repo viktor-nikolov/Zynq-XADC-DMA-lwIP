@@ -650,11 +650,18 @@ I tested the script on Ubuntu 22.04 and Windows 11.
 The default port the script listens on for connections is 65432, and the default bind IP address is 0.0.0.0 (i.e., the script listens on all the configured network interfaces).  
 In typical use, you will want to specify the output folder for the files. For example:
 
-`python file_via_socket.py --path c:\Temp\!fvs\`
+`python file_via_socket.py --path c:\Temp\XADC_data`
 
-```
-python file_via_socket.py --path c:\Temp\!fvs\
-```
+To get the full list of available parameters, run `python file_via_socket.py --help`.
+
+
+
+
+
+
+
+
+
 
 
 
