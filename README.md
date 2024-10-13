@@ -501,8 +501,40 @@ We will control the XADC from PS using functions from [xsysmon.h](https://github
 On the Basic tab, enable Enable AXI4Stream. We need the XADC Wizard to provide an AXI-Stream interface because this is how we get data into the RAM by means of AXI DMA.
 
 In the Startup Channel Selection, select Single Channel (if not selected already by default). Then go to the Single Channel tab and select "VAUXP1 VAUXN1" (i.e., the auxiliary channel 1).  
-Notice that the XADC Wizard now exposes both V<sub>P</sub>/V<sub>N</sub> and VAUX[1] channels as input signals (V<sub>P</sub>/V<sub>N</sub> is always available as the input signal in all configurations.)
+Notice that the XADC Wizard now exposes both V<sub>P</sub>/V<sub>N</sub> and VAUX[1] channels as input signals (V<sub>P</sub>/V<sub>N</sub> is always available as the input signal in all XADC Wizard configurations.)
 
-That's all the XADC Wizard configuration we need to do now.
+That's all the XADC Wizard configuration we need to do.
 
-**TODO** In the Startup Channel Selection, select Channel Sequencer. This is a small "hack". We won't use Channel Sequencer mode. We will configure the XADC from PS to run in Single Channel mode. However, we want to be able to switch the Single Channel mode between channel V<sub>P</sub>/V<sub>N</sub> and VAUX[1]. For that we need the XADC Wizard to expose both channels on the IP. That is not possible 
+> [!TIP]
+>
+> If you need to switch Single Channel mode between multiple auxiliary channels, follow this "hack" to expose them as input signals on the XADC Wizard:  
+> Select Channel Sequencer in the Startup Channel Selection. Channel Sequencer tab will appear, where you can select as many auxiliary channels as you wish. It doesn't matter that you configured the XADC Wizard IP for Channel Sequencer mode. You will switch it to the Single Channel mode during runtime by callign [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586).
+
+We need to connect the analog channels.  
+Right-click on the Vp_Vn input signal of the XADC Wizard and select Make External. Repeat the same for input signal Vaux1. This will create two analog differential input ports in the diagram. The ports in the constraint file are properly named to match the ports we just created.
+
+Vivado now offers Run Connection Automation. Run it.  
+Set all clocking sources to the Clocking Wizard (/clk_wiz_0/clk_out1). As explained earlier, we want to drive the XADC clock from the Clocking Wizard to have the flexibility of choosing the frequency.
+
+<img src="pictures\bd_conn_aut_axi_lite.png" width="400">
+
+<img src="pictures\bd_conn_aut_axis.png" width="400">
+
+The Connection Automation  
+We now have the following diagram (I shuffled and rotated the IPs for better clarity).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bkla
