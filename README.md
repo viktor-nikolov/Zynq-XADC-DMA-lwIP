@@ -543,11 +543,11 @@ Add Slice twice to the diagram and connect both to the GPIO_O[27:0] of the Zynq 
 
 Configure xlslice_0 to extract the least significant bit and connect its output to the start signal of the stream_tlaster module.
 
-<img src="pictures\bd_slice0.png" width="400">
+<img src="pictures\bd_slice0.png" width="450">
 
 Configure xlslice_1 to extract bits [25:1] and connect its output to the count signal of the stream_tlaster module.
 
-<img src="pictures\bd_slice1.png" width="400">
+<img src="pictures\bd_slice1.png" width="450">
 
 
 
