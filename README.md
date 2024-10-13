@@ -700,7 +700,7 @@ VAUX1 is activated as the input
 Information under the header `--lwIP Socket Mode TCP Startup--` comes from the lwIP network initialization and DHCP IP address assignment.  
 After the network initializes the thread controlling the XADC takes over and displays some basic information.
 
-We see that 1000 XADC samples will be provided in each measurement (i.e., in each DMA transfer from the XADC). You can control this number of samples by modifying the following macro at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
+We see that 1000 XADC samples will be provided in each measurement (i.e., in each DMA transfer from the XADC). You can control this number of samples by modifying the macro `SAMPLE_COUNT` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
 
 ```c++
 /* Number of samples transferred in one DMA transfer. Max. value is 33,554,431 */
@@ -718,7 +718,9 @@ We also see that XADC will not use any averaging. This is controlled by the defi
 //#define AVERAGING_MODE XSM_AVG_256_SAMPLES // Averaging over 256 acquisition samples
 ```
 
+The next information in the console output tells us that the value of XADC's Offset Calibration Coefficient ix 0xFF9A, which translates to -7 bits of correction. You may observe that this value changes slightly with each run of the application.
 
+The value of XADC's Gain Calibration Coefficient is 0x007F, which translates to 6.3% of correction (the maximum possible value). This is expected on the Cora Z7 board for reasons I explained in detail in the chapter [XADC autocalibration](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#xadc-autocalibration).
 
 
 
