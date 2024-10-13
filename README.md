@@ -70,7 +70,7 @@ Zynq-7000 XADC is a 12-bit ADC. However, the XADC [status registers](https://doc
 In general, the 12 most significant bits of the register are the converted XADC sample. Do ignore the 4 least significant bits.
 
 It is possible to configure the XADC to do an averaging of consecutive 16, 64, or 256 samples (see function [XSysMon_SetAvg](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L488)). I.e., to do the oversampling. The 4 least significant bits are then used to represent the averaged value with enhanced precision, i.e., the whole 16 bits of a status register can be used.  
-Obviously, letting the XADC do the averaging makes sense for slowly changing input signals where noise is expected to be removed by the averaging. I show a practical example of the effect of averaging in the [Measurement precision—a practical example](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?tab=readme-ov-file#measurement-precisiona-practical-example) chapter of this tutorial.
+Obviously, letting the XADC do the averaging makes sense for slowly changing input signals where noise is expected to be removed by the averaging. I show a practical example of the effect of averaging in the [Measurement precision—a practical example](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#measurement-precisiona-practical-example) chapter of this tutorial.
 
 ### Clocking, sampling rate, and bandwidth
 
@@ -249,7 +249,7 @@ In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. I
 ### The behavior of unipolar auxiliary channel AAF of Cora Z7
 
 Let's see what the low-pass AAF does to a signal.  
-I simulated a square wave signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the [previous chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?tab=readme-ov-file#settling-time-of-auxiliary-unipolar-channel-aaf-of-cora-z7). The result of the simulation is in the following figure.
+I simulated a square wave signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the [previous chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#settling-time-of-auxiliary-unipolar-channel-aaf-of-cora-z7). The result of the simulation is in the following figure.
 
 <img src="pictures\Cora_Z7_stair_signal_simulation.png">
 
@@ -425,6 +425,8 @@ Make sure you have Digilent board files installed. [This article](https://digile
 
 - In short: Download the most recent [Master Branch ZIP Archive](https://github.com/Digilent/vivado-boards/archive/master.zip), open it, and extract the content of folder \vivado-boards-master\new\board_files into c:\Xilinx\Vivado\2024.1\data\boards\board_files\\. You may need to create the folder board_files at the destination.
 
+### Constraints
+
 Create a new RTL Project in Vivado 2024.1. Select your version of Cora Z7 from the list of boards.
 
 Let's first set the constraints.  
@@ -449,6 +451,8 @@ set_property -dict { PACKAGE_PIN E17   IOSTANDARD LVCMOS33 } [get_ports { vaux1_
 set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { vaux1_n }]; #IO_L3N_T0_DQS_AD1N_35 Sch=ck_an_n[0]
 ```
 
+### Zynq Processing System
+
 Create the block design.  
 Add the ZYNQ7 Processing System to the diagram. Vivado offers to run the block automation. Run it. DDR and FIXED_IO signals will be connected to the Zynq PS.
 
@@ -467,8 +471,8 @@ There are 64 EMIO GPIO pins on Zynq-7000. The first 32 pins are in Bank 2 (EMIO 
 
 | EMIO pin number | Usage                                                        |
 | --------------- | :----------------------------------------------------------- |
-| 54              | output from Zynq PS  <br />`start` input signal to the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see the explanation in the [DMA chapter](#dma-direct-memory-access) |
-| 55-80           | output from Zynq PS  <br />25-bit value of the `count` input signal to the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see the explanation in the [DMA chapter](#dma-direct-memory-access) |
+| 54              | output from Zynq PS  <br />`start` input signal to the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see the explanation in the [DMA chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#dma-direct-memory-access) |
+| 55-80           | output from Zynq PS  <br />25-bit value of the `count` input signal to the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v)  <br />see the explanation in the [DMA chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#dma-direct-memory-access) |
 | 81              | input to Zynq PS  <br />connected to the board's button BTN0 |
 | 82              | input to Zynq PS  <br />connected to the board's button BTN1 |
 
@@ -486,10 +490,12 @@ Add Concat to the diagram. Connect the constant to Concat's In0 and btn[1:0] to 
 
 <img src="pictures\bd_1.png" width="450">
 
+### XADC Wizard
+
 Now, we add a Clocking Wizard. It will generate the XADC input clock DCLK, i.e., the clock for AXI interfaces connected to the XADC, because, in our setup, the DCLK will be driven by the AXI clock.
 
 Add a Clocking Wizzard to the diagram and connect clk_in1 to the FCLK_CLK0 output clock of the Zynq PS.  
-Set the frequency of clk_out1 to 104 MHz. This frequency will allow us to run the XADC at 1 Msps. We will use a clock divider equal to 4, which gives ADCCLK of 26 MHz, which translates to the sampling rate of 1 Msps. See detailed explanation in the chapter [Clocking, sampling rate, and bandwidth](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?tab=readme-ov-file#clocking-sampling-rate-and-bandwidth).  
+Set the frequency of clk_out1 to 104 MHz. This frequency will allow us to run the XADC at 1 Msps. We will use a clock divider equal to 4, which gives ADCCLK of 26 MHz, which translates to the sampling rate of 1 Msps. See detailed explanation in the chapter [Clocking, sampling rate, and bandwidth](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#clocking-sampling-rate-and-bandwidth).  
 If you later want to experiment with slower XADC sampling rates, you can set the Clocing Wizard's output frequency and the clock divider differently so you achieve the desired sampling rate.
 
 Set the Reset Type of the Clocking Wizzard to Active Low (the setting is on the Output Clocks tab)  
@@ -508,7 +514,7 @@ That's all the XADC Wizard configuration we need to do.
 > [!TIP]
 >
 > If you need to switch Single Channel mode between multiple auxiliary channels, follow this "hack" to expose them as input signals on the XADC Wizard:  
-> Select Channel Sequencer in the Startup Channel Selection. Channel Sequencer tab will appear, where you can select as many auxiliary channels as you wish. It doesn't matter that you configured the XADC Wizard IP for Channel Sequencer mode. You will switch it to the Single Channel mode during runtime by callign [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586).
+> Select Channel Sequencer in the Startup Channel Selection. Channel Sequencer tab will appear, where you can select as many auxiliary channels as you wish. It doesn't matter that you configured the XADC Wizard IP for Channel Sequencer mode. You will switch it to the Single Channel mode during runtime by calling [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586).
 
 We need to connect the analog channels.  
 Right-click on the Vp_Vn input signal of the XADC Wizard and select Make External. Repeat the same for input signal Vaux1. This will create two analog differential input ports in the diagram. The ports in the constraint file are properly named to match the ports we just created.
@@ -520,10 +526,20 @@ Set all clocking sources to the Clocking Wizard (/clk_wiz_0/clk_out1). As explai
 
 <img src="pictures\bd_conn_aut_axis.png" width="520">
 
-The Connection Automation  
+The Connection Automation added AXI Interconnect to connect the Zynq PS with the XADC Wizard. A processor System Reset was added to generate a reset signal for the AXI bus. Everything is clocked by the Clocking Wizard.   
 We now have the following diagram (I shuffled and rotated the IPs for better clarity).
 
 <img src="pictures\bd_2.png">
+
+### DMA
+
+As explained in the [DMA chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#dma-direct-memory-access), we need have the module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) between the XADC Wizard and AXI DMA, and we need to connect its input signals to Zynq PS GPIO.
+
+
+
+
+
+
 
 
 
