@@ -2,6 +2,8 @@
 
 These files are intended to be copied into the src folder of the application project in Vitis.
 
+The details are explained in the chapter [Software](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#software).
+
 | Source file                                                  | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | [FileViaSocket.h](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.h)  <br />[FileViaSocket.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.cpp) | Definition of the C++ [ostream](https://en.cppreference.com/w/cpp/io/basic_ostream) class, which the demo application uses to send data over the network. I copied the files from another [repository](https://github.com/viktor-nikolov/lwIP-file-via-socket) of mine. |
