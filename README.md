@@ -661,7 +661,7 @@ In typical use, you will want to specify the output folder for the files. For ex
 
 (To get the full list of available parameters, run `python file_via_socket.py --help`.)
 
-To summarize. To successfully run the application, you need to perform these steps:
+Let me summarize. To successfully run the application, you need to perform these steps:
 
 1. Connect a suitable signal from a signal generator to Cora Z7 pins V_P and V_N or to pin A0 (or to both).
 2. Connect the network cable to the Cora Z7 board.
@@ -700,7 +700,7 @@ VAUX1 is activated as the input
 Information under the header `--lwIP Socket Mode TCP Startup--` comes from the lwIP network initialization and DHCP IP address assignment.  
 After the network initializes the thread controlling the XADC takes over and displays some basic information.
 
-We see that 1000 XADC samples will be provided in each measurement (i.e., in each DMA transfer from XADC). You can control this number of samples by modifying the following macro at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
+We see that 1000 XADC samples will be provided in each measurement (i.e., in each DMA transfer from the XADC). You can control this number of samples by modifying the following macro at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
 
 ```c++
 /* Number of samples transferred in one DMA transfer. Max. value is 33,554,431 */
