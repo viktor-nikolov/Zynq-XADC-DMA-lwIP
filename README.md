@@ -594,6 +594,8 @@ Last but not least, we need to export the hardware specification to an XSA file.
 
 ### Building the application
 
+I'm using Vitis Classic 2024.1 in thus tutorial. Nevertheless, the same steps work also in Vitis 2023.1 or Vitis Classic 2023.2.
+
 Start Vitis Classic 2024.1.  
 Create a new platform project using the HW export XSA file we just generated.  
 Make sure to select freertos_10_xilinx as the operating system.
@@ -617,10 +619,10 @@ Let me briefly explain, what source files we have:
 
 | Source file                                                  | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [FileViaSocket.h](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.h)  <br />[FileViaSocket.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.cpp) | Definition of the C++ [ostream](https://en.cppreference.com/w/cpp/io/basic_ostream) class. |
-|                                                              |                                                              |
-|                                                              |                                                              |
-|                                                              |                                                              |
+| [FileViaSocket.h](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.h)  <br />[FileViaSocket.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.cpp) | Definition of the C++ [ostream](https://en.cppreference.com/w/cpp/io/basic_ostream) class, which the demo application uses to send data over the network. I copied the files from another [repository](https://github.com/viktor-nikolov/lwIP-file-via-socket) of mine. |
+| [button_debounce.h](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/button_debounce.h)  <br />[button_debounce.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/button_debounce.cpp) | A C++ class that the demo application uses for debouncing buttons (i.e., for ensuring that the app gets a filtered signal from the buttons for smooth control).  <br />Copyright © [Trent Cleghorn](https://github.com/tcleg). I copied the files from his [repository](https://github.com/tcleg/Button_Debouncer). |
+| [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp) | The main source file of the demo application.                |
+| [network_thread.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) | The definition of a FreeRTOS thread, which initiates the network and handles network operation.  <br />I derived I from a [sample project](https://github.com/Xilinx/embeddedsw/blob/master/lib/sw_apps/freertos_lwip_tcp_perf_client/src/main.c) provided by AMD Xilinx.<br/>Copyright © 2024 Viktor Nikolov<br/>Copyright © 2018-2022 Xilinx, Inc.<br/>Copyright © 2022-2023 Advanced Micro Devices, Inc. |
 
 The project should be built without errors. You may see two or three warnings coming from the platform source files (not files in the app's src folder). These can be ignored.
 
