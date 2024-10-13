@@ -566,6 +566,9 @@ Run Connection Automation which Vivado offers now. Set all clock sources to the 
 
 The automation connected the AXI DMA AXI-Lite interface to the Zynq PS via the existing AXI Interconnect. It created a new AXI Interconnect and used it to connect the DMA AXI master interface to the S_AXI_HP0 of Zynq PS. Also, the resets and clocks were connected accordingly.
 
+We now have the final diagram (the image in full resolution is available [here](https://raw.githubusercontent.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/refs/heads/main/pictures/bd_final.png)).
+
+<img src="pictures\bd_final.png">
 
 
 
