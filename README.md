@@ -634,7 +634,7 @@ To see interesting results, you need to use a signal generator and connect a sui
 
 > [!CAUTION]
 >
-> **The voltage on the V_P and V_N pins must always be within a range from 0 V to 1.0 V with respect to the board's GND. Also, the differential V<sub>P</sub> &minus; V<sub>N</sub> must be within the range of ±0.5V.\**
+> **The voltage on the V_P and V_N pins must always be within a range from 0 V to 1.0 V with respect to the board's GND. Also, the differential V<sub>P</sub> &minus; V<sub>N</sub> must be within the range of ±0.5V.**
 >
 > **The voltage on the pin A0 must always be positive and not greater than 3.3 V.**
 
