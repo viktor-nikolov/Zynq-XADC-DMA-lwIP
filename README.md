@@ -536,7 +536,7 @@ We now have the following diagram (I shuffled and rotated the IPs for better cla
 As explained in the [DMA chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#dma-direct-memory-access), we need to have the module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) between the XADC Wizard and AXI DMA, and we need to connect its input signals to Zynq PS GPIO.
 
 Add the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) as a design source to the project. Add the module to the block diagram.  
-Connect the module's input s_axis interface to the output M_AXIS interface of the XADC Wizard. Connect the module's input clock (signal clk) to the output clock of the Clocking Wizard.
+Connect the module's s_axis interface to the M_AXIS interface of the XADC Wizard. Connect the module's input clock (clk) to the output clock of the Clocking Wizard.
 
 In order to connect the module's input signals start and count, we need to slice the 28-bit PS GPIO signal accordingly.  
 Add Slice twice to the diagram and connect both to the GPIO_O[27:0] of the Zynq PS.
@@ -553,8 +553,13 @@ Our diagram now looks as follows.
 
 <img src="pictures\bd_3.png">
 
+Now, add the AXI Direct Memory Access to the diagram and open its configuration.  
+We do not need to use AXI DMA [Scatter/Gather Mode](https://docs.amd.com/r/en-US/pg021_axi_dma/Scatter/Gather-Mode), so we disable the Enable Scatter Gather Engine option.  
+We set the Width of the Buffer Length Register to the value 26 (i.e., the maximum). This will allow us to transfer up to 33.5 million XADC data samples in one transfer (64 MB of data).  
+We are only writing to RAM so we disable the option Enable Read Channel.  
+We enable the Allow Unaligned Transfer option on the Write Channel and increase the Max Burst Size to 128.
 
-
+<img src="pictures\bd_dma.png" width="650">
 
 
 
