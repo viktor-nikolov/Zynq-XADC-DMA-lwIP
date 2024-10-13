@@ -630,13 +630,31 @@ The project should be built without errors. You may see two or three warnings co
 
 The HW design and the demo application from this tutorial allow 1 Msps digitalization on the differential dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>  (labeled V_P/V_N on the Cora Z7 board) and the unipolar auxiliary channel VAUX[1] (labeled A0 on the board).
 
-To see interesting results, you need to use a signal generator and connect a suitable differential signal to pins V_P/V_N (e.g., a signal I used in [this chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main#the-behavior-of-dedicated-channel-vpvn-aaf-of-cora-z7)) and a unipolar signal to pin A0.
+To see interesting results, you need to use a signal generator. Connect a suitable differential signal to pins V_P/V_N (e.g., a signal I used in [this chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main#the-behavior-of-dedicated-channel-vpvn-aaf-of-cora-z7)) and a unipolar signal to pin A0.
 
 > [!CAUTION]
 >
 > **The voltage on the V_P and V_N pins must always be within a range from 0 V to 1.0 V with respect to the board's GND. Also, the differential V<sub>P</sub> &minus; V<sub>N</sub> must be within the range of ±0.5V.**
 >
 > **The voltage on the pin A0 must always be positive and not greater than 3.3 V.**
+
+The application sends data samples over the network to a server, which is the Python script [file_via_socket.py](https://github.com/viktor-nikolov/lwIP-file-via-socket/blob/main/file_via_socket.py).  
+The server writes the samples (a list of voltage values) to a text file. Each set of samples is written to a new file.  
+The standard name of the file the server creates looks like this: via_socket_*240324_203824.6369*.txt  
+Part of the name in italics is the date and time stamp.
+
+Depending on your Python installation, run the script with the command `python3 file_via_socket.py [params]` or `python file_via_socket.py [params]`.
+
+I tested the script on Ubuntu 22.04 and Windows 11.
+
+The default port the script listens on for connections is 65432, and the default bind IP address is 0.0.0.0 (i.e., the script listens on all the configured network interfaces).  
+In typical use, you will want to specify the output folder for the files. For example:
+
+`python file_via_socket.py --path c:\Temp\!fvs\`
+
+```
+python file_via_socket.py --path c:\Temp\!fvs\
+```
 
 
 
