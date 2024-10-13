@@ -559,7 +559,7 @@ We set the Width of the Buffer Length Register to the value 26 (i.e., the maximu
 We are only writing to RAM so we disable the option Enable Read Channel.  
 We enable the Allow Unaligned Transfer option on the Write Channel and increase the Max Burst Size to 128.
 
-<img src="pictures\bd_dma.png" width="650">
+<img src="pictures\bd_dma.png" width="730">
 
 
 
