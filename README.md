@@ -549,6 +549,9 @@ Configure xlslice_1 to extract bits [25:1] and connect its output to the count s
 
 <img src="pictures\bd_slice1.png" width="450">
 
+Our diagram now looks as follows.
+
+<img src="pictures\bd_3.png">
 
 
 
