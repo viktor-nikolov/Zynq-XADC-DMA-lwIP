@@ -2,7 +2,7 @@
 
 These files are intended to be copied into the src folder of the application project in Vitis.
 
-The details are explained in the chapter [Software](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main#software).
+The details are explained in the chapter [Software](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#software).
 
 | Source file                                                  | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
