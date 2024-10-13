@@ -430,7 +430,7 @@ Make sure you have Digilent board files installed. [This article](https://digile
 Create a new RTL Project in Vivado 2024.1. Select your version of Cora Z7 from the list of boards.
 
 Let's first set the constraints.  
-Download [Cora-Z7-07S-Master.xdc](https://github.com/Digilent/digilent-xdc/blob/master/Cora-Z7-07S-Master.xdc) from the [Digilent GitHub repository](https://github.com/Digilent/digilent-xdc/) and add it as a constraints source file to the project.
+**TODO WRONG CONSTRAINTS** Download [Cora-Z7-07S-Master.xdc](https://github.com/Digilent/digilent-xdc/blob/master/Cora-Z7-07S-Master.xdc) from the [Digilent GitHub repository](https://github.com/Digilent/digilent-xdc/) and add it as a constraints source file to the project.
 
 We will use the two buttons, the dedicated analog input v_p/v_n (labeled V_P/V_N on the board) and the auxiliary input vaux1_p/vaux1_n (labeled A0 on the board; the vaux1_n is connected to ground, it doesn't have a pin on the board).  
 Uncomment these items in the constraints file.
@@ -441,14 +441,14 @@ set_property -dict { PACKAGE_PIN D20   IOSTANDARD LVCMOS33 } [get_ports { btn[0]
 set_property -dict { PACKAGE_PIN D19   IOSTANDARD LVCMOS33 } [get_ports { btn[1] }]; #IO_L4P_T0_35 Sch=btn[1]
 
 ## Dedicated Analog Inputs
-set_property -dict { PACKAGE_PIN K9    IOSTANDARD LVCMOS33 } [get_ports { v_p }]; #VP_0 Sch=xadc_v_p
-set_property -dict { PACKAGE_PIN L10   IOSTANDARD LVCMOS33 } [get_ports { v_n }]; #VN_0 Sch=xadc_v_n
+set_property -dict { PACKAGE_PIN K9    IOSTANDARD LVCMOS33 } [get_ports { Vp_Vn_0_v_p }]; #VP_0 Sch=xadc_v_p
+set_property -dict { PACKAGE_PIN L10   IOSTANDARD LVCMOS33 } [get_ports { Vp_Vn_0_v_n }]; #VN_0 Sch=xadc_v_n
 
 ## ChipKit Outer Analog Header - as Single-Ended Analog Inputs
 ## NOTE: These ports can be used as single-ended analog inputs with voltages from 0-3.3V (ChipKit analog pins A0-A5) or as digital I/O.
 ## WARNING: Do not use both sets of constraints at the same time!
-set_property -dict { PACKAGE_PIN E17   IOSTANDARD LVCMOS33 } [get_ports { vaux1_p }]; #IO_L3P_T0_DQS_AD1P_35 Sch=ck_an_p[0]
-set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { vaux1_n }]; #IO_L3N_T0_DQS_AD1N_35 Sch=ck_an_n[0]
+set_property -dict { PACKAGE_PIN E17   IOSTANDARD LVCMOS33 } [get_ports { Vaux1_0_v_p  }]; #IO_L3P_T0_DQS_AD1P_35 Sch=ck_an_p[0]
+set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { Vaux1_0_v_n  }]; #IO_L3N_T0_DQS_AD1N_35 Sch=ck_an_n[0]
 ```
 
 ### Zynq Processing System
@@ -562,7 +562,7 @@ We enable the Allow Unaligned Transfer option on the Write Channel and increase 
 <img src="pictures\bd_dma.png" width="730">
 
 Connect S_AXIS_S2MM of AXI DMA with the m_axis of the stream_tlaster module.  
-Run Connection Automation which Vivado offers now. Set all clock sources to the Clocking Wizard (/clk_wiz_0/clk_out1).
+Run Connection Automation which Vivado offers now. Make sure to set all clock sources to the Clocking Wizard (/clk_wiz_0/clk_out1).
 
 The automation connected the AXI DMA AXI-Lite interface to the Zynq PS via the existing AXI Interconnect. It created a new AXI Interconnect and used it to connect the DMA AXI master interface to the S_AXI_HP0 of Zynq PS. Also, the resets and clocks were connected accordingly.
 
@@ -570,9 +570,16 @@ We now have the final diagram (the image in full resolution is available [here](
 
 <img src="pictures\bd_final.png">
 
+### Generate output
 
+To make sure that nothing was missed, click the Validate Design button in the toolbar of the diagram window (or press F6).  
+You will probably see a critical warning about negative DQS skew values. This warning can be ignored. I guess this is some glitch in the Cora Z7 board file. It has no negative effect.
 
+HDL Wrapper for the diagram needs to be created: Go to Sources|Design Sources, right-click on the block diagram's name, select "Create HDL Wrapper," and select "Let Vivado manage wrapper."
 
+Now we create the design outputs: Click "Generate Bitstream" in the Flow Navigator on the left. Synthesis and Implementation will be run automatically before bitstream generation. There should be no errors.
+
+Last but not least, we need to export the hardware specification. Go to File|Export|Export Hardware, and select "Include Bitstream".
 
 
 
