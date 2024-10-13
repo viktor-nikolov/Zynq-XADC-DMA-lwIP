@@ -697,6 +697,27 @@ press BTN1 to switch between VAUX1 and VPVN inputs
 VAUX1 is activated as the input
 ```
 
+Information under the header `--lwIP Socket Mode TCP Startup--` comes from the lwIP network initialization and DHCP IP address assignment.  
+After the network initializes the thread controlling the XADC takes over and displays some basic information.
+
+We see that 1000 XADC samples will be provided in each measurement (i.e., in each DMA transfer from XADC). You can control this number of samples by modifying the following macro at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
+
+```c++
+/* Number of samples transferred in one DMA transfer. Max. value is 33,554,431 */
+#define SAMPLE_COUNT 1000
+```
+
+We also see that XADC will not use any averaging. This is controlled by the defining value of the macro `AVERAGING_MODE` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). You can select one of the four options: 
+
+```c++
+/* Set XADC averaging.
+ * Leave one of the lines below uncommented to set averaging mode of the XADC. */
+#define AVERAGING_MODE XSM_AVG_0_SAMPLES // No averaging
+//#define AVERAGING_MODE XSM_AVG_16_SAMPLES  // Averaging over  16 acquisition samples
+//#define AVERAGING_MODE XSM_AVG_64_SAMPLES  // Averaging over  64 acquisition samples
+//#define AVERAGING_MODE XSM_AVG_256_SAMPLES // Averaging over 256 acquisition samples
+```
+
 
 
 
