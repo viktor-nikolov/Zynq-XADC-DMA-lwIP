@@ -1,6 +1,6 @@
-## Source files of the HW design
+## Source files for the HW design
 
-These files are intended to be used for the HW design in Vivado.
+These files are intended to be used in the HW design in Vivado.
 
 | Source file                                                  | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
