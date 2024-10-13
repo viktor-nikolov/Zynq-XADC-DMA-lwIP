@@ -516,9 +516,9 @@ Right-click on the Vp_Vn input signal of the XADC Wizard and select Make Externa
 Vivado now offers Run Connection Automation. Run it.  
 Set all clocking sources to the Clocking Wizard (/clk_wiz_0/clk_out1). As explained earlier, we want to drive the XADC clock from the Clocking Wizard to have the flexibility of choosing the frequency.
 
-<img src="pictures\bd_conn_aut_axi_lite.png" width="480">
+<img src="pictures\bd_conn_aut_axi_lite.png" width="520">
 
-<img src="pictures\bd_conn_aut_axis.png" width="480">
+<img src="pictures\bd_conn_aut_axis.png" width="520">
 
 The Connection Automation  
 We now have the following diagram (I shuffled and rotated the IPs for better clarity).
