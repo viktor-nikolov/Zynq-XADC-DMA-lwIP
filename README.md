@@ -523,7 +523,7 @@ Set all clocking sources to the Clocking Wizard (/clk_wiz_0/clk_out1). As explai
 The Connection Automation  
 We now have the following diagram (I shuffled and rotated the IPs for better clarity).
 
-
+<img src="pictures\bd_2.png">
 
 
 
