@@ -689,8 +689,8 @@ Gateway :       192.168.44.1
 will connect to the network address 192.168.44.10:65432
 samples per DMA transfer: 1000
 no averaging is used
-calib coefficient ADC offset: FF9A (-7)
-calib coefficient gain error: 007F (6.3 %)
+calib coefficient ADC offset: FF9A (-7 bits)
+calib coefficient gain error: 007F (6.3%)
 
 press BTN0 to start ADC conversion
 press BTN1 to switch between VAUX1 and VPVN inputs
