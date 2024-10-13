@@ -430,10 +430,10 @@ Make sure you have Digilent board files installed. [This article](https://digile
 Create a new RTL Project in Vivado 2024.1. Select your version of Cora Z7 from the list of boards.
 
 Let's first set the constraints.  
-**TODO WRONG CONSTRAINTS** Download [Cora-Z7-07S-Master.xdc](https://github.com/Digilent/digilent-xdc/blob/master/Cora-Z7-07S-Master.xdc) from the [Digilent GitHub repository](https://github.com/Digilent/digilent-xdc/) and add it as a constraints source file to the project.
+Download the [Cora-Z7-07S-Master.xdc](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/Cora-Z7-07S-Master.xdc) from my repository, which I tailored for this tutorial, and add it as a constraints source file to the project.
 
 We will use the two buttons, the dedicated analog input v_p/v_n (labeled V_P/V_N on the board) and the auxiliary input vaux1_p/vaux1_n (labeled A0 on the board; the vaux1_n is connected to ground, it doesn't have a pin on the board).  
-Uncomment these items in the constraints file.
+These are the port definitions, which are uncommented in the constraints file:
 
 ```
 ## Buttons
@@ -450,6 +450,12 @@ set_property -dict { PACKAGE_PIN L10   IOSTANDARD LVCMOS33 } [get_ports { Vp_Vn_
 set_property -dict { PACKAGE_PIN E17   IOSTANDARD LVCMOS33 } [get_ports { Vaux1_0_v_p  }]; #IO_L3P_T0_DQS_AD1P_35 Sch=ck_an_p[0]
 set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { Vaux1_0_v_n  }]; #IO_L3N_T0_DQS_AD1N_35 Sch=ck_an_n[0]
 ```
+
+> [!NOTE]
+>
+> I'm on purpose not using the Cora Z7 master XDC file from the [Digilent GitHub repository](https://github.com/Digilent/digilent-xdc/).  
+> Instead, I'm using a version that is based on the XDC file provided in Digilent's [Cora Z7 XADC Demo](https://digilent.com/reference/programmable-logic/cora-z7/demos/xadc).  
+> This is because, at the time of writing this, the names of analog input ports in the XDC file on Digilent GitHub are not correct.
 
 ### Zynq Processing System
 
@@ -583,24 +589,30 @@ Last but not least, we need to export the hardware specification to an XSA file.
 
 ## Software
 
+### Building the application
+
 Start Vitis Classic 2024.1.  
-Create a new platform project using the HW XSA file we just generated.  
+Create a new platform project using the HW export XSA file we just generated.  
 Make sure to select freertos_10_xilinx as the operating system.
 
-We will be using the lwIP library for streaming XADC data overto stream a network. Therefore, we must enable the lwIP in the Board Support Package settings (BSP).
+We will be using the lwIP library to stream XADC data over the network. Therefore, we must enable the lwIP in the Board Support Package settings (BSP).
 
 <img src="pictures\vt_bsp_lwip.png" width="400">
 
 The following settings are then needed in the lwIP BSP configuration:
 
-- Set api_mode to "SOCKET API" because this api_mode is required for a stand-alone application.
-- Set dhcp_options/lwip_dhcp to true because the app code is using DHCP to obtain an IP address.
+- Set api_mode to "SOCKET API" because this api_mode is required for a FreeRTOS or stand-alone application.
+- Set dhcp_options/lwip_dhcp to true because my demo application is using DHCP to obtain an IP address.
 
 <img src="pictures\vt_bsp_lwip_conf.png" width="400">
 
+Create new application project.  
+Make sure to select the "Empty Application (**C++**)" in the last step of application project creating wizard.
 
+Copy the content of the [XADC_tutorial_app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) folder from the repository into the src folder of the application project in Vitis.  
+The project should be built without errors. You may see two or three warnings coming from the platform source files (not files in the app's src folder).
 
-
+**TODO, WHAT ARE THE SOURCES**
 
 
 
