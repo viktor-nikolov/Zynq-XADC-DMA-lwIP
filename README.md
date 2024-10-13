@@ -1,4 +1,7 @@
+[![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
+
 # Tutorial: Xilinx Zynq XADC using DMA and network streaming
+
 This tutorial shows how to do an HW design and code a SW application to make use of AMD Xilinx Zynq-7000 [XADC](https://www.xilinx.com/products/technology/analog-mixed-signal.html). We will also see how to use the [DMA](https://www.xilinx.com/products/intellectual-property/axi_dma.html) to transfer data from the XADC into Zynq CPU's memory and stream data to a remote PC over the network.
 
 In this tutorial, I'm using the Digilent board [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start). However, all the principles described here can be used on any other Zynq-7000 board. I will highlight aspects specific to Cora Z7 in the text.  
@@ -398,13 +401,13 @@ I think the most practical way to transfer large amounts of samples from the XAD
 
 <img src="pictures\bd_axi_dma_ip.png" width="300">
 
-The "magic" of the AXI DMA is that it gets data from the [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) input interface S_AXIX_S2MM and sends them via output AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM cores being involved. (The S_AXI_LITE interface is used to control the AXI DMA by functions from [xaxidma.h](https://xilinx.github.io/embeddedsw.github.io/axidma/doc/html/api/xaxidma_8h.html).)  
+The "magic" of the AXI DMA is that it gets data from the slave [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) interface S_AXIX_S2MM and sends them via the master AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM cores being involved. (The S_AXI_LITE interface is used to control the AXI DMA by functions from [xaxidma.h](https://xilinx.github.io/embeddedsw.github.io/axidma/doc/html/api/xaxidma_8h.html).)  
 In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appears in the `DataBuffer` (I will explain all the details in a later chapter).
 
 The maximum amount of data that AXI DMA can move in a single transfer is 64 MB (exactly 0x3FFFFFF bytes). This is because the AXI DMA register to store buffer length can be, at most, 26 bits wide.  
 In our case, we will be transferring 16-bit values, i.e., we can transfer at most 33,554,431 samples in one go. That should be more than enough. We could record up to 33.6 seconds of the input signal with the XADC running at 1 Msps.
 
-The [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) can be configured to have an output AXI-Stream interface. When you configure the XADC for continuous sampling, you will get the actual stream of data coming out from the XADC Wizard AXI-Stream interface. However, this data stream is not ready to be connected directly to the AXI DMA.  
+The [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) can be configured to have an output AXI-Stream interface. When you configure the XADC for continuous sampling, you will get the actual stream of data coming out from the XADC Wizard AXI-Stream interface at the rate equal to the sampling rate of the XADC. However, this data stream is not ready to be connected directly to the AXI DMA.  
 The thing is that the AXI-Stream interface on the XADC Wizard doesn't contain an AXI-Stream signal TLAST. This signal is asserted to indicate the end of the data stream. The AXI DMA must receive the TLAST signal to know when to stop the DMA transfer.
 
 Therefore, we need an intermediate PL module to handle the AXI-Stream data between the XADC Wizard and the DMA IP. I wrote a module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) for use in this tutorial.
@@ -414,7 +417,7 @@ Therefore, we need an intermediate PL module to handle the AXI-Stream data betwe
 This Verilog module controls when the data from the slave AXI-Stream interface (connected to the XADC Wizard) starts to be sent to the master AXI-Stream interface (connected to the AXI DMA).  This happens when the input signal `start` is asserted.
 The module also controls how many data transfers are made (the input signal `count` defines this) and asserts the TLAST signal of the m_axis interface on the last transfer.
 
-We will control the input signals `start` and `count` from the PS (will connect them to the GPIO). First, we set the `count`, then call `XAxiDma_SimpleTransfer()`, and lastly, assert the `start` signal so the data starts to flow into the AXI DMA and thus into the RAM. This will ensure our complete control of how many data samples are transferred from the XADC into the RAM.
+We will control the input signals `start` and `count` from the PS (will connect them to the GPIO). First, we set the `count`, then call `XAxiDma_SimpleTransfer()`, and lastly, assert the `start` signal so the data starts to flow into the AXI DMA and thus into the RAM. This will ensure our complete control of how many data samples are transferred from the XADC into the RAM and when.
 
 ## Hardware design in Vivado
 
@@ -606,13 +609,20 @@ The following settings are then needed in the lwIP BSP configuration:
 
 <img src="pictures\vt_bsp_lwip_conf.png" width="400">
 
-Create new application project.  
-Make sure to select the "Empty Application (**C++**)" in the last step of application project creating wizard.
+Create a new application project.  
+Make sure to select the "**Empty Application (C++**)" in the last step of the application project creating wizard.
 
-Copy the content of the [XADC_tutorial_app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) folder from the repository into the src folder of the application project in Vitis.  
-The project should be built without errors. You may see two or three warnings coming from the platform source files (not files in the app's src folder).
+Copy all source files from the [XADC_tutorial_app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) folder of my repository into the src folder of the application project in Vitis.  
+Let me briefly explain, what source files we have:
 
-**TODO, WHAT ARE THE SOURCES**
+| Source file                                                  | Description                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [FileViaSocket.h](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.h)  <br />[FileViaSocket.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.cpp) | Definition of the C++ [ostream](https://en.cppreference.com/w/cpp/io/basic_ostream) class. |
+|                                                              |                                                              |
+|                                                              |                                                              |
+|                                                              |                                                              |
+
+The project should be built without errors. You may see two or three warnings coming from the platform source files (not files in the app's src folder). These can be ignored.
 
 
 
