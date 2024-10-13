@@ -577,7 +577,7 @@ The automation connected the AXI DMA AXI-Lite interface to the Zynq PS via the e
 
 We now have the final diagram (the image in full resolution is available [here](https://raw.githubusercontent.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/refs/heads/main/pictures/bd_final.png)).
 
-<img src="pictures\bd_final.png">
+<img src="pictures\bd_final.png" alt="XADC tutorial HW design diagram">
 
 ### Generate output
 
@@ -707,7 +707,7 @@ We see that 1000 XADC samples will be provided in each measurement (i.e., in eac
 #define SAMPLE_COUNT 1000
 ```
 
-We also see that XADC will not use any averaging. This is controlled by the defining value of the macro `AVERAGING_MODE` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). You can select one of the four options: 
+We also see that XADC will not use any averaging. This is controlled by defining the value of the macro `AVERAGING_MODE` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). You can select one of the four options: 
 
 ```c++
 /* Set XADC averaging.
@@ -720,9 +720,23 @@ We also see that XADC will not use any averaging. This is controlled by the defi
 
 The next information in the console output tells us that the value of XADC's Offset Calibration Coefficient ix 0xFF9A, which translates to -7 bits of correction. You may observe that this value changes slightly with each run of the application.
 
-The value of XADC's Gain Calibration Coefficient is 0x007F, which translates to 6.3% of correction (the maximum possible value). This is expected on the Cora Z7 board for reasons I explained in detail in the chapter [XADC autocalibration](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#xadc-autocalibration).
+The value of XADC's Gain Calibration Coefficient is shown as 0x007F, which translates to a 6.3% correction (the maximum possible value). This is expected on the Cora Z7 board for reasons I explained in detail in the chapter [XADC autocalibration](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#xadc-autocalibration).
 
+Lastly, the console output tells us what the buttons do and that the auxiliary channel VAUX[1] is activated as input for the XADC measurement.  
+When we press the board's button labeled BTN0, the application will store 1000 XADC samples in memory (using DMA), display values of the first 8 samples on the terminal, and send all 1000 samples to the server, where a file of 1000 lines will be created. 
 
+```
+***** XADC DATA[0..7] *****
+1.878496
+1.651487
+1.448801
+1.277734
+1.156933
+1.086398
+1.074237
+1.120449
+sending data...   sent
+```
 
 
 
