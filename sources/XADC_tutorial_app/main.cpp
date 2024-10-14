@@ -41,7 +41,7 @@ using std::cerr;
 using std::endl;
 
 /* Number of samples transferred in one DMA transfer. Max. value is 33,554,431 */
-#define SAMPLE_COUNT 100
+#define SAMPLE_COUNT 1000
 
 #if SAMPLE_COUNT > 0x01FFFFFF
 	#error "SAMPLE_COUNT is higher than possible max. of 33,554,431 (=0x01FFFFFF)"
@@ -49,9 +49,9 @@ using std::endl;
 
 /* Set XADC averaging.
  * Leave one of the lines below uncommented to set averaging mode of the XADC. */
-//#define AVERAGING_MODE XSM_AVG_0_SAMPLES // No averaging
+#define AVERAGING_MODE XSM_AVG_0_SAMPLES // No averaging
 //#define AVERAGING_MODE XSM_AVG_16_SAMPLES  // Averaging over  16 acquisition samples
-#define AVERAGING_MODE XSM_AVG_64_SAMPLES  // Averaging over  64 acquisition samples
+//#define AVERAGING_MODE XSM_AVG_64_SAMPLES  // Averaging over  64 acquisition samples
 //#define AVERAGING_MODE XSM_AVG_256_SAMPLES // Averaging over 256 acquisition samples
 
 /* IP address and port of the server running the script file_via_socket.py.
@@ -207,14 +207,14 @@ static int XADCInitialize()
 	// Print values of calibration coefficients. (Calibration was done automatically during FPGA configuration.)
 	u16 ADCOffsetCoeff = XSysMon_GetCalibCoefficient(&XADCInstance, XSM_CALIB_ADC_OFFSET_COEFF); //Read value of the Offset Calibration Coefficient from the XADC register
 	cout << "calib coefficient ADC offset: "
-	     << std::hex << std::uppercase << std::setw(4) << std::setfill('0') << ADCOffsetCoeff  // Print Offset Coeff. raw value in hex
-	     << std::dec << " (" << Convert12BitToSigned16Bit(ADCOffsetCoeff >> 4) << ')' << endl; // Print the Offset Coeff. value
+	     << std::hex << std::uppercase << std::setw(4) << std::setfill('0') << ADCOffsetCoeff       // Print Offset Coeff. raw value in hex
+	     << std::dec << " (" << Convert12BitToSigned16Bit(ADCOffsetCoeff >> 4) << " bits)" << endl; // Print the Offset Coeff. value
 
 	u16 GainCoeff = XSysMon_GetCalibCoefficient(&XADCInstance, XSM_CALIB_GAIN_ERROR_COEFF); //Read value of the Gain Calibration Coefficient from the XADC register
 	cout << "calib coefficient gain error: "
-	     << std::hex << std::setw(4) << GainCoeff                               // Print Gain Coeff. raw value in hex
+	     << std::hex << std::setw(4) << GainCoeff                              // Print Gain Coeff. raw value in hex
          << std::dec << std::fixed << std::setprecision(1) << std::showpoint
-	     << " ("  << ConvertRawGainCoefToPercents(GainCoeff) << " %)" << endl;  // Print Gain Coeff. value
+	     << " ("  << ConvertRawGainCoefToPercents(GainCoeff) << "%)" << endl;  // Print Gain Coeff. value
 
 	// Disable all interrupts
 	XSysMon_IntrGlobalDisable(&XADCInstance);
@@ -230,7 +230,7 @@ static int XADCInitialize()
 	// Read Configuration Register 0
 	u32 RegValue = XSysMon_ReadReg(XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET);
 	// To disable calibration coef. averaging, set bit XSM_CFR0_CAL_AVG_MASK to 1
-	 RegValue |= XSM_CFR0_CAL_AVG_MASK;
+	RegValue |= XSM_CFR0_CAL_AVG_MASK;
 	// Write Configuration Register 0
 	XSysMon_WriteReg(XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET, RegValue);
 
@@ -254,15 +254,14 @@ static int ActivateXADCInput()
 {
 	XStatus Status;
 
-	if( ActiveXADCInput == eXADCInput::VAUX1 ) {
-		// Set the ADCCLK frequency equal to 1/6 of XADC input clock in order to have correct acquisition time
-/////		XSysMon_SetAdcClkDivisor(&XADCInstance, 6);
+	// Set the ADCCLK frequency equal to 1/4 of XADC input clock. When the input clock is 104 MHz it will result in 1 Mbps sampling rate
+	XSysMon_SetAdcClkDivisor(&XADCInstance, 4);
 
+	if( ActiveXADCInput == eXADCInput::VAUX1 ) {
 		// Set single channel mode for VAUX1 analog input
 		Status = XSysMon_SetSingleChParams( &XADCInstance,
 											XSM_CH_AUX_MIN+1, // == channel bit of VAUX1 == Cora Z7 board pin A0
-/////											true,             // IncreaseAcqCycles==false -> default 4 ADCCLKs used for the acquisition; true -> 10 ADCCLKs used
-											false,            // IncreaseAcqCycles==false -> default 4 ADCCLKs used for the acquisition; true -> 10 ADCCLKs used
+											false,            // IncreaseAcqCycles==false -> default 4 ADCCLKs used for the settling; true -> 10 ADCCLKs used
 											false,            // IsEventMode==false -> continuous sampling
 											false );          // IsDifferentialMode==false -> unipolar mode
 		if(Status != XST_SUCCESS) {
@@ -274,9 +273,6 @@ static int ActivateXADCInput()
 		cout << "VAUX1 is activated as the input" << endl;
 	}
 	else if( ActiveXADCInput == eXADCInput::VPVN ) {
-		// Set the ADCCLK frequency equal to 1/4 of XADC input clock. We can have shorter acquisition time for VPVN input
-/////		XSysMon_SetAdcClkDivisor(&XADCInstance, 4);
-
 		// Set single channel mode for VP/VN dedicated analog inputs
 		Status = XSysMon_SetSingleChParams( &XADCInstance,
 											XSM_CH_VPVN,      // == channel bit of VP/VN == Cora Z7 board pins V_P and V_N
@@ -303,7 +299,7 @@ static int DMAInitialize()
 	XAxiDma_Config *cfgptr;
 	XStatus Status;
 
-    cfgptr = XAxiDma_LookupConfig(XPAR_AXI_DMA_DEVICE_ID);
+    cfgptr = XAxiDma_LookupConfig(XPAR_AXI_DMA_0_DEVICE_ID);
 	if(cfgptr == NULL) {
 		cerr << "XAxiDma_LookupConfig  failed! terminating" << endl;
 		return XST_FAILURE;
