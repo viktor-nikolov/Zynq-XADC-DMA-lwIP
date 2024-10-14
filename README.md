@@ -801,11 +801,12 @@ XSysMon_SetAdcClkDivisor( &XADCInstance, 4 );
 We activate the auxiliary input VAUX[1] in the single channel unipolar mode by the following call.
 
 ```c++
-XSysMon_SetSingleChParams( &XADCInstance,
-                           XSM_CH_AUX_MIN+1, // == channel bit of VAUX1 
-                           false,            // IncreaseAcqCycles==false -> default 4 ADCCLKs used for the settling; true -> 10 ADCCLKs used
-                           false,            // IsEventMode==false -> continuous sampling
-                           false );          // IsDifferentialMode==false -> unipolar mode
+XSysMon_SetSingleChParams(
+  &XADCInstance,
+  XSM_CH_AUX_MIN+1, // == channel bit of VAUX1 
+  false,            // IncreaseAcqCycles==false -> default 4 ADCCLKs used for the settling; true -> 10 ADCCLKs used
+  false,            // IsEventMode==false -> continuous sampling
+  false );          // IsDifferentialMode==false -> unipolar mode
 ```
 
 
