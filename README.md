@@ -768,7 +768,8 @@ XSysMon_SetSequencerMode( &XADCInstance, XSM_SEQ_MODE_SINGCHAN );
 // Disable all alarms
 XSysMon_SetAlarmEnables(&XADCInstance, 0);
 
-/* Disable averaging for the calculation of the calibration coefficients in the Configuration Register 0. */
+/* Disable averaging for the calculation of the calibration coefficients
+   in the Configuration Register 0. */
 // Read Configuration Register 0
 u32 RegValue = XSysMon_ReadReg( XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET );
 // To disable calibration coef. averaging, set bit XSM_CFR0_CAL_AVG_MASK to 1
