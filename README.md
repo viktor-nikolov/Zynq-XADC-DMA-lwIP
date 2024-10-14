@@ -803,17 +803,23 @@ We activate the auxiliary input VAUX[1] in the single channel unipolar mode by t
 ```c++
 XSysMon_SetSingleChParams(
   &XADCInstance,
-  XSM_CH_AUX_MIN+1, // == channel bit of VAUX1 
-  false,            // IncreaseAcqCycles==false -> default 4 ADCCLKs used for the settling; true -> 10 ADCCLKs used
+  XSM_CH_AUX_MIN+1, // == channel index of VAUX[1]
+  false,            /* IncreaseAcqCycles==false -> default 4 ADCCLKs used for the settling;
+                       true -> 10 ADCCLKs used */
   false,            // IsEventMode==false -> continuous sampling
   false );          // IsDifferentialMode==false -> unipolar mode
 ```
 
+The second parameter of [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586) is the channel index. You can use macros XSM_CH_* defined in the [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). Macro `XSM_CH_AUX_MIN` is the index of VAUX[0]. By adding 1 to it, we get the index of VAUX[1].  
+The index of the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub> is given by the macro `XSM_CH_VPVN`.
 
+Next is the boolean parameter `IncreaseAcqCycles`.  
+Value false means that the default duration of 4 ADCCLK clock cycles is used for the settling period, so the acquisition takes 26 ADCCLK cycles in total. We use a 104 MHz XADC input clock in the HW design. We set the divider ratio to 4 by calling `XSysMon_SetAdcClkDivisor`. This results in 26 MHz ADCCLK and thus 1 Msps sampling rate.  
+If the parameter `IncreaseAcqCycles` was true, 10 ADCCLK cycles would be used for the settling period, thus extending the acquisition to 32 ADCCLK cycles. That would result in an 812.5 ksps sampling rate.
 
+The next boolean parameter `IsEventMode` specifies [event sampling mode](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Event-Driven-Sampling) (value true) or [continuous sampling mode](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) (value false).
 
-
-
+The last boolean parameter `IsDifferentialMode` specifies bipolar mode (value true) or unipolar mode (value false). See the explanation of the two modes in [this chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#what-is-xadc).
 
 
 
