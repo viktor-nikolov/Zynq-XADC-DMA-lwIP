@@ -788,7 +788,7 @@ The macro `AVERAGING_MODE` is set to one of the values `XSM_AVG_0_SAMPLES` (no a
 Because the board Cora Z7 doesn't provide an external voltage reference to the XADC, we must make sure to enable only usage of the Offset Calibration Coefficient by following the call (see details explained in the chapter [XADC Autocalibration](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#xadc-autocalibration)).
 
 ```
-XSysMon_SetCalibEnables( &XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK );
+XSysMon_SetCalibEnables(&XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK);
 ```
 
 
