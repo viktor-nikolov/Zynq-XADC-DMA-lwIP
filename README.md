@@ -783,15 +783,19 @@ The XADC Averaging is set using the following call.
 ```c++
 XSysMon_SetAvg( &XADCInstance, AVERAGING_MODE );
 ```
-The macro `AVERAGING_MODE` is set to one of the values `XSM_AVG_0_SAMPLES` (no averaging), `XSM_AVG_16_SAMPLES`, `XSM_AVG_64_SAMPLES` or `XSM_AVG_256_SAMPLES` at the beginning of main.cpp.
+The macro `AVERAGING_MODE` is set to one of the values `XSM_AVG_0_SAMPLES` (no averaging), `XSM_AVG_16_SAMPLES`, `XSM_AVG_64_SAMPLES` or `XSM_AVG_256_SAMPLES` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
 
-Because the board Cora Z7 doesn't provide an external voltage reference to the XADC, we must make sure to enable only usage of the Offset Calibration Coefficient by following the call (see details explained in the chapter [XADC Autocalibration](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#xadc-autocalibration)).
+Because the board Cora Z7 doesn't provide an external voltage reference to the XADC, we must make sure to enable only usage of the Offset Calibration Coefficient by the following call (see details explained in the chapter [XADC Autocalibration](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#xadc-autocalibration)).
 
 ```c++
 XSysMon_SetCalibEnables(&XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK);
 ```
 
+Before activating an analog input and setting the Single Channel mode, we need to set the ADCCLK divider ratio (see details explained in the chapter [Clocking](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#clocking-sampling-rate-and-bandwidth)).
 
+```c++
+XSysMon_SetAdcClkDivisor( &XADCInstance, 4 ); // Set the ADCCLK frequency equal to 1/4 of XADC input clock
+```
 
 
 
