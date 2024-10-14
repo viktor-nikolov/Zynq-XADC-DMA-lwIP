@@ -759,7 +759,7 @@ Status = XSysMon_CfgInitialize( &XADCInstance, ConfigPtr, ConfigPtr->BaseAddress
 if( Status != XST_SUCCESS ) { /* raise an error*/ }
 ```
 
-After the initialization, I disable XADC features, which we do not need or use in this demo application:
+After the initialization, I disable XADC features, which we do not need in this demo application:
 
 ```c++
 // Disable all interrupts
@@ -791,14 +791,14 @@ Because the board Cora Z7 doesn't provide an external voltage reference to the X
 XSysMon_SetCalibEnables(&XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK);
 ```
 
-Before activating an analog input and setting the Single Channel Mode, we need to set the ADCCLK divider ratio (see details explained in the chapter [Clocking](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#clocking-sampling-rate-and-bandwidth)).
+Before activating an analog input, we need to set the ADCCLK divider ratio (see details explained in the chapter [Clocking](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#clocking-sampling-rate-and-bandwidth)).
 
 ```c++
 // Set the ADCCLK frequency equal to 1/4 of the XADC input clock 
 XSysMon_SetAdcClkDivisor( &XADCInstance, 4 );
 ```
 
-We activate the auxiliary input VAUX[1] in the single channel unipolar mode by the following call.
+We activate the auxiliary input VAUX[1] in the single channel unipolar continuous sampling mode by the following call.
 
 ```c++
 XSysMon_SetSingleChParams(
@@ -810,7 +810,7 @@ XSysMon_SetSingleChParams(
   false );          // IsDifferentialMode==false -> unipolar mode
 ```
 
-The second parameter of [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586) is the channel index. You can use macros XSM_CH_* defined in the [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). Macro `XSM_CH_AUX_MIN` is the index of VAUX[0]. By adding 1 to it, we get the index of VAUX[1].  
+The second parameter of [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586) is the channel index. You can use macros `XSM_CH_*` defined in the [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). Macro `XSM_CH_AUX_MIN` is the index of VAUX[0]. By adding 1 to it, we get the index of VAUX[1].  
 The index of the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub> is given by the macro `XSM_CH_VPVN`.
 
 Next is the boolean parameter `IncreaseAcqCycles`.  
