@@ -13,6 +13,7 @@ Before we dive into drawing a block diagram in Vivado and writing code in Vitis,
 
 ## TODOs, to be removed
 
+- **TODO:** test precision of the measurement with gain calib. coeeficient enabled
 - Oversampling: https://www.silabs.com/documents/public/application-notes/an118.pdf
 - calibration:
   - [53586 - Zynq and 7-Series XADC Gain Calibration Behaviour with Internal Voltage Reference (xilinx.com)](https://support.xilinx.com/s/article/53586?language=en_US)
@@ -766,7 +767,7 @@ XSysMon_IntrGlobalDisable( &XADCInstance );
 // Disable the Channel Sequencer (we will use the Single Channel mode)
 XSysMon_SetSequencerMode( &XADCInstance, XSM_SEQ_MODE_SINGCHAN );
 // Disable all alarms
-XSysMon_SetAlarmEnables(&XADCInstance, 0);
+XSysMon_SetAlarmEnables( &XADCInstance, 0 );
 
 /* Disable averaging for the calculation of the calibration coefficients */
 // Read Configuration Register 0
@@ -777,9 +778,18 @@ RegValue |= XSM_CFR0_CAL_AVG_MASK;
 XSysMon_WriteReg( XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET, RegValue );
 ```
 
+The XADC Averaging is set using the following call.  
+The macro `AVERAGING_MODE` is set to one of the values `XSM_AVG_0_SAMPLES` (no averaging), `XSM_AVG_16_SAMPLES`, `XSM_AVG_64_SAMPLES` or `XSM_AVG_256_SAMPLES` at the beginning of main.cpp.
 
+```c++
+XSysMon_SetAvg( &XADCInstance, AVERAGING_MODE );
+```
 
+Because the Cora Z7 board doesn't provide an external voltage reference to the XADC we must make sure enable only usage of the Offset Calibration Coefficient by following call. See details explained in the chapter [XADC Autocalibration](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#xadc-autocalibration).
 
+```
+XSysMon_SetCalibEnables( &XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK );
+```
 
 
 
