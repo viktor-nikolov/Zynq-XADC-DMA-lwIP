@@ -778,14 +778,14 @@ RegValue |= XSM_CFR0_CAL_AVG_MASK;
 XSysMon_WriteReg( XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET, RegValue );
 ```
 
-The XADC Averaging is set using the following call.  
-The macro `AVERAGING_MODE` is set to one of the values `XSM_AVG_0_SAMPLES` (no averaging), `XSM_AVG_16_SAMPLES`, `XSM_AVG_64_SAMPLES` or `XSM_AVG_256_SAMPLES` at the beginning of main.cpp.
+The XADC Averaging is set using the following call. 
 
 ```c++
 XSysMon_SetAvg( &XADCInstance, AVERAGING_MODE );
 ```
+The macro `AVERAGING_MODE` is set to one of the values `XSM_AVG_0_SAMPLES` (no averaging), `XSM_AVG_16_SAMPLES`, `XSM_AVG_64_SAMPLES` or `XSM_AVG_256_SAMPLES` at the beginning of main.cpp.
 
-Because the Cora Z7 board doesn't provide an external voltage reference to the XADC we must make sure enable only usage of the Offset Calibration Coefficient by following call. See details explained in the chapter [XADC Autocalibration](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#xadc-autocalibration).
+Because the board Cora Z7 doesn't provide an external voltage reference to the XADC, we must make sure to enable only usage of the Offset Calibration Coefficient by following the call (see details explained in the chapter [XADC Autocalibration](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#xadc-autocalibration)).
 
 ```
 XSysMon_SetCalibEnables( &XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK );
