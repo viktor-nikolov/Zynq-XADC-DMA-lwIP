@@ -742,7 +742,7 @@ sending data...   sent
 
 Let me explain in more detail the aspects of controlling the XADC from the PS. I will use code snippets from the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
 
-Initialization of the XADC is very similar to the other Xillinx subsystems.
+The initialization of the XADC is very similar to the other Xillinx subsystems:
 
 ```c++
 #include "xsysmon.h"
@@ -758,7 +758,7 @@ Status = XSysMon_CfgInitialize( &XADCInstance, ConfigPtr, ConfigPtr->BaseAddress
 if( Status != XST_SUCCESS ) { /* raise an error*/ }
 ```
 
-After the initialization I disable XADC features, which we do not need or use in this demo application.
+After the initialization, I disable XADC features, which we do not need or use in this demo application:
 
 ```c++
 // Disable all interrupts
@@ -768,12 +768,11 @@ XSysMon_SetSequencerMode( &XADCInstance, XSM_SEQ_MODE_SINGCHAN );
 // Disable all alarms
 XSysMon_SetAlarmEnables(&XADCInstance, 0);
 
-/* Disable averaging for the calculation of the calibration coefficients
-   in the Configuration Register 0. */
+/* Disable averaging for the calculation of the calibration coefficients */
 // Read Configuration Register 0
 u32 RegValue = XSysMon_ReadReg( XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET );
 // To disable calibration coef. averaging, set bit XSM_CFR0_CAL_AVG_MASK to 1
- RegValue |= XSM_CFR0_CAL_AVG_MASK;
+RegValue |= XSM_CFR0_CAL_AVG_MASK;
 // Write Configuration Register 0
 XSysMon_WriteReg( XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET, RegValue );
 ```
