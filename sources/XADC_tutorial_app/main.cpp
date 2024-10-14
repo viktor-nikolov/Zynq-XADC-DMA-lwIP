@@ -74,7 +74,7 @@ extern void network_init_thread(void *p);              // Defined in network_thr
 static u16 DataBuffer[ SAMPLE_COUNT + 8 ] __attribute__((aligned(4)));
 
 static XGpioPs GpioInstance;
-static XSysMon XADCInstance;
+static XSysMon XADCInstance;   // The XADC instance
 static XAxiDma AxiDmaInstance;
 
 enum class eXADCInput { VAUX1, VPVN };              // Enumeration type for valid XADCInputs
@@ -192,7 +192,7 @@ static int XADCInitialize()
 	XSysMon_Config *ConfigPtr;
 	XStatus Status;
 
-	ConfigPtr = XSysMon_LookupConfig(XPAR_XADC_WIZ_0_DEVICE_ID);
+	ConfigPtr = XSysMon_LookupConfig(XPAR_XADC_WIZ_0_DEVICE_ID); // The macro comes from xparameters.h
 	if(ConfigPtr == NULL) {
 		cerr << "XSysMon_LookupConfig failed! terminating" << endl;
 		return XST_FAILURE;
@@ -218,7 +218,7 @@ static int XADCInitialize()
 
 	// Disable all interrupts
 	XSysMon_IntrGlobalDisable(&XADCInstance);
-	// Disable the Channel Sequencer
+	// Disable the Channel Sequencer (we will use the Single Channel mode)
 	XSysMon_SetSequencerMode(&XADCInstance, XSM_SEQ_MODE_SINGCHAN);
 	// Disable all alarms
 	XSysMon_SetAlarmEnables(&XADCInstance, 0);
@@ -226,9 +226,12 @@ static int XADCInitialize()
 	// Set averaging mode
 	XSysMon_SetAvg(&XADCInstance, AVERAGING_MODE); // Select averaging mode by defining value of the macro AVERAGING_MODE
 
-	// Just in case: Disable averaging for the calculation of the calibration coefficients in Configuration Register 0
+	/* Just in case: Disable averaging for the calculation of the calibration coefficients in the Configuration Register 0. */
+	// Read Configuration Register 0
 	u32 RegValue = XSysMon_ReadReg(XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET);
-	RegValue |= XSM_CFR0_CAL_AVG_MASK; //To disable averaging, set bit XSM_CFR0_CAL_AVG_MASK to 1
+	// To disable calibration coef. averaging, set bit XSM_CFR0_CAL_AVG_MASK to 1
+	 RegValue |= XSM_CFR0_CAL_AVG_MASK;
+	// Write Configuration Register 0
 	XSysMon_WriteReg(XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET, RegValue);
 
 	/* Enable offset and gain calibration
