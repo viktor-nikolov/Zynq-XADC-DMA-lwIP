@@ -747,7 +747,7 @@ Initialization of the XADC is very similar to the other Xillinx subsystems.
 ```c++
 #include "xsysmon.h"
 
-XSysMon XADCInstance;      // XADC instance
+XSysMon XADCInstance;      // The XADC instance
 XSysMon_Config *ConfigPtr; // Pointer to the XADC configuration
 XStatus Status;
 
@@ -768,9 +768,12 @@ XSysMon_SetSequencerMode( &XADCInstance, XSM_SEQ_MODE_SINGCHAN );
 // Disable all alarms
 XSysMon_SetAlarmEnables(&XADCInstance, 0);
 
-// Just in case: Disable averaging for the calculation of the calibration coefficients in Configuration Register 0
+/* Disable averaging for the calculation of the calibration coefficients in the Configuration Register 0. */
+// Read Configuration Register 0
 u32 RegValue = XSysMon_ReadReg( XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET );
-RegValue |= XSM_CFR0_CAL_AVG_MASK; //To disable averaging, set bit XSM_CFR0_CAL_AVG_MASK to 1
+// To disable calibration coef. averaging, set bit XSM_CFR0_CAL_AVG_MASK to 1
+ RegValue |= XSM_CFR0_CAL_AVG_MASK;
+// Write Configuration Register 0
 XSysMon_WriteReg( XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET, RegValue );
 ```
 
