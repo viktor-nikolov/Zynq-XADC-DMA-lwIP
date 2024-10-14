@@ -791,11 +791,26 @@ Because the board Cora Z7 doesn't provide an external voltage reference to the X
 XSysMon_SetCalibEnables(&XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK);
 ```
 
-Before activating an analog input and setting the Single Channel mode, we need to set the ADCCLK divider ratio (see details explained in the chapter [Clocking](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#clocking-sampling-rate-and-bandwidth)).
+Before activating an analog input and setting the Single Channel Mode, we need to set the ADCCLK divider ratio (see details explained in the chapter [Clocking](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#clocking-sampling-rate-and-bandwidth)).
 
 ```c++
-XSysMon_SetAdcClkDivisor( &XADCInstance, 4 ); // Set the ADCCLK frequency equal to 1/4 of XADC input clock
+// Set the ADCCLK frequency equal to 1/4 of the XADC input clock 
+XSysMon_SetAdcClkDivisor( &XADCInstance, 4 );
 ```
+
+We activate the auxiliary input VAUX[1] in the single channel unipolar mode by the following call.
+
+```c++
+XSysMon_SetSingleChParams( &XADCInstance,
+                           XSM_CH_AUX_MIN+1, // == channel bit of VAUX1 
+                           false,            // IncreaseAcqCycles==false -> default 4 ADCCLKs used for the settling; true -> 10 ADCCLKs used
+                           false,            // IsEventMode==false -> continuous sampling
+                           false );          // IsDifferentialMode==false -> unipolar mode
+```
+
+
+
+
 
 
 
