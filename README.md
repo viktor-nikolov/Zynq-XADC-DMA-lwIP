@@ -820,7 +820,7 @@ If the parameter `IncreaseAcqCycles` was true, 10 ADCCLK cycles would be used fo
 
 The HW design in this tutorial and the demo app are set to run the XADC at the maximum possible sampling rate of 1 Msps.  
 To achieve other (i.e., lower) sampling rates, you need to set a suitable XADC Wizard input clock frequency in the HW design and a suitable ADCCLK clock divider ratio so the quotient of frequency and the ratio is 26 times the desired sampling rate.  
-E.g. to have a sampling rate of 100 ksps, set the Clocking Wizard, which feeds the XADC Wizard input clock, to 101.4 MHz and set the divider ratio (by calling [XSysMon_SetAdcClkDivisor](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L1089)) to 39. $`101400 /over 39 = 2600`$ 
+E.g. to have a sampling rate of 100 ksps, set the Clocking Wizard, which feeds the XADC Wizard input clock, to 101.4 MHz and set the divider ratio (by calling [XSysMon_SetAdcClkDivisor](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L1089)) to 39. $`{101400}/over{39}=2600`$ 
 
 The next boolean parameter `IsEventMode` specifies [event sampling mode](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Event-Driven-Sampling) (value true) or [continuous sampling mode](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) (value false).
 
