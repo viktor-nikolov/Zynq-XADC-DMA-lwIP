@@ -14,7 +14,7 @@ Before we dive into drawing a block diagram in Vivado and writing code in Vitis,
 ## TODOs, to be removed
 
 - **TODO:** test precision of the measurement with gain calib. coeeficient enabled
-- **TODO:** test getting the 104 ksps
+- **TODO:** test getting the 100 ksps
 - Oversampling: https://www.silabs.com/documents/public/application-notes/an118.pdf
 - calibration:
   - [53586 - Zynq and 7-Series XADC Gain Calibration Behaviour with Internal Voltage Reference (xilinx.com)](https://support.xilinx.com/s/article/53586?language=en_US)
@@ -203,7 +203,7 @@ When the input analog signal changes to a new value, the settling time is the ti
 We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/8erAzNpWEDQ8zWWH_EdtFg?section=XREF_11532_Equation2_5) from [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) to adapt it to the resistances of Cora Z7 analog input:
 
 ```math
-t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000 }} + 140 + 845) \times 1 \times 10^{-9} = 15.1725 \mskip3mu \mu s
+t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000}} + 140 + 845) \times 1 \times 10^{-9} = 15.1725 \mskip3mu \mu s
 ```
 The term $`\ln(2^{12+1})`$ is the number of time constants needed for 12-bit resolution.
 
@@ -820,7 +820,7 @@ If the parameter `IncreaseAcqCycles` was true, 10 ADCCLK cycles would be used fo
 
 The HW design in this tutorial and the demo app are set to run the XADC at the maximum possible sampling rate of 1 Msps.  
 To achieve other (i.e., lower) sampling rates, you need to set a suitable XADC Wizard input clock frequency in the HW design and a suitable ADCCLK clock divider ratio so the quotient of frequency and the ratio is 26 times the desired sampling rate.  
-E.g. to have a sampling rate of 100 ksps, set the Clocking Wizard, which feeds the XADC Wizard input clock, to 101.4 MHz and set the divider ratio (by calling [XSysMon_SetAdcClkDivisor](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L1089)) to 39. $`{101400}/over{39}=2600`$ 
+E.g. to have a sampling rate of 100 ksps, set the Clocking Wizard, which feeds the XADC Wizard input clock, to 101.4 MHz and set the divider ratio (by calling [XSysMon_SetAdcClkDivisor](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L1089)) to 39. $`{101400} /over {39}=2600`$ 
 
 The next boolean parameter `IsEventMode` specifies [event sampling mode](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Event-Driven-Sampling) (value true) or [continuous sampling mode](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) (value false).
 
