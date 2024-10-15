@@ -83,7 +83,7 @@ The XADC is driven by the input clock DCLK.
 When the XADC Wizard is configured to have an AIX4Lite interface (which is what we will do), the DCLK is driven by the s_axi_aclk clock of the AXI interface.
 
 The ADC circuitry within the XADC is driven by the clock ADCCLK, which is derived from DCLK by a configurable ratio divider. The minimum possible divider ratio is 2, and the maximum ratio is 255.  
-The divider ratio can be configured dynamically by the function [XSysMon_SetAdcClkDivisor()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L1089).
+The divider ratio can be configured dynamically by calling the function [XSysMon_SetAdcClkDivisor()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L1089).
 
 In the default XADC setup of Continuous Sampling mode, 26 ADCCLK cycles are required to acquire an analog signal and perform a conversion.  
 The 26 ADCCLK cycle period can be extended to 32 cycles by configuration. See the boolean parameter IncreaseAcqCycles of the [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586). The parameter controls the duration of the so-called settling period (this is what [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) calls it), which is 4 ADCCLK cycles by default and can be extended to 10 cycles.
@@ -98,6 +98,9 @@ The 26 ADCCLK cycle period can be extended to 32 cycles by configuration. See th
 
 The XADC maximum sampling rate is 1&nbsp;Msps.  
 This is achieved by having 104 MHz DCLK and the divider ratio set to 4. This results in the highest possible ADCCLK frequency of 26 MHz. Using 26 ADCCLK cycles for single conversion then gives 1 Msps.
+
+To achieve other (i.e., lower) sampling rates, you need to set a suitable XADC input clock frequency in the HW design and a suitable ADCCLK clock divider ratio, so the quotient of frequency and the ratio is 26 times the desired sampling rate.  
+E.g. to have a sampling rate of 100 ksps, set the XADC input clock to 101.4&nbsp;MHz and set the divider ratio to 39.&nbsp;&nbsp;&nbsp;$`\frac{101400}{39} = 2600`$&nbsp;&nbsp;&nbsp;&nbsp;$`\frac{2600}{26} = 100 \mskip3mu ksps`$
 
 > [!IMPORTANT]
 >
