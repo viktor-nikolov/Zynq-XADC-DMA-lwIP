@@ -100,7 +100,7 @@ The XADC maximum sampling rate is 1&nbsp;Msps.
 This is achieved by having 104 MHz DCLK and the divider ratio set to 4. This results in the highest possible ADCCLK frequency of 26 MHz. Using 26 ADCCLK cycles for single conversion then gives 1 Msps.
 
 To achieve other (i.e., lower) sampling rates, you need to set a suitable DCLK clock frequency in the HW design and a suitable ADCCLK clock divider ratio, so the quotient of frequency and the ratio is 26 times the desired sampling rate.  
-E.g. to have a sampling rate of 100 ksps, set the XADC input clock to 101.4&nbsp;MHz and set the divider ratio to 39.&nbsp;&nbsp;&nbsp;$`\frac{101400}{39} = 2600`$&nbsp;&nbsp;&nbsp;&nbsp;$`\frac{2600}{26} = 100 \mskip3mu ksps`$
+E.g. to have a sampling rate of 100 ksps, set the DCLK to 101.4&nbsp;MHz and the divider ratio to 39.&nbsp;&nbsp;&nbsp;$`\frac{101400}{39} = 2600`$&nbsp;&nbsp;&nbsp;&nbsp;$`\frac{2600}{26} = 100 \mskip3mu ksps`$
 
 > [!IMPORTANT]
 >
