@@ -14,6 +14,7 @@ Before we dive into drawing a block diagram in Vivado and writing code in Vitis,
 ## TODOs, to be removed
 
 - **TODO:** test precision of the measurement with gain calib. coeeficient enabled
+- **TODO:** test getting the 104 ksps
 - Oversampling: https://www.silabs.com/documents/public/application-notes/an118.pdf
 - calibration:
   - [53586 - Zynq and 7-Series XADC Gain Calibration Behaviour with Internal Voltage Reference (xilinx.com)](https://support.xilinx.com/s/article/53586?language=en_US)
@@ -646,7 +647,7 @@ You must specify IP address of the server in the constant in [main.cpp](https://
 const std::string SERVER_ADDR( "192.168.44.10" ); // Specify your actual server IP address
 ```
 
-The server writes the samples (a list of voltage values) to a text file. Each set of samples is written to a new file.  
+The server writes the XADC samples (a list of voltage values) to a text file. Each set of samples is written to a new file.  
 The standard name of the file the server creates looks like this: via_socket_*240324_203824.6369*.txt  
 Part of the name in italics is the date and time stamp.
 
@@ -662,7 +663,7 @@ In typical use, you will want to specify the output folder for the files. For ex
 
 (To get the full list of available parameters, run `python file_via_socket.py --help`.)
 
-Let me summarize. To successfully run the application, you need to perform these steps:
+Let me summarize. To successfully run the demo application, you need to perform these steps:
 
 1. Connect a suitable signal from a signal generator to Cora Z7 pins V_P and V_N or to pin A0 (or to both).
 2. Connect the network cable to the Cora Z7 board.
@@ -815,7 +816,11 @@ The index of the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub> is g
 
 Next is the boolean parameter `IncreaseAcqCycles`.  
 Value false means that the default duration of 4 ADCCLK clock cycles is used for the settling period, so the acquisition takes 26 ADCCLK cycles in total. We use a 104 MHz XADC input clock in the HW design. We set the divider ratio to 4 by calling `XSysMon_SetAdcClkDivisor`. This results in 26 MHz ADCCLK and thus 1 Msps sampling rate.  
-If the parameter `IncreaseAcqCycles` was true, 10 ADCCLK cycles would be used for the settling period, thus extending the acquisition to 32 ADCCLK cycles. That would result in an 812.5 ksps sampling rate.
+If the parameter `IncreaseAcqCycles` was true, 10 ADCCLK cycles would be used for the settling period, thus extending the acquisition to 32 ADCCLK cycles. That would result in an 812.5 ksps sampling rate. 
+
+The HW design in this tutorial and the demo app are set to run the XADC at the maximum possible sampling rate of 1 Msps.  
+To achieve other (i.e., lower) sampling rates, you need to set a suitable XADC Wizard input clock frequency in the HW design and a suitable ADCCLK clock divider ratio so the quotient of frequency and the ratio is 26 times the desired sampling rate.  
+E.g. to have a sampling rate of 100 ksps, set the Clocking Wizard, which feeds the XADC Wizard input clock, to 101.4 MHz and set the divider ratio (by calling [XSysMon_SetAdcClkDivisor](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L1089)) to 39. $`101400 /over 39 = 2600`$ 
 
 The next boolean parameter `IsEventMode` specifies [event sampling mode](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Event-Driven-Sampling) (value true) or [continuous sampling mode](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) (value false).
 
