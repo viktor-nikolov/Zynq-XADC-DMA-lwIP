@@ -846,15 +846,24 @@ XAxiDma_IntrDisable( &AxiDmaInstance, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DEVICE_TO_DM
 XAxiDma_IntrDisable( &AxiDmaInstance, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DMA_TO_DEVICE );
 ```
 
-We need to have a space in memory for the AXI DMA to load data into. The easiest way is to declare a global variable as follows.
+We need to have a space in memory for the AXI DMA to load data into. The easiest way is to declare a global array as follows.
 
 ```c++
 u16 DataBuffer[ SAMPLE_COUNT + 8 ] __attribute__((aligned(4)));
 ```
 
+Important considerations go into declaring an array for receiving data from AXI DMA. Let me explain:
 
+1. **Data type:** In our case, the AXI-Stream data width is 16 bits. This is because the XADC Wizzard exposes a 16-bit wide master AXI-Stream interface, and it goes as the 16-bit stream all the way into the AXI DMA. So, we use the data type `u16`.
+2. **Array length:** The number of samples we transfer in one DMA transfer is given by the macro `SAMPLE_COUNT`. However, there is a catch. The ARM Cortex-A9 processor has a cache line size of 32 bytes.
+   **TODO** Because we need to invalidate Data Cache in a slightly bigger memory range. Otherwise we risk cache issues caused by end of the buffer not aligned with cache line.
+3. **Memory alignment:** dd
 
+bla bla
 
+### Converting raw XADC data samples to the voltage
+
+bla bla
 
 
 
