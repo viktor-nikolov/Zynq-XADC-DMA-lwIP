@@ -11,17 +11,6 @@ The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain. **TODO Vi
 
 Before we dive into drawing a block diagram in Vivado and writing code in Vitis, we need to understand the basics of the XDAC and be aware of important aspects and limitations. Let me cover this in the first chapters of this tutorial.
 
-## TODOs, to be removed
-
-- **TODO:** test precision of the measurement with gain calib. coeeficient enabled
-- **TODO:** test getting the 100 ksps
-- Oversampling: https://www.silabs.com/documents/public/application-notes/an118.pdf
-- calibration:
-  - [53586 - Zynq and 7-Series XADC Gain Calibration Behaviour with Internal Voltage Reference (xilinx.com)](https://support.xilinx.com/s/article/53586?language=en_US)
-  - [The analog input for XADC calibration in 7 series FPGA (xilinx.com)](https://support.xilinx.com/s/question/0D52E00006hpPXlSAM/the-analog-input-for-xadc-calibration-in-7-series-fpga?language=en_US)
-
-Cora Z7 has VREFP and VREFN connected to ADCGND
-
 ## A short introduction to Zynq-7000 XADC
 
 ### What is XADC
@@ -100,7 +89,7 @@ The XADC maximum sampling rate is 1&nbsp;Msps.
 This is achieved by having 104 MHz DCLK and the divider ratio set to 4. This results in the highest possible ADCCLK frequency of 26 MHz. Using 26 ADCCLK cycles for single conversion then gives 1 Msps.
 
 To achieve other (i.e., lower) sampling rates, you need to set a suitable DCLK clock frequency in the HW design and a suitable ADCCLK clock divider ratio, so the quotient of frequency and the ratio is 26 times the desired sampling rate.  
-E.g. to have a sampling rate of 100 ksps, you can set the DCLK to 101.4&nbsp;MHz and the divider ratio to 39.&nbsp;&nbsp;&nbsp;$`\frac{101400}{39} = 2600`$&nbsp;&nbsp;&nbsp;&nbsp;$`\frac{2600}{26} = 100 \mskip3mu ksps`$
+E.g., to have a sampling rate of 100 ksps, you can set the DCLK to 101.4&nbsp;MHz and the divider ratio to 39.&nbsp;&nbsp;&nbsp;$`\frac{101400}{39} = 2600`$&nbsp;&nbsp;&nbsp;&nbsp;$`\frac{2600}{26} = 100 \mskip3mu ksps`$
 
 > [!IMPORTANT]
 >
@@ -644,7 +633,7 @@ To see interesting results, you need to use a signal generator. Connect a suitab
 > **The voltage on the pin A0 must always be positive and not greater than 3.3 V.**
 
 The application sends data samples over the network to a server, which is the Python script [file_via_socket.py](https://github.com/viktor-nikolov/lwIP-file-via-socket/blob/main/file_via_socket.py).  
-You must specify IP address of the server in the constant in [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). It is this line at the beginning of the main.cpp:
+You must specify the IP address of the server in the constant in [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). It is this line at the beginning of the main.cpp:
 
 ```c++
 const std::string SERVER_ADDR( "192.168.44.10" ); // Specify your actual server IP address
@@ -723,7 +712,7 @@ We also see that XADC will not use any averaging. This is controlled by defining
 //#define AVERAGING_MODE XSM_AVG_256_SAMPLES // Averaging over 256 acquisition samples
 ```
 
-The next information in the console output tells us that the value of XADC's Offset Calibration Coefficient ix 0xFF9A, which translates to -7 bits of correction. You may observe that this value changes slightly with each run of the application.
+The next information in the console output tells us that the value of XADC's Offset Calibration Coefficient ix 0xFF9A, which translates to -7 bits of correction. You may observe that this value changes slightly with each application run.
 
 The value of XADC's Gain Calibration Coefficient is shown as 0x007F, which translates to a 6.3% correction (the maximum possible value). This is expected on the Cora Z7 board for reasons I explained in detail in the chapter [XADC autocalibration](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#xadc-autocalibration).
 
@@ -743,9 +732,9 @@ When we press the board's button labeled BTN0, the application will store 1000 X
 sending data...   sent
 ```
 
-### Control of the XADC from the PS
+### Controling the XADC from the PS
 
-Let me explain in more detail the aspects of controlling the XADC from the PS. I will use code snippets from the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
+Let me explain the aspects of controlling the XADC from the PS in more detail. I will use code snippets from the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
 
 The initialization of the XADC is very similar to the other Xillinx subsystems:
 
@@ -795,14 +784,14 @@ Because the board Cora Z7 doesn't provide an external voltage reference to the X
 XSysMon_SetCalibEnables(&XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK);
 ```
 
-Before activating an analog input, we need to set the ADCCLK divider ratio (see details explained in the chapter [Clocking](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#clocking-sampling-rate-and-bandwidth)).
+Before activating an analog input, we must set the ADCCLK divider ratio (see details explained in the chapter [Clocking](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#clocking-sampling-rate-and-bandwidth)).
 
 ```c++
 // Set the ADCCLK frequency equal to 1/4 of the XADC input clock 
 XSysMon_SetAdcClkDivisor( &XADCInstance, 4 );
 ```
 
-We activate the auxiliary input VAUX[1] in the single channel unipolar continuous sampling mode by the following call.
+The following call activates the auxiliary input VAUX[1] in the single channel unipolar continuous sampling mode.
 
 ```c++
 XSysMon_SetSingleChParams(
@@ -814,8 +803,8 @@ XSysMon_SetSingleChParams(
   false );          // IsDifferentialMode==false -> unipolar mode
 ```
 
-The second parameter of [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586) is the channel index. You can use macros `XSM_CH_*` defined in the [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). Macro `XSM_CH_AUX_MIN` is the index of VAUX[0]. By adding 1 to it, we get the index of VAUX[1].  
-The index of the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub> is given by the macro `XSM_CH_VPVN`.
+The second parameter of [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586) is the channel index. You can use macros `XSM_CH_*`, which are defined in the [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). Macro `XSM_CH_AUX_MIN` is the index of VAUX[0]. By adding 1 to it, we get the index of VAUX[1].  
+The macro `XSM_CH_VPVN` gives the index of the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>.
 
 Next is the boolean parameter `IncreaseAcqCycles`.  
 Value false means that the default duration of 4 ADCCLK clock cycles is used for the settling period, so the acquisition takes 26 ADCCLK cycles in total. We use a 104 MHz XADC input clock in the HW design. We set the divider ratio to 4 by calling `XSysMon_SetAdcClkDivisor`. This results in 26 MHz ADCCLK and thus 1 Msps sampling rate.  
@@ -823,13 +812,13 @@ If the parameter `IncreaseAcqCycles` was true, 10 ADCCLK cycles would be used fo
 
 The HW design in this tutorial and the demo app are set to run the XADC at the maximum possible sampling rate of 1 Msps.  
 To achieve other (i.e., lower) sampling rates, you need to set a suitable XADC Wizard input clock frequency in the HW design and a suitable ADCCLK clock divider ratio so the quotient of frequency and the ratio is 26 times the desired sampling rate.  
-E.g. to have a sampling rate of 100 ksps, you can set the Clocking Wizard, which feeds the XADC Wizard input clock, to 101.4&nbsp;MHz and set the divider ratio to 39 (by calling [XSysMon_SetAdcClkDivisor](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L1089)).&nbsp;&nbsp;&nbsp;$`\frac{101400}{39} = 2600`$&nbsp;&nbsp;&nbsp;&nbsp;$`\frac{2600}{26} = 100 \mskip3mu ksps`$
+E.g., to have a sampling rate of 100 ksps, you can set the Clocking Wizard, which feeds the XADC Wizard input clock, to 101.4&nbsp;MHz and set the divider ratio to 39 (by calling [XSysMon_SetAdcClkDivisor](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L1089)).&nbsp;&nbsp;&nbsp;$`\frac{101400}{39} = 2600`$&nbsp;&nbsp;&nbsp;&nbsp;$`\frac{2600}{26} = 100 \mskip3mu ksps`$
 
 The next boolean parameter `IsEventMode` specifies [event sampling mode](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Event-Driven-Sampling) (value true) or [continuous sampling mode](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Continuous-Sampling) (value false).
 
-The last boolean parameter `IsDifferentialMode` specifies bipolar mode (value true) or unipolar mode (value false). See the explanation of the two modes in [this chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#what-is-xadc).
+The last boolean parameter, `IsDifferentialMode`, specifies bipolar mode (value true) or unipolar mode (value false). See the explanation of the two modes in [this chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#what-is-xadc).
 
-
+### Using the DMA
 
 
 
