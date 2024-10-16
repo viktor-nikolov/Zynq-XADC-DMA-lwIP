@@ -820,6 +820,48 @@ The last boolean parameter, `IsDifferentialMode`, specifies bipolar mode (value 
 
 ### Using the DMA
 
+In our design, the XADC starts sending the desired data samples over the master AXI-Stream of the XADC Wizard after we call  [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586) in the PS.  
+Let me explain in this chapter how we control the AXI DMA to get data from PL into the RAM of Zynq ARM core.
+
+The initialization of the DMA is like of other Xillinx subsystems:
+
+```c++
+#include "xaxidma.h"
+
+XAxiDma AxiDmaInstance; // The AXI DMA instance
+XAxiDma_Config *cfgptr; // Pointer to the AXI DMA configuration
+XStatus Status;
+
+cfgptr = XAxiDma_LookupConfig( XPAR_AXI_DMA_0_DEVICE_ID ); // The macro comes from xparameters.h
+if( cfgptr == NULL ) { /* raise an error*/ }
+
+Status = XAxiDma_CfgInitialize( &AxiDmaInstance, cfgptr );
+if( Status != XST_SUCCESS ) { /* raise an error*/ }
+```
+
+We don't use AXI DMA interrupts in this demo application, so we disable them:
+
+```c++
+XAxiDma_IntrDisable( &AxiDmaInstance, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DEVICE_TO_DMA );
+XAxiDma_IntrDisable( &AxiDmaInstance, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DMA_TO_DEVICE );
+```
+
+We need to have a space in memory for the AXI DMA to load data into. The easiest way is to declare a global variable as follows.
+
+```c++
+u16 DataBuffer[ SAMPLE_COUNT + 8 ] __attribute__((aligned(4)));
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
