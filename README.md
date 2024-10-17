@@ -871,7 +871,7 @@ The repository's folder [project_files](https://github.com/viktor-nikolov/Zynq-X
 
 - [XADC_tutorial_hw_2024.1.1.xpr.zip](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/project_files/XADC_tutorial_hw_2024.1.1.xpr.zip)
   - HW design project export from Vivado 2024.1.1.
-  - This is the HW design for the Digilent [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/start) board, which we created in the chapter [Hardware design in Vivado](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#hardware-design-in-vivado).
+  - This is the HW design for the Digilent [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start) board, which we created in the chapter [Hardware design in Vivado](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#hardware-design-in-vivado).
   - The archive contains exported HW, the file system_wrapper.xsa, which can be directly used in Vitis 2024.1.1 for creating the platform.
   - Note: To have Vivado version 2024.1.1, you must install "Vivado™ Edition **Update 1** - 2024.1 Product Update". See the Xilinx [download page](https://www.xilinx.com/support/download.html).
 
