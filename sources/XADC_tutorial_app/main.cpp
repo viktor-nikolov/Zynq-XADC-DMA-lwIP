@@ -44,7 +44,7 @@ using std::endl;
 #define SAMPLE_COUNT 1000
 
 #if SAMPLE_COUNT > 0x01FFFFFF
-	#error "SAMPLE_COUNT is higher than possible max. of 33,554,431 (=0x01FFFFFF)"
+	#error "SAMPLE_COUNT is higher than possible max. of 33,554,431 (>0x01FFFFFF)"
 #endif
 
 /* Set XADC averaging.
@@ -56,32 +56,31 @@ using std::endl;
 
 /* IP address and port of the server running the script file_via_socket.py.
  * The address must be provided in numerical form in a string, e.g., "192.168.44.10".*/
-//const std::string    SERVER_ADDR( "###SERVER_ADDR is not set###" );
-const std::string    SERVER_ADDR( "192.168.44.10" );
-const unsigned short SERVER_PORT{ 65432 }; //The server script file_via_socket.py uses port 65432 by default.
+const std::string    SERVER_ADDR( "###SERVER_ADDR is not set###" );
+//const std::string    SERVER_ADDR( "192.168.44.10" );
+const unsigned short SERVER_PORT{ 65432 }; //The server script file_via_socket.py uses the port 65432 by default.
 
-//Size of the stack (as number of 32bit words) for threads we create:
+//Size of the stack (as number of 32bit words) for FreeRTOS threads we create
 #define STANDARD_THREAD_STACKSIZE 1024
 
 extern sys_thread_t network_init_thread_handle; // Defined in network_thread.cpp
-extern void network_init_thread(void *p);              // Defined in network_thread.cpp
+extern void network_init_thread(void *p);       // Defined in network_thread.cpp
 
-
-/* We need the buffer to be aligned on an address divisible by 4.
+/* We need the target buffer of the DMA transfer to be aligned on an address divisible by 4.
  * We are also making it 16 bytes larger than needed, because we need to invalidate Data Cache
  * in a slightly bigger memory range. Otherwise we risk cache issues caused by end of the buffer
  * not aligned with cache line. */
 static u16 DataBuffer[ SAMPLE_COUNT + 8 ] __attribute__((aligned(4)));
 
-static XGpioPs GpioInstance;
+static XGpioPs GpioInstance;   // The PS GPIO instance
 static XSysMon XADCInstance;   // The XADC instance
-static XAxiDma AxiDmaInstance;
+static XAxiDma AxiDmaInstance; // The AXI DMA instance
 
 enum class eXADCInput { VAUX1, VPVN };              // Enumeration type for valid XADCInputs
 static eXADCInput ActiveXADCInput;                  // Defines, which input is active
 static float (*Xadc_RawToVoltageFunc)(u16 RawData); // Pointer to the function for converting raw measurement to volts.
                                                     // We switch it between the function for AUX1 and the function for VP/VN.
-
+// Initialize the GPIO subsystem
 static int GPIOInitialize()
 {
 	XGpioPs_Config *GpioConfig;
@@ -103,9 +102,10 @@ static int GPIOInitialize()
 
 	/* There are 64 EMIO GPIO pins on Zynq-7000. The first 32 pins are in Bank 2 (EMIO pin numbers 54 through 85),
 	 * the rest of the pins are in Bank 3.
-	 * In this code we assume that we are using EMIO pin 54 as start/stop signal and pins 55-80
-	 * as the 25-bit value, which sets number of data samples we transfer form the XADC via DMA.
-	 * EMIO pin 81 is connected to board's button BTN0 and EMIO pin 82 to BTN1 */
+	 * In the HW design we defined use of the GPIO pins as follows:
+	 * We are using EMIO pin 54 as start/stop signal and pins 55-80 as the 25-bit value,
+	 * which sets number of data samples we transfer form the XADC via DMA.
+	 * EMIO pin 81 is connected to board's button BTN0 and EMIO pin 82 to BTN1. */
 	XGpioPs_SetDirection( &GpioInstance, 2 /*Bank 2*/, 0x03FFFFFF );    //Set 26 EMIO pins 54-80 as outputs (pins 81 and 82 will be inputs)
 	XGpioPs_Write( &GpioInstance, 2 /*Bank 2*/, SAMPLE_COUNT << 1 );    //Set sample count to pins 55-80 and set start/stop signal to 0
 	XGpioPs_SetOutputEnable( &GpioInstance, 2 /*Bank 2*/, 0x03FFFFFF ); //Enable 26 EMIO pins 54-80
@@ -113,25 +113,26 @@ static int GPIOInitialize()
 	return 0;
 } // GPIOInitialize
 
+// Conversion function of XADC raw sample to voltage for the channel VAUX[1]
 static float Xadc_RawToVoltageAUX1(u16 RawData)
 {
 	const float Scale = 3.32; // We use AUX1 as unipolar; it has the scale from 0 V to 3.32 V.
-	                          // There is voltage divider of R1 = 2.32 kOhm and R2 = 1 kOhm on the intput.
+	                          // There is voltage divider of R1 = 2.32 kOhm and R2 = 1 kOhm on the input.
 
 #if AVERAGING_MODE == XSM_AVG_0_SAMPLES
-	// XADC doesn't do averaging, only top 12 bits of RawData are valid
-	return Scale * ( float(RawData >> 4) / float(0xFFF) ); // We are not using averaging, only 12 most significant bits are valid, which
-	                                                       // contain the XADC reading.
+	// XADC doesn't do averaging, only the 12 most significant bits of RawData are valid
+	return Scale * ( float(RawData >> 4) / float(0xFFF) );
 #else
 	// XADC does average samples, all 16 bits of RawData are valid
-	return Scale * ( float(RawData) / float(0xFFFF) );
+	return Scale * ( float(RawData)      / float(0xFFFF) );
 #endif
 } // Xadc_RawToVoltageAUX1
 
+// Conversion function of XADC raw sample to voltage for the channel VP/VN
 static float Xadc_RawToVoltageVPVN(u16 RawData)
 {
 #if AVERAGING_MODE == XSM_AVG_0_SAMPLES
-	// XADC doesn't do averaging, only top 12 bits of RawData are valid
+	// XADC doesn't do averaging, only the 12 most significant bits of RawData are valid
 
 	if( (RawData >> 4) == 0x800 ) // This is the special case of the lowest negative value. The measuring range is -500 mV to 499.75 mV.
 		return -0.5;
@@ -145,8 +146,7 @@ static float Xadc_RawToVoltageVPVN(u16 RawData)
 	else
 		sign = 1.0;
 
-	RawData = RawData >> 4; // We are not using averaging, only 12 most significant bits are valid, which
-	                        // contain the XADC reading.
+	RawData = RawData >> 4; // We are not using averaging, only the 12 most significant bits of RawData are valid
 	return sign * float(RawData) * ( 1.0/4096.0 ); // One bit equals to the reading of 244 uV. I.e., 1/4096 == 244e-6
 #else
 	// XADC does average samples, all 16 bits of RawData are valid
@@ -170,23 +170,24 @@ static float Xadc_RawToVoltageVPVN(u16 RawData)
 // Convert 12-bit two's complement integer stored in u16 to int16_t
 static int16_t Convert12BitToSigned16Bit(u16 num)
 {
-    // Check if the number is negative
-    if (num & 0x800) {
-        // If negative, sign-extend to 16 bits
-        num |= 0xF000;
-    }
-    return (int16_t)num;
+	// Check if the number is negative
+	if (num & 0x800) {
+		// If negative, sign-extend to 16 bits
+		num |= 0xF000;
+	}
+	return (int16_t)num;
 } // Convert12BitToSigned16Bit
 
-// Convert raw value of the XADC Gain Calibration Coefficient to the percentage of gain correction.
+// Convert raw value of the XADC Gain Calibration Coefficient to the percentage of gain correction
 static float ConvertRawGainCoefToPercents(u16 num)
 {
 	float res = (num & 0x3F) * 0.1; // Bottom 6 bits contain number of tenthes of percent
-    if( (num & 0x40) == 0 )         // 7th bit is sign bit, value 0 means negative coefficient
-    	res *= -1;
-    return res;
+	if( (num & 0x40) == 0 )         // 7th bit is sign bit, value 0 means negative coefficient
+		res *= -1;
+	return res;
 } // ConvertRawGainCoefToPercents
 
+// Initialize the XADC
 static int XADCInitialize()
 {
 	XSysMon_Config *ConfigPtr;
@@ -213,7 +214,7 @@ static int XADCInitialize()
 	u16 GainCoeff = XSysMon_GetCalibCoefficient(&XADCInstance, XSM_CALIB_GAIN_ERROR_COEFF); //Read value of the Gain Calibration Coefficient from the XADC register
 	cout << "calib coefficient gain error: "
 	     << std::hex << std::setw(4) << GainCoeff                              // Print Gain Coeff. raw value in hex
-         << std::dec << std::fixed << std::setprecision(1) << std::showpoint
+	     << std::dec << std::fixed << std::setprecision(1) << std::showpoint
 	     << " ("  << ConvertRawGainCoefToPercents(GainCoeff) << "%)" << endl;  // Print Gain Coeff. value
 
 	// Disable all interrupts
@@ -223,10 +224,7 @@ static int XADCInitialize()
 	// Disable all alarms
 	XSysMon_SetAlarmEnables(&XADCInstance, 0);
 
-	// Set averaging mode
-	XSysMon_SetAvg(&XADCInstance, AVERAGING_MODE); // Select averaging mode by defining value of the macro AVERAGING_MODE
-
-	/* Just in case: Disable averaging for the calculation of the calibration coefficients in the Configuration Register 0. */
+	/* Just to be sure, disable averaging for the calculation of the calibration coefficients */
 	// Read Configuration Register 0
 	u32 RegValue = XSysMon_ReadReg(XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET);
 	// To disable calibration coef. averaging, set bit XSM_CFR0_CAL_AVG_MASK to 1
@@ -234,9 +232,12 @@ static int XADCInitialize()
 	// Write Configuration Register 0
 	XSysMon_WriteReg(XADCInstance.Config.BaseAddress, XSM_CFR0_OFFSET, RegValue);
 
+	// Set averaging mode
+	XSysMon_SetAvg(&XADCInstance, AVERAGING_MODE); // Select averaging mode by defining value of the macro AVERAGING_MODE
+
 	/* Enable offset and gain calibration
 	 * When internal FPGA voltage references are used, the Gain Calibration Coefficient has constant value 0x007F and should be ignored.
-	 * Cora Z7 is an example of Zynq board relying on internal voltage references.
+	 * Cora Z7 is an example of Zynq board relying on internal voltage reference.
 	 * See details explained here: https://support.xilinx.com/s/article/53586
 	 */
 	u16 CalibrationEnables;
@@ -249,42 +250,43 @@ static int XADCInitialize()
 	return XST_SUCCESS;
 } // XADCInitialize
 
-// Activate the XADC input based on value of the variable ActiveXADCInput
+// Activate the XADC input based on value of the global variable ActiveXADCInput
 static int ActivateXADCInput()
 {
 	XStatus Status;
 
-	// Set the ADCCLK frequency equal to 1/4 of XADC input clock. When the input clock is 104 MHz it will result in 1 Mbps sampling rate
+	/* Set the ADCCLK frequency equal to 1/4 of the XADC input clock.
+	 * When the input clock is 104 MHz it will result in 1 Msps sampling rate. */
 	XSysMon_SetAdcClkDivisor(&XADCInstance, 4);
 
 	if( ActiveXADCInput == eXADCInput::VAUX1 ) {
-		// Set single channel mode for VAUX1 analog input
+		// Set single channel unipolar mode for VAUX[1] analog input
 		Status = XSysMon_SetSingleChParams( &XADCInstance,
-											XSM_CH_AUX_MIN+1, // == channel bit of VAUX1 == Cora Z7 board pin A0
-											false,            // IncreaseAcqCycles==false -> default 4 ADCCLKs used for the settling; true -> 10 ADCCLKs used
-											false,            // IsEventMode==false -> continuous sampling
-											false );          // IsDifferentialMode==false -> unipolar mode
+		                                    XSM_CH_AUX_MIN+1, // == channel index of VAUX[1] == Cora Z7 board pin A0
+		                                    false,            // IncreaseAcqCycles==false -> default 4 ADCCLKs used for the settling; true -> 10 ADCCLKs used
+		                                    false,            // IsEventMode==false -> continuous sampling
+		                                    false );          // IsDifferentialMode==false -> unipolar mode
 		if(Status != XST_SUCCESS) {
-			cerr << "XSysMon_SetSingleChParams for VAUX1 failed! terminating" << endl;
+			cerr << "XSysMon_SetSingleChParams for VAUX[1] failed! terminating" << endl;
 			return XST_FAILURE;
 		}
 
-		Xadc_RawToVoltageFunc = Xadc_RawToVoltageAUX1;
-		cout << "VAUX1 is activated as the input" << endl;
+		Xadc_RawToVoltageFunc = Xadc_RawToVoltageAUX1;        // Assign pointer to the function converting raw samples to voltage
+		cout << "VAUX[1] is activated as the input" << endl;
 	}
 	else if( ActiveXADCInput == eXADCInput::VPVN ) {
-		// Set single channel mode for VP/VN dedicated analog inputs
+		// Set single channel bipolar mode for VP/VN dedicated analog inputs
 		Status = XSysMon_SetSingleChParams( &XADCInstance,
-											XSM_CH_VPVN,      // == channel bit of VP/VN == Cora Z7 board pins V_P and V_N
-											false,            // IncreaseAcqCycles==false -> default 4 ADCCLKs used for the acquisition; true -> 10 ADCCLKs used
-											false,            // IsEventMode==false -> continuous sampling
-											true );           // IsDifferentialMode==true -> bipolar mode
+		                                    XSM_CH_VPVN,      // == channel bit of VP/VN == Cora Z7 board pins V_P and V_N
+		                                    false,            // IncreaseAcqCycles==false -> default 4 ADCCLKs used for the acquisition; true -> 10 ADCCLKs used
+		                                    false,            // IsEventMode==false -> continuous sampling
+		                                    true );           // IsDifferentialMode==true -> bipolar mode
 		if(Status != XST_SUCCESS) {
 			cerr << "XSysMon_SetSingleChParams for VP/VN failed! terminating" << endl;
 			return XST_FAILURE;
 		}
 
-		Xadc_RawToVoltageFunc = Xadc_RawToVoltageVPVN;
+		Xadc_RawToVoltageFunc = Xadc_RawToVoltageVPVN;        // Assign pointer to the function converting raw samples to voltage
 		cout << "VPVN is activated as the input" << endl;
 	}
 	else {
@@ -294,12 +296,13 @@ static int ActivateXADCInput()
 	return XST_SUCCESS;
 } // ActivateXADCInput
 
+// Initialize AXI DMA
 static int DMAInitialize()
 {
 	XAxiDma_Config *cfgptr;
 	XStatus Status;
 
-    cfgptr = XAxiDma_LookupConfig(XPAR_AXI_DMA_0_DEVICE_ID);
+	cfgptr = XAxiDma_LookupConfig(XPAR_AXI_DMA_0_DEVICE_ID); // The macro comes from xparameters.h
 	if(cfgptr == NULL) {
 		cerr << "XAxiDma_LookupConfig  failed! terminating" << endl;
 		return XST_FAILURE;
@@ -318,6 +321,7 @@ static int DMAInitialize()
 	return 0;
 } // DMAInitialize
 
+// Perform a DMA transfer of digitized samples from XADC into RAM
 static int ReceiveData()
 {
 	Xil_DCacheFlushRange( (UINTPTR)DataBuffer, sizeof(DataBuffer) );  // Just in case, flush any data in DataBuffer, held in CPU cache, to RAM
@@ -330,21 +334,24 @@ static int ReceiveData()
 		return XST_FAILURE;
 	}
 
-	XGpioPs_WritePin( &GpioInstance, 54, 1 /*high*/ ); // Set start signal to start generation of the AXI Stream of data coming from XADC
+	XGpioPs_WritePin( &GpioInstance, 54, 1 /*high*/ ); // Set start signal to start generation of the AXI-Stream of data coming from XADC
 	XGpioPs_WritePin( &GpioInstance, 54, 0 /*low*/  ); // Reset the start signal (it needed to be high for just a single PL clock cycle)
 
 	while( XAxiDma_Busy(&AxiDmaInstance, XAXIDMA_DEVICE_TO_DMA) ) // Wait till DMA transfer is done
-		vTaskDelay( pdMS_TO_TICKS( 1 ) );
+		vTaskDelay( pdMS_TO_TICKS( 1 ) ); // Wait 1 ms
 
 	/* Invalidate the CPU cache for memory block holding the DataBuffer.
 	 * DMA transfer wasn't using the CPU cache, it wrote directly to RAM.
-	 * We need the CPU to get data from RAM, not cache, when processing the DataBuffer.
+	 * We need the CPU to get data from the RAM, not cache, when processing data in the DataBuffer.
 	 */
 	Xil_DCacheInvalidateRange( (UINTPTR)DataBuffer, sizeof(DataBuffer) );
 
 	return 0;
 } // ReceiveData
 
+/* FreeRTOS thread of the main controlling logic of the application.
+ * The network_init_thread will start XADC_thread after the network is initialized.
+ */
 void XADC_thread(void *p)
 {
 	cout << "***** XADC THREAD STARTED *****\n";
@@ -356,30 +363,35 @@ void XADC_thread(void *p)
 
 	// Initialize the subsystems
 	if( GPIOInitialize() == XST_FAILURE )
-		vTaskDelete(NULL); // We end this task on error
+		vTaskDelete(NULL); // We end this thread on an error
 	if( XADCInitialize() == XST_FAILURE )
 		vTaskDelete(NULL);
 	if( DMAInitialize()  == XST_FAILURE )
 		vTaskDelete(NULL);
 
 	cout << "\npress BTN0 to start ADC conversion" << endl
-	     << "press BTN1 to switch between VAUX1 and VPVN inputs" << endl;
+	     << "press BTN1 to switch between VAUX[1] and VP/VN inputs" << endl;
 
-	// Activate VAUX1 as input
+	// Activate VAUX[1] as input
 	ActiveXADCInput = eXADCInput::VAUX1;
 	if( ActivateXADCInput() == XST_FAILURE )
 		vTaskDelete(NULL);
 
+	// The object for debouncing the buttons (i.e., for ensuring that the app gets a filtered signal from the buttons for smooth control)
 	Debouncer btns( 0 ); // Passing 0 to the constructor because our buttons are pull-down buttons
 
 	while(1) {
-		btns.ButtonProcess( XGpioPs_Read( &GpioInstance, 2 /*Bank 2*/ ) >> 26 ); // Give status of the buttons to the debouncer
+		/* Give status of the buttons to the debouncer.
+		 * EMIO pin 81 is connected to board's button BTN0 and EMIO pin 82 to BTN1.
+		 * Therefore, we must ignore the 26 lower bits of XGpioPs_Read return value to provide
+		 * 2-bit buttons' state to the debouncer. */
+		btns.ButtonProcess( XGpioPs_Read( &GpioInstance, 2 /*Bank 2*/ ) >> 26 );
 
 		if( btns.ButtonPressed(BUTTON_PIN_0) ) { // If Cora Z7 button BTN0 was pressed
-			if( ReceiveData() == XST_FAILURE )
-				vTaskDelete(NULL); // We end this task
+			if( ReceiveData() == XST_FAILURE )   // Perform a DMA transfer of digitized samples from XADC into RAM
+				vTaskDelete(NULL); // We end this thread on error
 
-			// Print data sample to the console
+			// Print data sample of the first 8 values to the console
 			cout << "\n***** XADC DATA[0..7] *****\n";
 			cout << std::defaultfloat << std::setprecision(7); // Disabling std::fixed used in previous output
 			for( int i = 0; i < 8; i++ )
@@ -387,7 +399,7 @@ void XADC_thread(void *p)
 
 			// Transfer data over the network
 			try {
-				FileViaSocket f( SERVER_ADDR, SERVER_PORT ); // Declare the object and open the connection
+				FileViaSocket f( SERVER_ADDR, SERVER_PORT ); // Declare the object and open the network connection
 
 				cout << "sending data..." << std::flush;
 				f << std::setprecision(7); // Set decimal precision for the output
@@ -396,7 +408,7 @@ void XADC_thread(void *p)
 					                                                     * std::endl has a side effect of flushing the buffer, i.e.,
 					                                                     * each single value would be immediately sent in a TCP packet. */
 				cout << "   sent" << endl;
-			} // Object f ceases to exist, destructor on f is called, buffer is flushed,
+			} // Object f ceases to exist, destructor on f is called, the connection is closed
 			catch( const std::exception& e ) {
 				cerr << "Error on opening the socket:\n" << e.what() << endl;
 			}
@@ -406,10 +418,10 @@ void XADC_thread(void *p)
 			// Activate the other channel as input
 			ActiveXADCInput = ActiveXADCInput==eXADCInput::VAUX1 ? eXADCInput::VPVN : eXADCInput::VAUX1;
 			if( ActivateXADCInput() == XST_FAILURE )
-				vTaskDelete(NULL);
+				vTaskDelete(NULL); // We end this thread on error
 		}
 
-		vTaskDelay( pdMS_TO_TICKS( 1 ) );
+		vTaskDelay( pdMS_TO_TICKS( 1 ) ); // Wait 1 ms
 	} // while(1)
 } // XADC_thread
 
