@@ -244,14 +244,14 @@ FileViaSocket::SocketConnectionErrorExc::SocketConnectionErrorExc( int errCode )
 
 	switch (errCode) {
 		case ECONNREFUSED: // On Linux this error is raised when server is not running
-			               // on the target host.
+		                   // on the target host.
 			message += " (connection refused; is server running?)";
 			break;
 		case ETIMEDOUT:
 			message += " (connection timed out; is server accessible?)";
 			break;
 		case ECONNRESET:   // On lwIP this error is raised when server is not running
-			               // on the target host.
+		                   // on the target host.
 			message += " (connection reset by peer; is server running?)";
 			break;
 		case ECONNABORTED: // On lwIP this error is raised instead of ETIMEDOUT
