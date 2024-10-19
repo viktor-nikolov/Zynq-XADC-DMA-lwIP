@@ -687,8 +687,8 @@ calib coefficient ADC offset: FF9A (-7 bits)
 calib coefficient gain error: 007F (6.3%)
 
 press BTN0 to start ADC conversion
-press BTN1 to switch between VAUX1 and VPVN inputs
-VAUX1 is activated as the input
+press BTN1 to switch between VAUX[1] and VP/VN inputs
+VAUX[1] is activated as the input
 ```
 
 Information under the header `--lwIP Socket Mode TCP Startup--` comes from the lwIP network initialization and DHCP IP address assignment.  
