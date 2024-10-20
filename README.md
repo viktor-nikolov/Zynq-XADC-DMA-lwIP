@@ -823,7 +823,7 @@ The last boolean parameter, `IsDifferentialMode`, specifies bipolar mode (value 
 ### Using the DMA
 
 In our design, the XADC starts sending the desired data samples over the master AXI-Stream of the XADC Wizard after we call  [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586) in the PS.  
-Let me explain in this chapter how we control the AXI DMA to get data from PL into the RAM of Zynq ARM core.
+Let me explain in this chapter how we control the AXI DMA to get data from PL into the RAM of the Zynq ARM core.
 
 The initialization of the DMA is like of other Xillinx subsystems:
 
@@ -848,7 +848,7 @@ XAxiDma_IntrDisable( &AxiDmaInstance, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DEVICE_TO_DM
 XAxiDma_IntrDisable( &AxiDmaInstance, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DMA_TO_DEVICE );
 ```
 
-We need to have a space in memory for the AXI DMA to load data into. The easiest way is to declare a global array as follows.
+We need to have a space in memory for the AXI DMA to load data into. The easiest way is to declare the data buffer as a global variable. This way, we don't need to worry about FreeRTOS thread's stack size. 
 
 ```c++
 u16 DataBuffer[ SAMPLE_COUNT + 8 ] __attribute__((aligned(4)));
@@ -857,11 +857,10 @@ u16 DataBuffer[ SAMPLE_COUNT + 8 ] __attribute__((aligned(4)));
 Important considerations go into declaring an array for receiving data from AXI DMA. Let me explain:
 
 1. **Data type:** In our case, the AXI-Stream data width is 16 bits. This is because the XADC Wizzard exposes a 16-bit wide master AXI-Stream interface, and it goes as the 16-bit stream all the way into the AXI DMA. So, we use the data type `u16`.
-2. **Array length:** The number of samples we transfer in one DMA transfer is given by the macro `SAMPLE_COUNT`. However, there is a catch. The ARM Cortex-A9 processor has a cache line size of 32 bytes.
-   **TODO** Because we need to invalidate Data Cache in a slightly bigger memory range. Otherwise we risk cache issues caused by end of the buffer not aligned with cache line.
-3. **Memory alignment:** dd
-
-bla bla
+2. **Array length:** The number of samples we transfer in one DMA transfer is given by the macro `SAMPLE_COUNT`. However, there is a catch, which is why I recommend that you declare the `DataBuffer` slightly larger than needed.  
+   The AXI DMA loads data directly into the RAM. There is a data cache between the RAM and the CPU in play. To achieve proper results so the CPU "sees" the correct data, we flush the data cache into RAM by calling [Xil_DCacheFlushRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheFlushRange?tocId=ih5Bwba_1KuHZ_3v1wDPjw) before the DMA transfer. We also invalidate the data cache by calling [Xil_DCacheInvalidateRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheInvalidateRange?tocId=hQlJBPx~LFoO1Pndt20_5g) after the DMA transfer finishes so the `DataBuffer` memory region is served to the CPU from RAM when read for the first time.  
+   I faced strange errors in my testing when I used a bigger `DataBuffer`. It went away when I declared the `DataBuffer` slightly larger than needed. I think this is a bug or a limitation of the [Xil_DCacheInvalidateRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheInvalidateRange?tocId=hQlJBPx~LFoO1Pndt20_5g). It may be connected to the fact that the data cache is organized into so-called lines, which are 32 bytes long on the ARM Cortex-A9 processor used in Zynq-7000. So, the cache invalidation is done in 32-byte chunks.
+3. **Memory alignment:** Even though the AXI DMA can be configured to allow data transfer to an address that is not aligned to a word boundary, it's a good practice to declare the `DataBuffer` as aligned to a 32-bit word. This is what the GCC attribute definition `__attribute__((aligned(4)))` does.
 
 ### Converting raw XADC data samples to the voltage
 
