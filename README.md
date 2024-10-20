@@ -103,7 +103,7 @@ E.g., to have a sampling rate of 100 ksps, you can set the DCLK to 101.4&nbsp;MH
 
 You can sample an auxiliary channel at 1 Msps. However, signals with a frequency higher than 250 kHz are not guaranteed to be precisely recorded. This seems to be an analog bandwidth limitation of Zynq-7000 circuits related to auxiliary channels.
 
-The data sheet doesn't mention the bandwidth of the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>. We can assume it is at least 500 kHz (i.e., the [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) for 1 Msps ADC).
+The data sheet doesn't mention the bandwidth of the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>. We can assume it is at least 500 kHz (i.e., the [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) for a 1 Msps ADC).
 
 ## Acquisition and settling time—the theory
 
@@ -149,7 +149,7 @@ t_{ACQ} = 9 \times 100 \times 3 \times 10^{-12} = 2.7 \mskip3mu ns
 >
 > The calculation of the acquisition times we did above is valid only for an ideal case when the only resistance present in the circuit is the resistance of the Zynq XADC's internal analog multiplexer.
 >
-> In most cases, this is not true because you need an [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter), i.e., a low pass filter, which will eliminate frequencies higher than the [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) in the input signal.
+> In the vast majority of cases, this is not true because you need an [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter), i.e., a low pass filter, which will eliminate frequencies higher than the [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) in the input signal.
 
 But how does the calculated acquisition time translate to the possible sampling rate?  
 The hint for that can be found in the Driving the Xilinx Analog-to-Digital Converter Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc). This note explains on page 4 that XADC is able to acquire the next sample (i.e., charge the internal capacitor) during the conversion of the current sample. At least 75% of the overall sample time is available for the acquisition.
@@ -207,7 +207,7 @@ The factor $`1 \times 10^{-9}`$ is the capacitance of the AAF's capacitor.
 
 Further details on how the equation was constructed can be found in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc).
 
-In theory, the settling time of 15.1725 μs allows for a 65.909 kHz sampling rate. In the later chapter, we will explore how the circuit behaves in practice and to which use cases the 65.909 kHz sampling rate applies well.
+One may be tempted to think that a settling time of 15.1725 μs allows for a sampling rate with a 15.1725 μs period or 65.909 kHz. However, it is not that simple. In the [later chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#the-behavior-of-unipolar-auxiliary-channel-aaf-of-cora-z7), we will explore how the circuit behaves in practice and to which use cases the 65.909 kHz sampling rate may apply well.
 
 One "controversy" is already apparent: According to the [Nyquist theorem](https://www.techtarget.com/whatis/definition/Nyquist-Theorem), the 65.9 kHz sampling rate allows correct sampling of an input signal of frequency up to 33 kHz. However, the cut-off frequency of the AAF on the Cora Z7 unipolar input is 94.6 kHz. So, by running the XADC at 65.9 ksps, we risk that an imprecise digitalization of the so-called [alias](https://en.wikipedia.org/wiki/Aliasing) will happen if frequencies above 33 kHz are present in the input signal. We would need an AAF with a cutoff frequency of 33 kHz. However, such an AAF would have an even longer settling time.  
 There is no universal solution for this issue. How you compromise between sampling rate and settling time depends on the characteristics of the input signal and on what you want to achieve by digitizing it.
@@ -231,7 +231,7 @@ The Cora Z7 V<sub>P</sub>/V<sub>N</sub> channel can be used in both bipolar and 
 >
 > The dedicated analog input channel on Cora Z7 is less protected than auxiliary channels A0-A5. There is no voltage divider. Therefore, both V<sub>P</sub> and V<sub>N</sub> must always be within a range from 0 V to 1.0 V with respect to the board's GND. Also, the differential V<sub>P</sub> &minus; V<sub>N</sub> must be within the range of ±0.5V.
 
-The capacitor and the resistors form a low-pass filter with a cutoff frequency of 568.7 kHz (which is close to the 500 kHz [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) of the XADC running at 1 Msps).
+The capacitor and the resistors form a low-pass filter with a cutoff frequency of 568.7 kHz (which is relatively close to the 500 kHz [Nyquist frequency](https://en.wikipedia.org/wiki/Nyquist_frequency) of the XADC running at 1 Msps).
 
 We can calculate the settling time of this circuit as follows:
 
@@ -239,7 +239,7 @@ We can calculate the settling time of this circuit as follows:
 t_{settling} = \ln(2^{12+1}) \times ( 140 + 140 ) \times 1 \times 10^{-9} = 2.52 \mskip3mu \mu s
 ```
 
-In theory, the settling time of 2.52 μs allows for a 396.3 kHz sampling rate. In the next chapter, we will explore how the circuit behaves in practice and to which use cases the 396.3 kHz sampling rate applies well.
+In the [later chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#the-behavior-of-dedicated-channel-vpvn-aaf-of-cora-z7), I will show a practical example of how the circuit behaves.
 
 ## Acquisition and settling time—the practice
 
@@ -264,7 +264,7 @@ As you can see, the real-life measurement on the physical HW matches the simulat
 
 What is happening here? The XADC auxiliary input, which has an acquisition time of 540 ns, precisely digitized a signal <ins>after</ins> AAF, which has a settling time of 15.17 μs. The XADC is, of course, unable to "see" the actual input signal <ins>before</ins> the AAF.
 
-I mentioned before that the settling time of 15.17 μs allows for a 65.9 kHz theoretical sampling rate. This is what [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) says. Let's see in the following figure what would happen if I mindlessly followed XAPP795's advice and used 65.9 ksps instead of 1 Msps.
+Let's show in the following figure what would happen if I mindlessly interpreted the circuit's settling time of 15.17 μs as a period of sampling rate (i.e., 65.9 kHz sampling frequency).
 
 <img src="pictures\Cora_Z7_stair_signal_reading_simulation.png">
 
@@ -277,7 +277,7 @@ We saw that a square wave signal is a challenge for the XADC. What about somethi
 
 8 kHz is very well below the 94.6 kHz cutoff frequency of the AAF, so we see only a very minor impact of the filter on the output signal. There is very slight attenuation and a small phase shift (i.e., delay of the output signal as compared to the input).
 
-The next figure shows an example of what the 65.9 ksps digitization of the 8 kHz signal may look like.
+The next figure shows an example of what the 65.9 ksps digitization of the 8 kHz signal may look like (i.e., digitization with the sample period equal to the circuit's settling time).
 
 <img src="pictures\Cora_Z7_sine_signal_reading_simulation.png">
 
@@ -304,7 +304,7 @@ The V<sub>P</sub>/V<sub>N</sub> channel's AAF cutoff frequency is pretty high at
 
 There are no surprises. The 50 kHz signal is negligibly attenuated by the AAF, and there is a very slight phase shift in the output.
 
-I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using the [software app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) shared in this repository. The resulting measurement shown in the following figure is exactly as expected. A 50 kHz differential is captured by the XADC with good precision.
+I reproduced the scenario on a physical Cora Z7 board and measured the signal by the XADC configured to the sample rate of 1 Msps using the [software app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) shared in this repository. The resulting measurement shown in the following figure is exactly as expected. The XADC captures a 50 kHz differential signal with good precision.
 
 <img src="pictures\Cora_Z7_diff_signal_reading.png" alt="Zynq-7000 XADC differential signal digitization">
 
@@ -701,7 +701,7 @@ We see that 1000 XADC samples will be provided in each measurement (i.e., in eac
 #define SAMPLE_COUNT 1000
 ```
 
-- Note: Yes, I successfully tested the digitization of 33,554,431 samples. :smiley: It takes 33.5 seconds to record the XADC data and then about 1 minute 45 seconds to transfer the data to the PC (tested on Cora Z7).
+- Note: Yes, I successfully tested the digitization of 33,554,431 samples. :smiley: It takes 33.5 seconds to record the XADC data and then about 1 minute 45 seconds to convert raw values to voltage and transfer the data to the PC (tested on Cora Z7, compiled with the highest optimization level -O3).
 
 We also see in the console output that XADC will not use any averaging. This is controlled by defining the value of the macro `AVERAGING_MODE` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). You can select one of the four options: 
 
