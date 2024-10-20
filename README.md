@@ -865,13 +865,18 @@ Important considerations go into declaring an array for receiving data from AXI 
 We tell the AXI DMA to start loading data into RAM by this call:
 
 ```c++
-XAxiDma_SimpleTransfer( &AxiDmaInstance,
-                        (UINTPTR)DataBuffer,
-                        SAMPLE_COUNT * sizeof(u16),
-                        XAXIDMA_DEVICE_TO_DMA );
+XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer,
+                        SAMPLE_COUNT * sizeof(u16), XAXIDMA_DEVICE_TO_DMA );
 ```
 
-dd
+This call initiates the AXI DMA, but no data will start flowing yet. As I explained in the chapter [DMA,](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#dma-direct-memory-access) we have the module  [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) in our HW design to serve as a "valve" on the AXI-Strem between the XADC Wizard and AXI DMA.  
+We need to tell the module how many data samples we want to go through and then start the data flow. We do that by means of GPIO signals, which we connected to the stream_tlaster module in the HW design.
+
+	TODO 
+	
+	XGpioPs_WritePin( &GpioInstance, 54, 1 /*high*/ ); // Set start signal to start generation of the AXI-Stream of data coming from XADC
+	XGpioPs_WritePin( &GpioInstance, 54, 0 /*low*/  ); // Reset the start signal (it needed to be high for just a single PL clock cycle)
+
 
 ### Converting raw XADC data samples to the voltage
 
