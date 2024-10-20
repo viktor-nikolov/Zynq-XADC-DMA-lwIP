@@ -701,7 +701,9 @@ We see that 1000 XADC samples will be provided in each measurement (i.e., in eac
 #define SAMPLE_COUNT 1000
 ```
 
-We also see that XADC will not use any averaging. This is controlled by defining the value of the macro `AVERAGING_MODE` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). You can select one of the four options: 
+- Note: Yes, I successfully tested the digitization of 33,554,431 samples. :smiley: It takes 33.5 seconds to record the XADC data and then about 1 minute 45 seconds to transfer the data to the PC (tested on Cora Z7).
+
+We also see in the console output that XADC will not use any averaging. This is controlled by defining the value of the macro `AVERAGING_MODE` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). You can select one of the four options: 
 
 ```c++
 /* Set XADC averaging.
@@ -880,7 +882,7 @@ The repository's folder [project_files](https://github.com/viktor-nikolov/Zynq-X
   - Contains the SW project export from Vitis Classic 2024.1.1.
   - This is the XADC demo application for the Digilent [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start) board, which I described in the chapter [Software](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#software).
   - To use the export, create an empty folder on your PC and open it as a workspace in Vitis Classic 2024.1.1.  
-    Then select File|Import|Vitis project exported zip file. Select the archive file, and select all projects.
+    Then select File|Import|"Vitis project exported zip file". Select the archive file, and select all projects in the archive.
   - Note: To have Vitis version 2024.1.1, you must install "Vivado™ Edition **Update 1** - 2024.1 Product Update" on top of "Vivado™ Edition - 2024.1 Full Product Installation". See the Xilinx [download page](https://www.xilinx.com/support/download.html).
 
 <img src="pictures\vt_import.png" width="450">
