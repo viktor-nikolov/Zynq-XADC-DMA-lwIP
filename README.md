@@ -865,6 +865,8 @@ Important considerations go into declaring an array for receiving data from AXI 
 We tell the AXI DMA to start loading data into RAM by this call:
 
 ```c++
+TODO DATA CHACHE
+
 XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer,
                         SAMPLE_COUNT * sizeof(u16), XAXIDMA_DEVICE_TO_DMA );
 ```
