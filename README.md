@@ -858,9 +858,17 @@ Important considerations go into declaring an array for receiving data from AXI 
 
 1. **Data type:** In our case, the AXI-Stream data width is 16 bits. This is because the XADC Wizzard exposes a 16-bit wide master AXI-Stream interface, and it goes as the 16-bit stream all the way into the AXI DMA. So, we use the data type `u16`.
 2. **Array length:** The number of samples we transfer in one DMA transfer is given by the macro `SAMPLE_COUNT`. However, there is a catch, which is why I recommend that you declare the `DataBuffer` slightly larger than needed.  
-   The AXI DMA loads data directly into the RAM. There is a data cache between the RAM and the CPU in play. To achieve proper results so the CPU "sees" the correct data, we flush the data cache into RAM by calling [Xil_DCacheFlushRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheFlushRange?tocId=ih5Bwba_1KuHZ_3v1wDPjw) before the DMA transfer. We also invalidate the data cache by calling [Xil_DCacheInvalidateRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheInvalidateRange?tocId=hQlJBPx~LFoO1Pndt20_5g) after the DMA transfer finishes so the `DataBuffer` memory region is served to the CPU from RAM when read for the first time.  
+   The AXI DMA loads data directly into the RAM. There is a data cache between the RAM and the CPU in play. To achieve proper results so the CPU "sees" the correct data, we flush the data cache into RAM by calling [Xil_DCacheFlushRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheFlushRange?tocId=ih5Bwba_1KuHZ_3v1wDPjw) before the DMA transfer. We then invalidate the data cache by calling [Xil_DCacheInvalidateRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheInvalidateRange?tocId=hQlJBPx~LFoO1Pndt20_5g) after the DMA transfer finishes so the `DataBuffer` memory region is served to the CPU from RAM when read for the first time.  
    I faced strange errors in my testing when I used a bigger `DataBuffer`. It went away when I declared the `DataBuffer` slightly larger than needed. I think this is a bug or a limitation of the [Xil_DCacheInvalidateRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheInvalidateRange?tocId=hQlJBPx~LFoO1Pndt20_5g). It may be connected to the fact that the data cache is organized into so-called lines, which are 32 bytes long on the ARM Cortex-A9 processor used in Zynq-7000. So, the cache invalidation is done in 32-byte chunks.
 3. **Memory alignment:** Even though the AXI DMA can be configured to allow data transfer to an address that is not aligned to a word boundary, it's a good practice to declare the `DataBuffer` as aligned to a 32-bit word. This is what the GCC attribute definition `__attribute__((aligned(4)))` does.
+
+We tell the AXI DMA to start loading data into RAM by this call:
+
+```c++
+XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, SAMPLE_COUNT * sizeof(u16), XAXIDMA_DEVICE_TO_DMA );
+```
+
+dd
 
 ### Converting raw XADC data samples to the voltage
 
