@@ -116,7 +116,7 @@ static int GPIOInitialize()
 // Conversion function of XADC raw sample to voltage for the channel VAUX[1]
 static float Xadc_RawToVoltageAUX1(u16 RawData)
 {
-	const float Scale = 3.32; // We use AUX1 as unipolar; it has the scale from 0 V to 3.32 V.
+	const float Scale = 3.32; // We use VAUX[1] as unipolar; it has the scale from 0 V to 3.32 V.
 	                          // There is voltage divider of R1 = 2.32 kOhm and R2 = 1 kOhm on the input.
 
 #if AVERAGING_MODE == XSM_AVG_0_SAMPLES
@@ -134,8 +134,8 @@ static float Xadc_RawToVoltageVPVN(u16 RawData)
 #if AVERAGING_MODE == XSM_AVG_0_SAMPLES
 	// XADC doesn't do averaging, only the 12 most significant bits of RawData are valid
 
-	if( (RawData >> 4) == 0x800 ) // This is the special case of the lowest negative value. The measuring range is -500 mV to 499.75 mV.
-		return -0.5;
+	if( (RawData >> 4) == 0x800 ) // This is the special case of the lowest negative value.
+		return -0.5;              // The measuring range in bipolar mode is -500 mV to 499.75 mV.
 
 	float sign;
 
