@@ -103,7 +103,7 @@ static int GPIOInitialize()
 	/* There are 64 EMIO GPIO pins on Zynq-7000. The first 32 pins are in Bank 2 (EMIO pin numbers 54 through 85),
 	 * the rest of the pins are in Bank 3.
 	 * In the HW design we defined use of the GPIO pins as follows:
-	 * We are using EMIO pin 54 as start/stop signal and pins 55-80 as the 25-bit value,
+	 * We are using EMIO GPIO pin 54 as start/stop signal and pins 55-80 as the 25-bit value,
 	 * which sets number of data samples we transfer form the XADC via DMA.
 	 * EMIO pin 81 is connected to board's button BTN0 and EMIO pin 82 to BTN1. */
 	XGpioPs_SetDirection( &GpioInstance, 2 /*Bank 2*/, 0x03FFFFFF );    //Set 26 EMIO pins 54-80 as outputs (pins 81 and 82 will be inputs)
@@ -340,7 +340,7 @@ static int ReceiveData()
 	while( XAxiDma_Busy(&AxiDmaInstance, XAXIDMA_DEVICE_TO_DMA) ) // Wait till DMA transfer is done
 		vTaskDelay( pdMS_TO_TICKS( 1 ) ); // Wait 1 ms
 
-	/* Invalidate the CPU cache for memory block holding the DataBuffer.
+	/* Invalidate the CPU cache for the memory region holding the DataBuffer.
 	 * DMA transfer wasn't using the CPU cache, it wrote directly to RAM.
 	 * We need the CPU to get data from the RAM, not cache, when processing data in the DataBuffer.
 	 */
