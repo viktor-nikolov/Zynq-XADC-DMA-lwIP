@@ -911,8 +911,9 @@ bla bla
 // Conversion function of XADC raw sample to voltage for the channel VAUX[1]
 float Xadc_RawToVoltageAUX1(u16 RawData)
 {
-	const float Scale = 3.32; // We use AUX1 as unipolar; it has the scale from 0 V to 3.32 V.
-	                          // There is voltage divider of R1 = 2.32 kOhm and R2 = 1 kOhm on the input.
+    // We use AUX1 as unipolar; it has the scale from 0 V to 3.32 V.
+    // There is voltage divider of R1 = 2.32 kOhm and R2 = 1 kOhm on the input.
+    const float Scale = 3.32; 
 
 	// When XADC doesn't do averaging, only the 12 most significant bits of RawData are valid
 	return Scale * ( float(RawData >> 4) / float(0xFFF) );
