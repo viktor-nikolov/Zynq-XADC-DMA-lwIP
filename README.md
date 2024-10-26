@@ -929,7 +929,7 @@ float Xadc_RawToVoltageAUX1(u16 RawData)
 ddd
 
 ```c++
-// Conversion function of XADC raw sample to voltage for the channel VP/VN
+// Conversion function of XADC raw sample to voltage for the bipolar channel VP/VN
 static float Xadc_RawToVoltageVPVN(u16 RawData)
 {
     // When XADC doesn't do averaging, only the 12 most significant bits of RawData are valid
