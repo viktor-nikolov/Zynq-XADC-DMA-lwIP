@@ -9,9 +9,9 @@ The Cora Z7 is a suitable board for testing the Zynq XADC because it has analog 
 
 I'm using Vivado 2024.1.1 and Vitis Classic 2024.1.1 in this tutorial. Nevertheless, the same steps also work in Vivado 2023.1, Vitis 2023.1, and Vitis Classic 2023.2.
 
-Before we dive into drawing a block diagram in Vivado and writing code in Vitis, we need to understand the basics of the XDAC and be aware of important aspects and limitations. Let me cover this in the first chapters of this tutorial.
-
 ## A short introduction to Zynq-7000 XADC
+
+Before we dive into drawing a block diagram in Vivado and writing code in Vitis, we need to understand the basics of the XDAC and be aware of important aspects and limitations. Let me cover this in the first chapters of this tutorial.
 
 ### What is XADC
 
