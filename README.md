@@ -911,7 +911,7 @@ bla bla
 // Conversion function of XADC raw sample to voltage for the channel VAUX[1]
 float Xadc_RawToVoltageAUX1(u16 RawData)
 {
-    // We use AUX1 as unipolar; it has the scale from 0 V to 3.32 V.
+    // We use VAUX[1] as unipolar; it has the scale from 0 V to 3.32 V.
     // There is voltage divider of R1 = 2.32 kOhm and R2 = 1 kOhm on the input.
     const float Scale = 3.32; 
 
@@ -926,21 +926,19 @@ ddd
 // Conversion function of XADC raw sample to voltage for the channel VP/VN
 static float Xadc_RawToVoltageVPVN(u16 RawData)
 {
-	// When XADC doesn't do averaging, only the 12 most significant bits of RawData are valid
-	if( (RawData >> 4) == 0x800 ) // This is the special case of the lowest negative value
-                                  // The measuring range is -500 mV to 499.75 mV.
-		return -0.5;
+    // When XADC doesn't do averaging, only the 12 most significant bits of RawData are valid
+    if( (RawData >> 4) == 0x800 ) // This is the special case of the lowest negative value                           return -0.5;              // The measuring range is -500 mV to 499.75 mV.
 
-	float sign;
+    float sign;
 
-	if( RawData & 0x8000 ) {    // Is sign bit equal to 1? I.e. is RawData negative?
-		sign = -1.0;
-		RawData = ~RawData + 1; // Get absolute value from negative two's complement integer
-	}
-	else
-		sign = 1.0;
+    if( RawData & 0x8000 ) {    // Is sign bit equal to 1? I.e. is RawData negative?
+        sign = -1.0;
+        RawData = ~RawData + 1; // Get absolute value from negative two's complement integer
+    }
+    else
+        sign = 1.0;
 
-	RawData = RawData >> 4; // We are not using averaging, only the 12 most significant bits of RawData
+    RawData = RawData >> 4; // We are not using averaging, only the 12 most significant bits of RawData
                             // are valid
     // One bit equals to the reading of 244 uV. I.e., 1/4096 == 244e-6
     return sign * float(RawData) * ( 1.0/4096.0 );
