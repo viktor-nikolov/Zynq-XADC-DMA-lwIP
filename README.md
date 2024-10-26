@@ -915,8 +915,8 @@ float Xadc_RawToVoltageAUX1(u16 RawData)
     // There is voltage divider of R1 = 2.32 kOhm and R2 = 1 kOhm on the input.
     const float Scale = 3.32; 
 
-	// When XADC doesn't do averaging, only the 12 most significant bits of RawData are valid
-	return Scale * ( float(RawData >> 4) / float(0xFFF) );
+    // When XADC doesn't do averaging, only the 12 most significant bits of RawData are valid
+    return Scale * ( float(RawData >> 4) / float(0xFFF) );
 }
 ```
 
