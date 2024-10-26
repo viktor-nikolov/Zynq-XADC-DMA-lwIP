@@ -504,7 +504,7 @@ Set the Reset Type of the Clocking Wizzard to Active Low (the setting is on the 
 Connect the reset signal of the Clocking Wizard with the FCLK_RESET0_N of the Zynq PS.
 
 It's time for the XADC Wizard now. Add it to the diagram and open its configuration.  
-We will control the XADC from PS using functions from [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). Therefore, we will only do a bare minimum configuration of the XADC Wizard. 
+We will control the XADC from PS using functions from [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). Therefore, we will only do a bare minimum configuration of the XADC Wizard in Vivado. 
 
 On the Basic tab, enable Enable AXI4Stream. We need the XADC Wizard to provide an AXI-Stream interface because this is how we get data into the RAM by means of AXI DMA.
 
@@ -644,7 +644,7 @@ Part of the name in italics is the date and time stamp.
 
 Depending on your Python installation, run the script with the command `python3 file_via_socket.py [params]` or `python file_via_socket.py [params]`.
 
-I tested the script on Ubuntu 22.04 and Windows 11.
+I tested the script on Windows 11 and Ubuntu 22.04.
 
 The default port the script listens on for connections is 65432, and the default bind IP address is 0.0.0.0 (i.e., the script listens on all the configured network interfaces). **Make sure that the firewall on your PC allows incoming connections to Python on the given port.**
 
@@ -654,13 +654,13 @@ In typical use, you will want to specify the output folder for the files. For ex
 
 (To get the full list of available parameters, run `python file_via_socket.py --help`.)
 
-Let me summarize. To successfully run the demo application, you need to perform these steps:
+Let me summarize. To successfully use the demo application, you need to perform these steps:
 
 1. Connect a suitable signal from a signal generator to Cora Z7 pins V_P and V_N or to pin A0 (or to both).
 2. Connect the network cable to the Cora Z7 board.
 3. Start the `python file_via_socket.py` on your PC as the server to receive digitized data samples.
 4. Start a serial terminal application (e.g., [PuTTY](https://www.putty.org/)) and connect it to the USB serial port of the Cora Z7 board in your OS.
-5. Specify the IP address of your server in the constant `SERVER_ADDR` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
+5. Specify the IP address of your server in the constant `SERVER_ADDR` at the beginning of the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
 6. Build and run the application in Vitis.
 
 After the application starts, you shall see output in the serial terminal similar to this:
@@ -693,7 +693,7 @@ VAUX[1] is activated as the input
 Information under the header `--lwIP Socket Mode TCP Startup--` comes from the lwIP network initialization and DHCP IP address assignment.  
 After the network initializes the thread controlling the XADC takes over and displays some basic information.
 
-We see that 1000 XADC samples will be provided in each measurement (i.e., in each DMA transfer from the XADC). You can control this number of samples by modifying the macro `SAMPLE_COUNT` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
+We see that 1000 XADC samples will be provided in each measurement (i.e., in each DMA transfer from the XADC). You can control this number of samples by modifying the macro `SAMPLE_COUNT` at the beginning of the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
 
 ```c++
 /* Number of samples transferred in one DMA transfer. Max. value is 33,554,431 */
@@ -702,7 +702,7 @@ We see that 1000 XADC samples will be provided in each measurement (i.e., in eac
 
 - Note: Yes, I successfully tested the digitization of 33,554,431 samples. :smiley: It takes 33.5 seconds to record the XADC data and then about 1 minute 45 seconds to convert raw values to voltage and transfer the data to the PC (tested on Cora Z7, compiled with the highest optimization level -O3).
 
-We also see in the console output that XADC will not use any averaging. This is controlled by defining the value of the macro `AVERAGING_MODE` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). You can select one of the four options: 
+We also see in the console output that XADC will not use any averaging. This is controlled by defining the value of the macro `AVERAGING_MODE` at the beginning of the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). You can select one of the four options: 
 
 ```c++
 /* Set XADC averaging.
@@ -777,7 +777,7 @@ The XADC Averaging is set using the following call.
 ```c++
 XSysMon_SetAvg( &XADCInstance, AVERAGING_MODE );
 ```
-The macro `AVERAGING_MODE` is set to one of the values `XSM_AVG_0_SAMPLES` (no averaging), `XSM_AVG_16_SAMPLES`, `XSM_AVG_64_SAMPLES` or `XSM_AVG_256_SAMPLES` at the beginning of [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
+The macro `AVERAGING_MODE` is set to one of the values `XSM_AVG_0_SAMPLES` (no averaging), `XSM_AVG_16_SAMPLES`, `XSM_AVG_64_SAMPLES` or `XSM_AVG_256_SAMPLES` at the beginning of the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
 
 Because the board Cora Z7 doesn't provide an external voltage reference to the XADC, we must make sure to enable only usage of the Offset Calibration Coefficient by the following call (see details explained in the chapter [XADC Autocalibration](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#xadc-autocalibration)).
 
@@ -804,8 +804,7 @@ XSysMon_SetSingleChParams(
   false );          // IsDifferentialMode==false -> unipolar mode
 ```
 
-The second parameter of [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586) is the channel index. You can use macros `XSM_CH_*`, which are defined in the [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). Macro `XSM_CH_AUX_MIN` is the index of VAUX[0]. By adding 1 to it, we get the index of VAUX[1].  
-The macro `XSM_CH_VPVN` gives the index of the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>.
+The second parameter of [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586) is the channel index. You can use macros `XSM_CH_*`, which are defined in the [xsysmon.h](https://github.com/Xilinx/embeddedsw/blob/master/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.h). Macro `XSM_CH_AUX_MIN` is the index of VAUX[0]. By adding 1 to it, we get the index of VAUX[1]. The macro `XSM_CH_VPVN` gives the index of the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>.
 
 Next is the boolean parameter `IncreaseAcqCycles`.  
 Value false means that the default duration of 4 ADCCLK clock cycles is used for the settling period, so the acquisition takes 26 ADCCLK cycles in total. We use a 104 MHz XADC input clock in the HW design. We set the divider ratio to 4 by calling `XSysMon_SetAdcClkDivisor`. This results in 26 MHz ADCCLK and thus 1 Msps sampling rate.  
