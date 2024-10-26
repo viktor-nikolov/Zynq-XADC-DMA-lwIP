@@ -7,7 +7,7 @@ This tutorial shows how to do an HW design and code a SW application to make use
 In this tutorial, I'm using the Digilent board [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start). However, all the principles described here can be used on any other Zynq-7000 board. I will highlight aspects specific to Cora Z7 in the text.  
 The Cora Z7 is a suitable board for testing the Zynq XADC because it has analog inputs that are usable in a practical way.
 
-The tutorial is based on the Vivado 2023.1 and Vitis 2023.1 toolchain. **TODO Vivado 2024.1.1, Vitis Classic 2024.1.1, Vitis 2024.1.1; i.e., after installing Vivado Edition Update 1**
+I'm using Vivado 2024.1.1 and Vitis Classic 2024.1.1 in this tutorial. Nevertheless, the same steps also work in Vivado 2023.1, Vitis 2023.1, and Vitis Classic 2023.2.
 
 Before we dive into drawing a block diagram in Vivado and writing code in Vitis, we need to understand the basics of the XDAC and be aware of important aspects and limitations. Let me cover this in the first chapters of this tutorial.
 
