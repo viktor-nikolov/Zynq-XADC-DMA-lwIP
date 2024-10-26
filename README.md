@@ -905,10 +905,16 @@ Xil_DCacheInvalidateRange( (UINTPTR)DataBuffer, sizeof(DataBuffer) );
 
 ### Converting raw XADC data samples to the voltage
 
-bla bla
+To convert the raw XADC data sample to the voltage, we must consider whether the XADC uses averaging. If a voltage divider is present on the XADC channel input, we must, of course, also consider the scaling factor.
+
+The [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp) of the demo application contains conversion functions for unipolar channel VAUX[1] and bipolar channel V<sub>P</sub>/V<sub>N</sub>.  
+I'm using conditional compilation based on the value of the macro `AVERAGING_MODE`. When the XADC is set to use averaging, all 16 bits of the raw sample are used. Without averaging, only 12 bits are valid; the 4 least significant bits must be ignored.  
+Code snippets shown in this chapter are the versions when XADC averaging is not used.
+
+Converting raw sample to voltage is pretty straightforward for a channel in the unipolar mode:
 
 ```c++
-// Conversion function of XADC raw sample to voltage for the channel VAUX[1]
+// Conversion function of XADC raw sample to voltage for the unipolar channel VAUX[1]
 float Xadc_RawToVoltageAUX1(u16 RawData)
 {
     // We use VAUX[1] as unipolar; it has the scale from 0 V to 3.32 V.
