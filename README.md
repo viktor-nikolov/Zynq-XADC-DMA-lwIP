@@ -928,7 +928,7 @@ static float Xadc_RawToVoltageVPVN(u16 RawData)
 {
     // When XADC doesn't do averaging, only the 12 most significant bits of RawData are valid
     if( (RawData >> 4) == 0x800 ) // This is the special case of the lowest negative value
-        return -0.5;              // The measuring range is -500 mV to 499.75 mV.
+        return -0.5;              // The measuring range in bipolar mode is -500 mV to 499.75 mV.
 
     float sign;
 
