@@ -190,9 +190,9 @@ This circuit on Cora Z7 is basically the same as the one discussed in the Applic
 The AAF contains a 1 nF capacitor, which is orders of magnitude larger capacitance than the 3 pF sampling capacitor inside the XADC. Therefore, we can ignore the XADC sampling capacitor when determining the acquisition time.
 
 We need to determine the AAF circuit's settling time, which is the acquisition time needed for the XADC to acquire the input signal with the desired precision.  
-When the input analog signal changes to a new value, the settling time is the time it takes the circuit to settle to this new value on its output. Meaning, settle close enough for acquiring the new value with 12-bit precision.
+When the input analog signal changes to a new value, the settling time is the time it takes the circuit to settle to this new value on its output. Meaning, settle close enough for acquiring the new signal value with 12-bit precision.
 
-We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/8erAzNpWEDQ8zWWH_EdtFg?section=XREF_11532_Equation2_5) from [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) to adapt it to the resistances of Cora Z7 analog input:
+We can use a slightly modified [Equation 6-1](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/8erAzNpWEDQ8zWWH_EdtFg?section=XREF_11532_Equation2_5) from [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs) to adapt it to the resistances of Cora Z7 auxiliary analog input:
 
 ```math
 t_{settling} = \ln(2^{12+1}) \times ( {{2320 \times 1000} \over {2300 + 1000}} + 140 + 845) \times 1 \times 10^{-9} = 15.1725 \mskip3mu \mu s
@@ -215,7 +215,7 @@ There is no universal solution for this issue. How you compromise between sampli
 > [!IMPORTANT]
 >
 > Please note that any additional resistance of circuitry you connect to the Cora Z7's pins A0-A5 can further increase the settling time needed.  
-> To achieve a reliable measurement, the voltage source connected to pins A0-A5 must act as having low internal resistance.
+> To achieve a reliable measurement, the voltage source connected to pins A0-A5 should act as having low internal resistance.
 
 ### Settling time of dedicated channel V<sub>P</sub>/V<sub>N</sub> AAF of Cora Z7
 
@@ -287,7 +287,7 @@ At 65.9 ksps, the shape of the signal is generally well-recorded. You may miss t
 
 The settling time, which you can calculate using formulas in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc) and the User Guide [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/External-Analog-Inputs), tells you how long it takes for the output signal to settle to a new value (for the 12-bit digitization precision) when the input signal undergoes a <ins>step change</ins> to a new value. Nothing else!
 
-Knowing the settling time is crucial in cases when the input voltage undergoes sudden changes, such as when a [multiplexer](https://en.wikipedia.org/wiki/Multiplexer) is used. When the input signal is switched to a new source, you must wait at least the settling time before taking a sample by the XADC.
+Knowing the settling time is crucial in cases when the input voltage undergoes sudden changes, such as when a [multiplexer](https://en.wikipedia.org/wiki/Multiplexer) is used. When the input signal is switched to a new source, the XADC needs to acquire the signal for at least the settling time to produce the correct sample value.
 
 When you measure slowly changing signals (e.g., a voltage from a temperature sensor) and are not very concerned about noise in the input signal, it's probably enough to sample the input with the period equal to the settling time.
 
@@ -334,15 +334,15 @@ Using an external voltage reference allows the board designer to achieve higher 
 
 When you know exactly what Zynq-7000 board your code will run on, you can hard-code the configuration, understanding whether the external or internal reference is used. See the schematics of your board to check what is connected to Zynq-7000 [reference input pins VREFP and VREFN](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Reference-Inputs-VREFP-and-VREFN). The internal voltage reference is used if they are connected to the ADCGND (i.e., the ground of XADC circuitry).
 
-Use the following call (after you initialize the XADC instance) when the internal voltage reference is used to enable only the Offset Calibration Coefficient used for XADC and Zynq power supply measurements:
+Use the following call (after you initialize the XADC instance) when the internal voltage reference is used to enable only the Offset Calibration Coefficient for XADC and Zynq power supply measurements:
 
 `XSysMon_SetCalibEnables(&XADCInstance, XSM_CFR1_CAL_ADC_OFFSET_MASK | XSM_CFR1_CAL_PS_OFFSET_MASK);`
 
-When the  Zynq-7000 board you are using provides an external voltage reference, then use the following code to enable both Gain and Offset Calibration Coefficients used for XADC and Zynq power supply measurements:
+When the  Zynq-7000 board you are using provides an external voltage reference, then use the following code to enable both Gain and Offset Calibration Coefficients for XADC and Zynq power supply measurements:
 
 `XSysMon_SetCalibEnables(&XADCInstance, XSM_CFR1_CAL_ADC_GAIN_OFFSET_MASK | XSM_CFR1_CAL_PS_GAIN_OFFSET_MASK);`
 
-When the Zynq-7000 internal voltage reference is used for the calibration, the calibration of XADC gain is actually not done (only the XADC offset is calibrated). As explained [here](https://adaptivesupport.amd.com/s/article/53586?language=en_US), the value of the Gain Calibration Coefficient is set to 0x007F in such a case. 0x007F represents the maximum Gain Coefficient of 6.3%. Obviously, letting XADC apply this maximal Gain Coefficient would significantly reduce the precision of digitalization. That is why we need to pay attention to what kind of voltage reference our Zynq-7000 board uses.
+When the Zynq-7000 internal voltage reference is used for the calibration, the calibration of XADC gain is actually not done (only the XADC offset is calibrated). As explained [here](https://adaptivesupport.amd.com/s/article/53586?language=en_US), the value of the Gain Calibration Coefficient is set to 0x007F in such a case. 0x007F represents the maximum Gain Coefficient of 6.3%. Obviously, letting XADC apply this maximal Gain Coefficient would reduce the precision of digitalization. That is why we need to pay attention to what kind of voltage reference our Zynq-7000 board uses.
 
 We can write an XADC calibration setup code, which is portable between different Zynq-7000 boards, by checking the value of the Gain Calibration Coefficient. 
 
@@ -366,7 +366,7 @@ XSysMon_SetCalibEnables( &XADCInstance, CalibrationEnables );
 
 How precise can the XADC measurement be? Judging by my specimen of the [Cora Z7](https://digilent.com/reference/programmable-logic/cora-z7/start), it can be pretty precise when you use averaging.
 
-I connected a voltage reference to the unipolar auxiliary channel VAUX[1] of my Cora Z7. My freshly calibrated 6½ digits multimeter measured the reference as 2.495 V.  
+I connected a voltage reference to the unipolar auxiliary channel VAUX[1] of my Cora Z7. My recently calibrated 6½ digits multimeter measured the reference as 2.495 V.  
 I let the XADC digitize 6400 samples at 1 Msps using the [software app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) shared in this repository. The mean value of the 6400 samples was 2.498 V.
 
 Only a 3 mV difference between a Cora Z7 and an expensive digital multimeter is an excellent result! Mind that the Cora Z7 board doesn't provide an external voltage reference for XADC calibration and that two resistors forming a voltage divider are placed before the VAUX[1] input, i.e., tolerances of the resistors are at play here.  
@@ -378,13 +378,11 @@ The following figure shows the first 800 samples of my XADC measurement.
 
 We see that the noise makes most of the samples oscillate in an interval of 8 bits (8 values) of the 12-bit measurements. One bit represents a 0.81 mV change in the measured voltage.
 
-I mentioned earlier that the XADC can be configured to do averaging of samples. It set 64-sample averaging by calling `XSysMon_SetAvg(&XADCInstance, XSM_AVG_64_SAMPLES);` and captured 100 samples shown in the next figure. 
-
-Zynq-7000 XADC constant signal digitization with averaging
+I mentioned earlier that the XADC can be configured to do averaging of samples. It set 64-sample averaging by calling `XSysMon_SetAvg(&XADCInstance, XSM_AVG_64_SAMPLES);` and captured 100 samples shown in the next figure.
 
 <img src="pictures\Cora_Z7_2.495V_64avg_reading.png" alt="Zynq-7000 XADC constant signal digitization with averaging">
 
-The signal looks much cleaner now. The basic sample rate of the XADC is still 1 Msps, but it averages 64 samples before it produces one sample as the output. Therefore, the apparent sample rate is 15.6 ksps ( $`1000/64\dot{=}15.6`$ ). The 100 data points shown in the figure are the result of 6400 samples done by the XADC.  
+The signal looks much cleaner now. The basic sample rate of the XADC is still 1 Msps, but it averages 64 samples before it produces one sample as the output. Therefore, the apparent sample rate is 15.6 ksps ( $`1000/64\dot{=}15.6`$ ). The 100 data points shown in the figure result from 6400 acquisitions done by the XADC.  
 The output of XADC's averaging is a 16-bit value, so we see much finer differences between the data points compared to raw 12-bit samples in the previous figure.
 
 Of course, you can achieve 64-sample averaging (or any other type of averaging) by post-processing raw 12-bit samples with the PS code or PL logic. Nevertheless, 16, 64, or 256-sample averaging, which the XADC is able to do internally, can save you the coding effort.
@@ -395,8 +393,9 @@ I think the most practical way to transfer large amounts of samples from the XAD
 
 <img src="pictures\bd_axi_dma_ip.png" width="300">
 
-The "magic" of the AXI DMA is that it gets data from the slave [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) interface S_AXIX_S2MM and sends them via the master AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM cores being involved. (The S_AXI_LITE interface is used to control the AXI DMA by functions from [xaxidma.h](https://xilinx.github.io/embeddedsw.github.io/axidma/doc/html/api/xaxidma_8h.html).)  
-In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appears in the `DataBuffer` (I will explain all the details in a later chapter).
+The "magic" of the AXI DMA is that it gets data from the slave [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) interface S_AXIX_S2MM and sends them via the master AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM core being involved. (The S_AXI_LITE interface is used to control the AXI DMA by functions from [xaxidma.h](https://xilinx.github.io/embeddedsw.github.io/axidma/doc/html/api/xaxidma_8h.html).)
+
+In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appears in the `DataBuffer` (I will explain all the details in the [later chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#using-the-dma)).
 
 The maximum amount of data that AXI DMA can move in a single transfer is 64 MB (exactly 0x3FFFFFF bytes). This is because the AXI DMA register to store buffer length can be, at most, 26 bits wide.  
 In our case, we will be transferring 16-bit values, i.e., we can transfer at most 33,554,431 samples in one go. That should be more than enough. We could record up to 33.6 seconds of the input signal with the XADC running at 1 Msps.
