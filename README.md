@@ -848,7 +848,7 @@ XAxiDma_IntrDisable( &AxiDmaInstance, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DEVICE_TO_DM
 XAxiDma_IntrDisable( &AxiDmaInstance, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DMA_TO_DEVICE );
 ```
 
-We need to have a space in memory for the AXI DMA to load data into. The easiest way is to declare the data buffer as a global variable. This way, we don't need to worry about FreeRTOS thread's stack size. 
+We need to have a space in memory for the AXI DMA to load data into. The easiest way is to declare the data buffer as a global variable. This way, we don't need to worry about the FreeRTOS thread's stack size. 
 
 ```c++
 u16 DataBuffer[ SAMPLE_COUNT + 8 ] __attribute__((aligned(4)));
@@ -859,14 +859,17 @@ Important considerations go into declaring an array for receiving data from AXI 
 1. **Data type:** In our case, the AXI-Stream data width is 16 bits. This is because the XADC Wizzard exposes a 16-bit wide master AXI-Stream interface, and it goes as the 16-bit stream all the way into the AXI DMA. So, we use the data type `u16`.
 2. **Array length:** The number of samples we transfer in one DMA transfer is given by the macro `SAMPLE_COUNT`. However, there is a catch, which is why I recommend that you declare the `DataBuffer` slightly larger than needed.  
    The AXI DMA loads data directly into the RAM. There is a data cache between the RAM and the CPU in play. To achieve proper results so the CPU "sees" the correct data, we flush the data cache into RAM by calling [Xil_DCacheFlushRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheFlushRange?tocId=ih5Bwba_1KuHZ_3v1wDPjw) before the DMA transfer. We then invalidate the data cache by calling [Xil_DCacheInvalidateRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheInvalidateRange?tocId=hQlJBPx~LFoO1Pndt20_5g) after the DMA transfer finishes so the `DataBuffer` memory region is served to the CPU from RAM when read for the first time.  
-   I faced strange errors in my testing when I used a bigger `DataBuffer`. It went away when I declared the `DataBuffer` slightly larger than needed. I think this is a bug or a limitation of the [Xil_DCacheInvalidateRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheInvalidateRange?tocId=hQlJBPx~LFoO1Pndt20_5g). It may be connected to the fact that the data cache is organized into so-called lines, which are 32 bytes long on the ARM Cortex-A9 processor used in Zynq-7000. So, the cache invalidation is done in 32-byte chunks.
+   I faced strange errors in my testing when I used a bigger `DataBuffer`. The problem went away when I declared the `DataBuffer` slightly larger than needed. I think this is a bug or a limitation of the [Xil_DCacheInvalidateRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheInvalidateRange?tocId=hQlJBPx~LFoO1Pndt20_5g).  
+   My theory is that the issue is connected to the fact that the data cache is organized into so-called lines, which are 32 bytes long on the ARM Cortex-A9 CPU used in Zynq-7000. Cache invalidation is done by the 32-byte cache lines, not by the exact length of `DataBuffer`. I guess the problem I observed was caused by [Xil_DCacheInvalidateRange()](https://docs.amd.com/r/en-US/oslib_rm/Xil_DCacheInvalidateRange?tocId=hQlJBPx~LFoO1Pndt20_5g) missing a cache line.
 3. **Memory alignment:** Even though the AXI DMA can be configured to allow data transfer to an address that is not aligned to a word boundary, it's a good practice to declare the `DataBuffer` as aligned to a 32-bit word. This is what the GCC attribute definition `__attribute__((aligned(4)))` does.
 
 We tell the AXI DMA to start loading data into RAM by this call:
 
 ```c++
-TODO DATA CHACHE
+// Just in case, flush any data in DataBuffer, held in the CPU cache, to the RAM
+Xil_DCacheFlushRange( (UINTPTR)DataBuffer, sizeof(DataBuffer) );
 
+// Tell AXI DMA to start the data transfer
 XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer,
                         SAMPLE_COUNT * sizeof(u16), XAXIDMA_DEVICE_TO_DMA );
 ```
@@ -874,11 +877,31 @@ XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer,
 This call initiates the AXI DMA, but no data will start flowing yet. As I explained in the chapter [DMA,](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#dma-direct-memory-access) we have the module  [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) in our HW design to serve as a "valve" on the AXI-Strem between the XADC Wizard and AXI DMA.  
 We need to tell the module how many data samples we want to go through and then start the data flow. We do that by means of GPIO signals, which we connected to the stream_tlaster module in the HW design.
 
-	TODO 
-	
-	XGpioPs_WritePin( &GpioInstance, 54, 1 /*high*/ ); // Set start signal to start generation of the AXI-Stream of data coming from XADC
-	XGpioPs_WritePin( &GpioInstance, 54, 0 /*low*/  ); // Reset the start signal (it needed to be high for just a single PL clock cycle)
+```c++
+// Set sample count to EMIO GPIO pins 55-80, which are connected to the
+// stream_tlaster module.
+// (The least significant EMIO GPIO pin 54 is the start/stop signal.)
+XGpioPs_Write( &GpioInstance, 2 /*Bank 2*/, SAMPLE_COUNT << 1 );    
 
+// Set start signal of the stream_tlaster module to start generation of the 
+// AXI-Stream of data coming from the XADC.
+XGpioPs_WritePin( &GpioInstance, 54, 1 /*high*/ );
+// Reset the start signal (it needed to be high for just a single PL clock cycle)
+XGpioPs_WritePin( &GpioInstance, 54, 0 /*low*/  );
+```
+
+After that, we wait in a while loop for the AXI DMA to finish the data transfer.  
+Please note that there is no way to get information about how much data the AXI DMA actually transferred. That's why we need the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) module to have the ultimate control about the AXI-Stream data flow.  
+Afther the AXI DMA transfer finishes, we must invalidate the memory region of the `DataBuffer` in the data chache.
+
+```c++
+// Wait till the DMA transfer is done
+while( XAxiDma_Busy( &AxiDmaInstance, XAXIDMA_DEVICE_TO_DMA ) )
+    vTaskDelay( pdMS_TO_TICKS( 1 ) ); // Wait 1 ms
+
+// Invalidate the CPU cache for the memory region holding the DataBuffer.
+Xil_DCacheInvalidateRange( (UINTPTR)DataBuffer, sizeof(DataBuffer) );
+```
 
 ### Converting raw XADC data samples to the voltage
 
