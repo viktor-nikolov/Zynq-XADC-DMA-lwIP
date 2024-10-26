@@ -911,7 +911,7 @@ The [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/so
 I'm using conditional compilation based on the value of the macro `AVERAGING_MODE`. When the XADC is set to use averaging, all 16 bits of the raw sample are used. Without averaging, only 12 bits are valid; the 4 least significant bits must be ignored.  
 Code snippets shown in this chapter are the versions when XADC averaging is not used.
 
-Converting raw sample to voltage is pretty straightforward for a channel in the unipolar mode:
+Converting a raw sample to voltage is pretty straightforward for a channel in the unipolar mode:
 
 ```c++
 // Conversion function of XADC raw sample to voltage for the unipolar channel VAUX[1]
@@ -926,7 +926,8 @@ float Xadc_RawToVoltageAUX1(u16 RawData)
 }
 ```
 
-ddd
+Converting a raw sample from a channel in the bipolar mode requires a bit of binary arithmetics.  
+The measuring range is not symmetrical around zero. It goes from -500.00 mV to 499.75 mV in 244 μV steps. See  [Figure 2-3](https://docs.amd.com/r/qOeib0vlzXa1isUAfuFzOQ/yDu6LkRwmz5q985frASotQ?section=XREF_78910_X_Ref_Target) in the  [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC/ADC-Transfer-Functions).
 
 ```c++
 // Conversion function of XADC raw sample to voltage for the bipolar channel VP/VN
@@ -951,8 +952,6 @@ static float Xadc_RawToVoltageVPVN(u16 RawData)
     return sign * float(RawData) * ( 1.0/4096.0 );
 }
 ```
-
-
 
 ## Project files
 
