@@ -15,7 +15,7 @@ Before we dive into drawing a block diagram in Vivado and writing code in Vitis,
 
 ### What is XADC
 
-The XADC is a feature of an analog-to-digital converter integrated on selected Xilinx FPGA chips, including Zynq-7000. This ADC has two basic capabilities
+The XADC is a feature of an analog-to-digital converter integrated on selected Xilinx FPGA chips, including Zynq-7000. This ADC has two basic capabilities:
 
 1.  The System Monitor (SYSMON) reads the Zynq chip temperature and voltages of various Zynq power rails.
 1.  The XADC reads voltages from external inputs, which are called channels.
@@ -43,7 +43,7 @@ A channel may operate in unipolar or bipolar mode.
 
 - This mode can accommodate input signals driven from a true differential source.
 - The differential analog input (V<sub>P</sub> &minus; V<sub>N</sub>) can have a maximum input range of ±0.5V. I.e., the XADC output has a value between &minus;0.5 V and 0.5 V.
-- However, both V<sub>P</sub> and V<sub>N</sub> must be always within a range from 0 V to 1.0 V with respect to GNDADC.
+- However, both V<sub>P</sub> and V<sub>N</sub> must always be within a range from 0 V to 1.0 V with respect to GNDADC.
 
 See the chapter [Analog Inputs](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Analog-Inputs) of [UG480](https://docs.amd.com/r/en-US/ug480_7Series_XADC) for more details on unipolar and bipolar inputs.
 
@@ -60,7 +60,7 @@ We will also configure the XADC for Continuous Sampling. In this timing mode, th
 
 ### Bit resolution
 
-Zynq-7000 XADC is a 12-bit ADC. However, the XADC [status registers](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Status-Registers) storing the conversion result are 16-bit, and the function [XSysMon_GetAdcData](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L331) also returns a 16-bit value.
+Zynq-7000 XADC is a 12-bit ADC. However, the XADC [status registers](https://docs.amd.com/r/en-US/ug480_7Series_XADC/Status-Registers) storing the conversion result are 16-bit, and the function [XSysMon_GetAdcData](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L331) also returns a 16-bit value.  
 In general, the 12 most significant bits of the register are the converted XADC sample. Do ignore the 4 least significant bits.
 
 It is possible to configure the XADC to do an averaging of consecutive 16, 64, or 256 samples (see function [XSysMon_SetAvg](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L488)). I.e., to do the oversampling. The 4 least significant bits are then used to represent the averaged value with enhanced precision, i.e., the whole 16 bits of a status register can be used.  
@@ -378,7 +378,7 @@ The following figure shows the first 800 samples of my XADC measurement.
 
 We see that the noise makes most of the samples oscillate in an interval of 8 bits (8 values) of the 12-bit measurements. One bit represents a 0.81 mV change in the measured voltage.
 
-I mentioned earlier that the XADC can be configured to do averaging of samples. It set 64-sample averaging by calling `XSysMon_SetAvg(&XADCInstance, XSM_AVG_64_SAMPLES);` and captured 100 samples shown in the next figure.
+I mentioned earlier that the XADC can be configured to do averaging of samples. I set 64-sample averaging by calling `XSysMon_SetAvg(&XADCInstance, XSM_AVG_64_SAMPLES);` and captured 100 samples shown in the next figure.
 
 <img src="pictures\Cora_Z7_2.495V_64avg_reading.png" alt="Zynq-7000 XADC constant signal digitization with averaging">
 
