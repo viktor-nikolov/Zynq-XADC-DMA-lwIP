@@ -207,7 +207,7 @@ The factor $`1 \times 10^{-9}`$ is the capacitance of the AAF's capacitor.
 
 Further details on how the equation was constructed can be found in the Application Note [XAPP795](https://docs.amd.com/v/u/en-US/xapp795-driving-xadc).
 
-One may be tempted to think that a settling time of 15.1725 μs allows for a sampling rate with a 15.1725 μs period or 65.909 kHz. However, it is not that simple. In the [later chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#the-behavior-of-unipolar-auxiliary-channel-aaf-of-cora-z7), we will explore how the circuit behaves in practice and to which use cases the 65.909 kHz sampling rate may apply well.
+One may be tempted to think that a settling time of 15.1725 μs allows for a sampling rate with a 15.1725 μs period or 65.909 kHz. However, it is not that simple. In a [later chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#the-behavior-of-unipolar-auxiliary-channel-aaf-of-cora-z7), we will explore how the circuit behaves in practice and to which use cases the 65.909 kHz sampling rate may apply well.
 
 One "controversy" is already apparent: According to the [Nyquist theorem](https://www.techtarget.com/whatis/definition/Nyquist-Theorem), the 65.9 kHz sampling rate allows correct sampling of an input signal of frequency up to 33 kHz. However, the cut-off frequency of the AAF on the Cora Z7 unipolar input is 94.6 kHz. So, by running the XADC at 65.9 ksps, we risk that an imprecise digitalization of the so-called [alias](https://en.wikipedia.org/wiki/Aliasing) will happen if frequencies above 33 kHz are present in the input signal. We would need an AAF with a cutoff frequency of 33 kHz. However, such an AAF would have an even longer settling time.  
 There is no universal solution for this issue. How you compromise between sampling rate and settling time depends on the characteristics of the input signal and on what you want to achieve by digitizing it.
@@ -239,7 +239,7 @@ We can calculate the settling time of this circuit as follows:
 t_{settling} = \ln(2^{12+1}) \times ( 140 + 140 ) \times 1 \times 10^{-9} = 2.52 \mskip3mu \mu s
 ```
 
-In the [later chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#the-behavior-of-dedicated-channel-vpvn-aaf-of-cora-z7), I will show a practical example of how the circuit behaves.
+In a [later chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#the-behavior-of-dedicated-channel-vpvn-aaf-of-cora-z7), I will show a practical example of how the circuit behaves.
 
 ## Acquisition and settling time—the practice
 
@@ -395,12 +395,12 @@ I think the most practical way to transfer large amounts of samples from the XAD
 
 The "magic" of the AXI DMA is that it gets data from the slave [AXI-Stream](https://docs.amd.com/r/en-US/ug1399-vitis-hls/How-AXI4-Stream-Works) interface S_AXIX_S2MM and sends them via the master AXI interface M_AXI_S2MM to a memory address. If the M_AXI_S2MM is properly connected (as I will show later in this tutorial), the data are loaded directly into the RAM without Zynq-7000 ARM core being involved. (The S_AXI_LITE interface is used to control the AXI DMA by functions from [xaxidma.h](https://xilinx.github.io/embeddedsw.github.io/axidma/doc/html/api/xaxidma_8h.html).)
 
-In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appears in the `DataBuffer` (I will explain all the details in the [later chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#using-the-dma)).
+In essence, you call something like `XAxiDma_SimpleTransfer( &AxiDmaInstance, (UINTPTR)DataBuffer, DATA_SIZE, XAXIDMA_DEVICE_TO_DMA );` in the PS code and wait till the data appears in the `DataBuffer` (I will explain all the details in a [later chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#using-the-dma)).
 
 The maximum amount of data that AXI DMA can move in a single transfer is 64 MB (exactly 0x3FFFFFF bytes). This is because the AXI DMA register to store buffer length can be, at most, 26 bits wide.  
 In our case, we will be transferring 16-bit values, i.e., we can transfer at most 33,554,431 samples in one go. That should be more than enough. We could record up to 33.6 seconds of the input signal with the XADC running at 1 Msps.
 
-The [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) can be configured to have an output AXI-Stream interface. When you configure the XADC for continuous sampling, you will get the actual stream of data coming out from the XADC Wizard AXI-Stream interface at the rate equal to the sampling rate of the XADC. However, this data stream is not ready to be connected directly to the AXI DMA.  
+The [XADC Wizard IP](https://www.xilinx.com/products/intellectual-property/xadc-wizard.html) can be configured to have an output AXI-Stream interface. When you configure the XADC for continuous sampling, you will get the actual stream of data coming out from the XADC Wizard AXI-Stream interface at a rate equal to the sampling rate of the XADC. However, this data stream is not ready to be connected directly to the AXI DMA.  
 The thing is that the AXI-Stream interface on the XADC Wizard doesn't contain an AXI-Stream signal TLAST. This signal is asserted to indicate the end of the data stream. The AXI DMA must receive the TLAST signal to know when to stop the DMA transfer.
 
 Therefore, we need an intermediate PL module to handle the AXI-Stream data between the XADC Wizard and the DMA IP. I wrote a module [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) for use in this tutorial.
