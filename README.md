@@ -931,7 +931,7 @@ The measuring range is not symmetrical around zero. It goes from -500.00 mV to 4
 
 ```c++
 // Conversion function of XADC raw sample to voltage for the bipolar channel VP/VN
-static float Xadc_RawToVoltageVPVN(u16 RawData)
+float Xadc_RawToVoltageVPVN(u16 RawData)
 {
     // When XADC doesn't do averaging, only the 12 most significant bits of RawData are valid
     if( (RawData >> 4) == 0x800 ) // This is the special case of the lowest negative value
