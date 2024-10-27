@@ -459,7 +459,7 @@ Create the block design.
 Add the ZYNQ7 Processing System to the diagram. Vivado offers to run the block automation. Run it. DDR and FIXED_IO signals will be connected to the Zynq PS.
 
 We need to configure the Zynq PS for our needs.  
-Enable Slave AXI High-Performance interface 0. This is the interface AXI DMA will be connected to.
+Enable Slave AXI High-Performance interface 0. This is the interface to which AXI DMA will be connected.
 
 <img src="pictures\bd_axi_hp0.png" width="500">
 
