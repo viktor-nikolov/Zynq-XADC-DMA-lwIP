@@ -642,7 +642,9 @@ The server writes the XADC samples (a list of voltage values) to a text file. Ea
 The standard name of the file the server creates looks like this: via_socket_*240324_203824.6369*.txt  
 Part of the name in italics is the date and time stamp.
 
-Depending on your Python installation, run the script with the command `python3 file_via_socket.py [params]` or `python file_via_socket.py [params]`.
+Depending on your Python installation, run the script with the command  
+`python3 file_via_socket.py [params]` or  
+`python file_via_socket.py [params]`.
 
 I tested the script on Windows 11 and Ubuntu 22.04.
 
