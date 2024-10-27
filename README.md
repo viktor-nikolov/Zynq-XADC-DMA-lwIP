@@ -587,7 +587,9 @@ Last but not least, we need to export the hardware specification to an XSA file.
 
 ### Building the application
 
-I'm using Vitis Classic 2024.1 in this tutorial. Nevertheless, the same steps work also in Vitis 2023.1 and Vitis Classic 2023.2.
+I'm using Vitis Classic 2024.1 in this chapter. Nevertheless, the same steps work also in Vitis 2023.1 and Vitis Classic 2023.2.
+
+If you want to use Vitis 2024.1.1 (a.k.a. Vitis Unified 2024), go to this [readme](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app_Vitis_Unified/README.md) and then continue with the chapter [How to use the application](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#how-to-use-the-application).
 
 Start Vitis Classic 2024.1.  
 Create a new platform project using the HW export XSA file we just generated.  
