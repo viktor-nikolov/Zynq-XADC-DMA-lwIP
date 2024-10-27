@@ -458,7 +458,7 @@ set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { Vaux1_
 Create the block design.  
 Add the ZYNQ7 Processing System to the diagram. Vivado offers to run the block automation. Run it. DDR and FIXED_IO signals will be connected to the Zynq PS.
 
-We need to configure the Zynq PS for our needs.  
+We need to configure the Zynq PS to meet our needs.  
 Enable Slave AXI High-Performance interface 0. This is the interface to which AXI DMA will be connected.
 
 <img src="pictures\bd_axi_hp0.png" width="500">
@@ -500,7 +500,7 @@ Add a Clocking Wizzard to the diagram and connect clk_in1 to the FCLK_CLK0 outpu
 Set the frequency of clk_out1 to 104 MHz. This frequency will allow us to run the XADC at 1 Msps. We will use a clock divider equal to 4, which gives ADCCLK of 26 MHz, which translates to the sampling rate of 1 Msps. See detailed explanation in the chapter [Clocking, sampling rate, and bandwidth](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#clocking-sampling-rate-and-bandwidth).  
 If you later want to experiment with slower XADC sampling rates, you can set the Clocing Wizard's output frequency and the clock divider differently so you achieve the desired sampling rate.
 
-Set the Reset Type of the Clocking Wizzard to Active Low (the setting is on the Output Clocks tab)  
+Set the Reset Type of the Clocking Wizzard to Active Low (the setting is on the Output Clocks tab).  
 Connect the reset signal of the Clocking Wizard with the FCLK_RESET0_N of the Zynq PS.
 
 It's time for the XADC Wizard now. Add it to the diagram and open its configuration.  
@@ -564,7 +564,7 @@ We enable the Allow Unaligned Transfer option on the Write Channel and increase 
 <img src="pictures\bd_dma.png" width="730">
 
 Connect S_AXIS_S2MM of AXI DMA with the m_axis of the stream_tlaster module.  
-Run Connection Automation which Vivado offers now. Make sure to set all clock sources to the Clocking Wizard (/clk_wiz_0/clk_out1).
+Run Connection Automation, which Vivado offers now. Make sure to set all clock sources to the Clocking Wizard (/clk_wiz_0/clk_out1).
 
 The automation connected the AXI DMA AXI-Lite interface to the Zynq PS via the existing AXI Interconnect. It created a new AXI Interconnect and used it to connect the DMA AXI master interface to the S_AXI_HP0 of Zynq PS. Also, the resets and clocks were connected accordingly.
 
