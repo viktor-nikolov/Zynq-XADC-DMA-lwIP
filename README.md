@@ -613,7 +613,7 @@ Let me briefly explain what source files we have:
 | Source file                                                  | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | [FileViaSocket.h](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.h)  <br />[FileViaSocket.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.cpp) | Definition of the C++ [ostream](https://en.cppreference.com/w/cpp/io/basic_ostream) class, which the demo application uses to send data over the network. I copied the files from another [repository](https://github.com/viktor-nikolov/lwIP-file-via-socket) of mine. |
-| [button_debounce.h](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/button_debounce.h)  <br />[button_debounce.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/button_debounce.cpp) | A C++ class that the demo application uses for debouncing buttons (i.e., for ensuring that the app gets a filtered signal from the buttons for smooth control).  <br />Copyright © 2014 [Trent Cleghorn](https://github.com/tcleg). I copied the files from his [repository](https://github.com/tcleg/Button_Debouncer). |
+| [button_debounce.h](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/button_debounce.h)  <br />[button_debounce.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/button_debounce.cpp) | A C++ class that the demo application uses for debouncing buttons (i.e., to ensure that the app gets a filtered signal from the buttons for smooth control).  <br />Copyright © 2014 [Trent Cleghorn](https://github.com/tcleg). I copied the files from his [repository](https://github.com/tcleg/Button_Debouncer). |
 | [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp) | The main source file of the demo application.                |
 | [network_thread.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) | The definition of a FreeRTOS thread, which initiates the network and handles network operation.  <br />I derived it from a [sample project](https://github.com/Xilinx/embeddedsw/blob/master/lib/sw_apps/freertos_lwip_tcp_perf_client/src/main.c) provided by AMD Xilinx.<br/>Copyright © 2024 Viktor Nikolov<br/>Copyright © 2018-2022 Xilinx, Inc.<br/>Copyright © 2022-2023 Advanced Micro Devices, Inc. |
 
@@ -663,7 +663,7 @@ Let me summarize. To successfully use the demo application, you need to perform 
 5. Specify the IP address of your server in the constant `SERVER_ADDR` at the beginning of the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
 6. Build and run the application in Vitis.
 
-After the application starts, you shall see output in the serial terminal similar to this:
+After the application starts, you shall see the output in the serial terminal similar to this:
 
 ```
 *************** PROGRAM STARTED ***************
@@ -823,7 +823,7 @@ The last boolean parameter, `IsDifferentialMode`, specifies bipolar mode (value 
 In our design, the XADC starts sending the desired data samples over the master AXI-Stream of the XADC Wizard after we call  [XSysMon_SetSingleChParams()](https://github.com/Xilinx/embeddedsw/blob/5688620af40994a0012ef5db3c873e1de3f20e9f/XilinxProcessorIPLib/drivers/sysmon/src/xsysmon.c#L586) in the PS.  
 Let me explain in this chapter how we control the AXI DMA to get data from PL into the RAM of the Zynq ARM core.
 
-The initialization of the DMA is like of other Xillinx subsystems:
+The initialization of the DMA is like that of other Xillinx subsystems:
 
 ```c++
 #include "xaxidma.h"
@@ -889,8 +889,8 @@ XGpioPs_WritePin( &GpioInstance, 54, 0 /*low*/  );
 ```
 
 After that, we wait in a while loop for the AXI DMA to finish the data transfer.  
-Please note that there is no way to get information about how much data the AXI DMA actually transferred. That's why we need the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) module to have the ultimate control about the AXI-Stream data flow.  
-Afther the AXI DMA transfer finishes, we must invalidate the memory region of the `DataBuffer` in the data chache.
+Please note that there is no way to get information about how much data the AXI DMA actually transferred. That's why we need the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) module to have the ultimate control over the AXI-Stream data flow.  
+After the AXI DMA transfer finishes, we must invalidate the memory region of the `DataBuffer` in the data cache.
 
 ```c++
 // Wait till the DMA transfer is done
