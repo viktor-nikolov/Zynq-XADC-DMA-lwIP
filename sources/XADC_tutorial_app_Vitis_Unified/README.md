@@ -37,7 +37,9 @@ Create an empty embedded application using the platform we just created.
 
 Import source files [FileViaSocket.h](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.h), [FileViaSocket.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/FileViaSocket.cpp), [button_debounce.h](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/button_debounce.h) and [button_debounce.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/button_debounce.cpp) from the folder [XADC_tutorial_app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) into the application's src folder.
 
-The files 
+The files [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app_Vitis_Unified/main.cpp) and [network_thread.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app_Vitis_Unified/network_thread.cpp) needed slight updates for the Vitis Unified toolchain, so you must import them from the folder [XADC_tutorial_app_Vitis_Unified](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app_Vitis_Unified).
+
+- **Note:** Please ignore the "problems" that Vitis Unified reports in the FileViaSocket.cpp in the PROBLEMS tab. The FileViaSocket.cpp uses conditional compilation heavily, and the clang in the Vitis Unified is not able to handle it correctly. You will see that the GCC compiler will report no errors or warnings.
 
 Open the main.cpp and set your server IP address (i.e., the IP address where the Python script [file_via_socket.py](https://github.com/viktor-nikolov/lwIP-file-via-socket/blob/main/file_via_socket.py) will be running ).
 
@@ -45,4 +47,6 @@ Open the main.cpp and set your server IP address (i.e., the IP address where the
 const std::string SERVER_ADDR( "192.168.44.10" ); // Specify your actual server IP address
 ```
 
-TODO Note: Ignore problems on the FileViaSocket.cpp, clang is not handling it correctly.
+Build the project; there should be no errors or warnings. 
+
+Now, you can continue with the tutorial. Go to the chapter [How to use the application](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#how-to-use-the-application).
