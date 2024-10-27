@@ -178,7 +178,7 @@ The following picture is a copy of Figure 13.2.1 from the Cora Z7 [Reference Man
 
 <img src="pictures\cora-analog-single-ended.png" title=""  width="550">
 
-We see that the analog input circuit on Cora Z7 consists of a voltage divider and a low-pass anti-aliasing filter (AAF).   
+We see that the analog input circuit on Cora Z7 consists of a voltage divider and a low-pass [anti-aliasing filter](https://en.wikipedia.org/wiki/Anti-aliasing_filter) (AAF).   
 The voltage divider allows voltage up to 3.3 V to be connected to pins A0-A5. The voltage is reduced to the 1.0 V limit of the XADC.
 
 - To be precise, an input voltage of 3.3 V  is reduced to 0.994 V. The exact value may vary depending on how much the resistors on your particular board deviate within the tolerances. 
@@ -245,7 +245,7 @@ In the [later chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree
 
 ### The behavior of unipolar auxiliary channel AAF of Cora Z7
 
-Let's see what the low-pass AAF does to a signal.  
+Let's see what the low-pass [AAF](https://en.wikipedia.org/wiki/Anti-aliasing_filter) does to a signal.  
 I simulated a square wave signal passing through the Cora Z7 unipolar input AAF in [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html). One "step" of the signal has a duration of 15.1725 μs, i.e., it is as long as the circuit's settling time we calculated in the [previous chapter](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#settling-time-of-auxiliary-unipolar-channel-aaf-of-cora-z7). The result of the simulation is in the following figure.
 
 <img src="pictures\Cora_Z7_stair_signal_simulation.png">
@@ -298,7 +298,7 @@ There will be cases when it's beneficial to sample a low-frequency signal with a
 
 For completeness, let's look shortly also at a practical example using the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub>.
 
-The V<sub>P</sub>/V<sub>N</sub> channel's AAF cutoff frequency is pretty high at 568.7 kHz. Let's see in the following figure what happens when we feed the inputs with two 50 kHz sine waves of opposing phases and measure the output differentially.
+The V<sub>P</sub>/V<sub>N</sub> channel's [AAF](https://en.wikipedia.org/wiki/Anti-aliasing_filter) cutoff frequency is pretty high at 568.7 kHz. Let's see in the following figure what happens when we feed the inputs with two 50 kHz sine waves of opposing phases and measure the output differentially.
 
 <img src="pictures\Cora_Z7_diff_signal_simulation.png">
 
