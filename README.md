@@ -579,7 +579,7 @@ You will probably see a critical warning about negative DQS skew values. This wa
 
 HDL Wrapper for the diagram needs to be created: Go to Sources|Design Sources, right-click on the block diagram's name, select "Create HDL Wrapper," and select "Let Vivado manage wrapper."
 
-Now we create the design outputs: Click "Generate Bitstream" in the Flow Navigator on the left. Synthesis and Implementation will be run automatically before bitstream generation. There should be no errors.
+Now, we create the design outputs: Click "Generate Bitstream" in the Flow Navigator on the left. Synthesis and Implementation will be run automatically before bitstream generation. There should be no errors.
 
 Last but not least, we need to export the hardware specification to an XSA file. Go to File|Export|Export Hardware, and select "Include Bitstream".
 
@@ -605,7 +605,7 @@ The following settings are then needed in the lwIP BSP configuration:
 <img src="pictures\vt_bsp_lwip_conf.png" width="400">
 
 Create a new application project.  
-Make sure to select the "**Empty Application (C++**)" in the last step of the application project creating wizard.
+Make sure to select the "**Empty Application (C++)**" in the last step of the application project creating wizard.
 
 Copy all source files from the [XADC_tutorial_app](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app) folder of my repository into the src folder of the application project in Vitis.  
 Let me briefly explain, what source files we have:
