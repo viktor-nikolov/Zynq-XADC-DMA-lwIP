@@ -39,7 +39,7 @@ Import source files [FileViaSocket.h](https://github.com/viktor-nikolov/Zynq-XAD
 
 The files [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app_Vitis_Unified/main.cpp) and [network_thread.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app_Vitis_Unified/network_thread.cpp) needed slight updates for the Vitis Unified toolchain, so you must import them from the folder [XADC_tutorial_app_Vitis_Unified](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main/sources/XADC_tutorial_app_Vitis_Unified).
 
-This [readme file](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/draft/sources/XADC_tutorial_app/README.md) explains details about the six source files and their authors.
+This [readme file](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/README.md) explains details about the six source files and their authors.
 
 - **Note:** Please ignore the "problems" that Vitis Unified reports in the FileViaSocket.cpp in the PROBLEMS tab. The FileViaSocket.cpp uses conditional compilation heavily, and the clang in the Vitis Unified is not able to handle it correctly. The GCC compiler will report no errors or warnings for this source file.
 
