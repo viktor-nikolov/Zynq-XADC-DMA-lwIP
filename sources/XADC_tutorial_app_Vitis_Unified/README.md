@@ -8,7 +8,7 @@ Nevertheless, the demo application from this XADC tutorial can also be built in 
 
 Vitis Unified requires a HW timer to be present in the HW design. Otherwise, a FreeRTOS application can't be built in Vitis Unified. Therefore, we must add a timer to the Zynq PS configuration.
 
-If you have the Digilent [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start) board, you can use the HW export XSA file from the archive [XADC_tutorial_timer_hw_2024.1.1.xpr.zip](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/draft/project_files/XADC_tutorial_timer_hw_2024.1.1.xpr.zip) in the repository and skip this step.
+If you have the Digilent [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start) board, you can use the HW export XSA file from the archive [XADC_tutorial_timer_hw_2024.1.1.xpr.zip](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/project_files/XADC_tutorial_timer_hw_2024.1.1.xpr.zip) in the repository and skip this step.
 
 Open the original HW design, which we created in the [HW design](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP#hardware-design-in-vivado) chapter of the [tutorial](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP). Save it as a new project.
 
