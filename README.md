@@ -7,7 +7,8 @@ This tutorial shows how to do an HW design and code a SW application to make use
 In this tutorial, I'm using the Digilent board [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start). However, all the principles described here can be used on any other Zynq-7000 board. I will highlight aspects specific to Cora Z7 in the text.  
 The Cora Z7 is a suitable board for testing the Zynq XADC because it has analog inputs that are usable in a practical way.
 
-I'm using Vivado 2024.1.1 and Vitis Classic 2024.1.1 in this tutorial. Nevertheless, the same steps also work in Vivado 2023.1, Vitis 2023.1, and Vitis Classic 2023.2.
+I'm using Vivado 2024.1.1 and Vitis Classic 2024.1.1 in this tutorial. Nevertheless, the same steps also work in Vivado 2023.1, Vitis 2023.1, and Vitis Classic 2023.2.  
+I also provide instructions on how to build the demo application in Vitis 2024.1.1 (a.k.a. Vitis Unified 2024).
 
 ## A short introduction to Zynq-7000 XADC
 
@@ -587,7 +588,9 @@ Last but not least, we need to export the hardware specification to an XSA file.
 
 ### Building the application
 
-I'm using Vitis Classic 2024.1 in this tutorial. Nevertheless, the same steps work also in Vitis 2023.1 and Vitis Classic 2023.2.
+I'm using Vitis Classic 2024.1 in this chapter. Nevertheless, the same steps work also in Vitis 2023.1 and Vitis Classic 2023.2.
+
+If you want to use Vitis 2024.1.1 (a.k.a. Vitis Unified 2024), go to this [readme file](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app_Vitis_Unified/README.md) and then continue with the chapter [How to use the application](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#how-to-use-the-application).
 
 Start Vitis Classic 2024.1.  
 Create a new platform project using the HW export XSA file we just generated.  
@@ -977,3 +980,16 @@ The repository's folder [project_files](https://github.com/viktor-nikolov/Zynq-X
 
 <img src="pictures\vt_import.png" width="450">
 
+The following project exports are for building the demo application in Vitis 2024.1.1 (a.k.a. Vitis Unified 2024):
+
+- [XADC_tutorial_timer_hw_2024.1.1.xpr.zip](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/project_files/XADC_tutorial_timer_hw_2024.1.1.xpr.zip)
+  - Contains the HW design project export from Vivado 2024.1.1.
+  - This is the HW design for the Digilent [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start) board, which we created in the chapter [Hardware design in Vivado](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#hardware-design-in-vivado). The only addition is the enablement of Timer 0 in the Zynq PS configuration.  
+    Vitis Unified requires a HW timer to be present in the HW design. Otherwise, a FreeRTOS application can't be built in Vitis Unified.
+- [vitis_archive_Unified_2024.1.1.zip](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/project_files/vitis_archive_Unified_2024.1.1.zip)
+  - Contains the SW project export from Vitis 2024.1.1.
+  - This is the XADC demo application for the Digilent [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start) board, which I described in the chapter [Software](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#software).
+  - To use the export, create an empty folder on your PC and open it as a workspace in Vitis 2024.1.1.  
+    Then select File|Import. Select the archive file, and select all projects in the archive.
+
+<img src="pictures\unif_import.png" width="380">
