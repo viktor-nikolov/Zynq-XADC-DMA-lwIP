@@ -738,7 +738,7 @@ When we press the board's button labeled BTN0, the application will store 1000 X
 sending data...   sent
 ```
 
-### Controling the XADC from the PS
+### Controlling the XADC from the PS
 
 Let me explain the aspects of controlling the XADC from the PS in more detail. I will use code snippets from the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
 
