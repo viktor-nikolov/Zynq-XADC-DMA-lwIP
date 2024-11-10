@@ -31,9 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `timescale 1ns / 1ps
 
 module stream_tlaster(
-    input clk,          //AXI-Stream clock
-    input start,
-    input [24:0] count,
+    input clk,          // AXI-Stream clock
+    input start,        // When asserted, starts sending data to the master AXI-Stream 
+    input [24:0] count, // Number of data records to be sent before tlast is asserted
     
     //Master AXI-Stream signals
     output reg [15:0] m_axis_tdata,
@@ -44,20 +44,18 @@ module stream_tlaster(
     //Slave AXI-Stream signals
     input [15:0] s_axis_tdata,
     input s_axis_tvalid,
-    output s_axis_tready
+    output reg s_axis_tready
 );
 
     // State definitions
-    localparam IDLE = 1'b0,
-               RUNNING = 1'b1;
+    localparam IDLE = 0,
+               RUNNING = 1,
+               WAIT_FOR_TREADY = 2;
 
     // State and internal signals
-    reg state = IDLE, next_state;
+    reg [1:0] state = IDLE;
     reg [24:0] valid_count;
     reg s_axis_tvalid_prev;
-
-    // s_axis_tready is always 1
-    assign s_axis_tready = 1;
 
     // Next state logic and outputs
     always @(posedge clk) begin
@@ -68,15 +66,18 @@ module stream_tlaster(
                 s_axis_tvalid_prev <= 0;
                 m_axis_tlast <= 0;
                 m_axis_tvalid <= 0;
-
+                // We keep tready asserted in IDLE to keep the source producing the data 
+                s_axis_tready <= 1;
+                
                 // Transition to RUNNING when start is asserted
                 if (start)
                     state <= RUNNING;
             end
             RUNNING: begin
-                // Pass through data and valid signal
+                // Pass through data, valid and ready signal
                 m_axis_tdata <= s_axis_tdata;
                 m_axis_tvalid <= s_axis_tvalid;
+                s_axis_tready <= m_axis_tready;
 
                 // Check for transition from 0 to 1 in s_axis_tvalid
                 if (!s_axis_tvalid_prev && s_axis_tvalid) begin
@@ -84,7 +85,7 @@ module stream_tlaster(
                     // Check if the transition count reaches 'count'
                     if (valid_count == count-1) begin
                         m_axis_tlast <= 1;
-                        state <= IDLE;
+                        state <= WAIT_FOR_TREADY;
                     end else begin
                         m_axis_tlast <= 0;
                     end
@@ -94,6 +95,15 @@ module stream_tlaster(
 
                 // Update the previous valid signal state
                 s_axis_tvalid_prev <= s_axis_tvalid;
+            end
+            WAIT_FOR_TREADY: begin
+                /* To comply with AXI-Stream specification, we can deassert 
+                   tvalid and tlast only if m_axis_tready is high. */
+                if( m_axis_tready ) begin
+                    m_axis_tlast <= 0;
+                    m_axis_tvalid <= 0;
+                    state <= IDLE;
+                end               
             end
         endcase
     end
