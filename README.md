@@ -447,6 +447,12 @@ set_property -dict { PACKAGE_PIN L10   IOSTANDARD LVCMOS33 } [get_ports { Vp_Vn_
 set_property -dict { PACKAGE_PIN E17   IOSTANDARD LVCMOS33 } [get_ports { Vaux1_0_v_p  }]; #IO_L3P_T0_DQS_AD1P_35 Sch=ck_an_p[0]
 set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { Vaux1_0_v_n  }]; #IO_L3N_T0_DQS_AD1N_35 Sch=ck_an_n[0]
 ```
+> [!TIP]
+>
+> Specifying constraints for the dedicated analog input channel V<sub>P</sub>/V<sub>N</sub> is optional. Vivado will do synthesis and implementation even without the constraints specified.
+>
+> For auxiliary channels, the constraints specification can be omitted only if you don't use other Zynq pins from Bank 35.
+> In our case, we need buttons and they are connected to pins in Bank 35 on Cora Z7. Without the constraints for VAUX[1], the implementation would fail because of incompatible IO standards error.
 
 > [!NOTE]
 >
