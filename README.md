@@ -663,7 +663,7 @@ Waiting for connection on 0.0.0.0:65432
 ```
 
 The default port the script listens on for connections is 65432, and the default bind IP address is 0.0.0.0 (i.e., the script listens on all the configured network interfaces and their IP addresses).  
-Typically, you have just one IP address assigned to the Ethernet port of your PC. Use the command `ipconfig` (on Windows) or `ip a` (on Linux) to get this address and enter it as the `SERVER_ADDR` constant at the beginning of the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). 
+Typically, you have just one IP address assigned to the Ethernet port of your PC. Use the command `ipconfig` (on Windows) or `ip a` (on Linux) to get this address and enter it as the `SERVER_ADDR` constant at the beginning of the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).   
 **Make sure that the firewall on your PC allows incoming connections to Python on the given IP address and port.**
 
 I tested the script on Windows 11 and Ubuntu 22.04.  
