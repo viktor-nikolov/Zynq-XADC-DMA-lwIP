@@ -651,19 +651,23 @@ The server writes the XADC samples (a list of voltage values) to a text file. Ea
 The standard name of the file the server creates looks like this: via_socket_*240324_203824.6369*.txt  
 Part of the name in italics is the date and time stamp.
 
-Depending on your Python installation, run the script with the command  
+Depending on your Python installation, run the server script with the command  
 `python3 file_via_socket.py [params]` or  
 `python file_via_socket.py [params]`.
 
-I tested the script on Windows 11 and Ubuntu 22.04.
-
-The default port the script listens on for connections is 65432, and the default bind IP address is 0.0.0.0 (i.e., the script listens on all the configured network interfaces). **Make sure that the firewall on your PC allows incoming connections to Python on the given port.**
-
 In typical use, you will want to specify the output folder for the files. For example:
+```
+>python file_via_socket.py --path c:\Temp\XADC_data
+Waiting for connection on 0.0.0.0:65432
+(Press Ctrl+C to terminate)
+```
 
-`python file_via_socket.py --path c:\Temp\XADC_data`
+The default port the script listens on for connections is 65432, and the default bind IP address is 0.0.0.0 (i.e., the script listens on all the configured network interfaces and their IP addresses).  
+Typically, you have just one IP address assigned to the Ethernet port of your PC. Use the command `ipconfig` (on Windows) or `ip a` (on Linux) to get this address and enter it as the `SERVER_ADDR` constant at the beginning of the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp). 
+**Make sure that the firewall on your PC allows incoming connections to Python on the given IP address and port.**
 
-(To get the full list of available parameters, run `python file_via_socket.py --help`.)
+I tested the script on Windows 11 and Ubuntu 22.04.  
+To get the full list of available parameters, run `python file_via_socket.py --help`.
 
 Let me summarize. To successfully use the demo application, you need to perform these steps:
 
