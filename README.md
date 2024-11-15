@@ -675,7 +675,8 @@ Let me summarize. To successfully use the demo application, you need to perform 
 2. Connect the network cable to the Cora Z7 board.
 3. Start the `python file_via_socket.py` on your PC as the server to receive digitized data samples.
 4. Start a serial terminal application (e.g., [PuTTY](https://www.putty.org/)) and connect it to the USB serial port of the Cora Z7 board in your OS.
-5. Specify the IP address of your server in the constant `SERVER_ADDR` at the beginning of the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).
+5. Specify the IP address of your server in the constant `SERVER_ADDR` at the beginning of the [main.cpp](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/XADC_tutorial_app/main.cpp).  
+   Use the command `ipconfig` (on Windows) or `ip a` (on Linux) if you are unsure what the IP address of your PC is.
 6. Build and run the application in Vitis.
 
 After the application starts, you shall see the output in the serial terminal similar to this:
