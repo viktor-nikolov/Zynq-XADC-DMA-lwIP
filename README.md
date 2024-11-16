@@ -503,11 +503,20 @@ Add Concat to the diagram. Connect the constant to Concat's In0 and btn[1:0] to 
 
 Now, we add a Clocking Wizard. It will generate the XADC input clock DCLK, i.e., the clock for AXI interfaces connected to the XADC, because, in our setup, the DCLK will be driven by the AXI clock.
 
-Add a Clocking Wizzard to the diagram and connect clk_in1 to the FCLK_CLK0 output clock of the Zynq PS.  
+Add a Clocking Wizzard to the diagram and connect clk_in1 to the FCLK_CLK0 output clock of the Zynq PS. 
+
+Change the source of the input clock from "Single ended clock capable pin" to "No buffer".  
+The "clock capable pin" setting applies to clock signals from an external pin, which the FCLK_CLK0 is not. Therefore, an input buffer (IBUF) on Clocking Wizzard is unnecessary. Leaving the source set as a "clock capable pin" may result in a critical warning during implementation on some boards.
+
+<img src="pictures\bd_clwiz1.png" width="750">
+
 Set the frequency of clk_out1 to 104 MHz. This frequency will allow us to run the XADC at 1 Msps. We will use a clock divider equal to 4, which gives ADCCLK of 26 MHz, which translates to the sampling rate of 1 Msps. See detailed explanation in the chapter [Clocking, sampling rate, and bandwidth](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP?#clocking-sampling-rate-and-bandwidth).  
 If you later want to experiment with slower XADC sampling rates, you can set the Clocing Wizard's output frequency and the clock divider differently so you achieve the desired sampling rate.
 
-Set the Reset Type of the Clocking Wizzard to Active Low (the setting is on the Output Clocks tab).  
+Set the Reset Type of the Clocking Wizzard to Active Low. This is because the FCLK_RESET0_N reset signal of the Zynq PS is active low.
+
+<img src="pictures\bd_clwiz2.png" width="700">
+
 Connect the reset signal of the Clocking Wizard with the FCLK_RESET0_N of the Zynq PS.
 
 It's time for the XADC Wizard now. Add it to the diagram and open its configuration.  
