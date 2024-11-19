@@ -427,10 +427,10 @@ Make sure you have Digilent board files installed. [This article](https://digile
 Create a new RTL Project in Vivado 2024.1. Select your version of Cora Z7 from the list of boards.
 
 Let's first set the constraints.  
-Download the [Cora-Z7-07S-Master.xdc](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/Cora-Z7-07S-Master.xdc) from my repository, which I tailored for this tutorial, and add it as a constraints source file to the project.
+Download the [Cora-Z7-07S-Master.xdc](https://github.com/Digilent/digilent-xdc/blob/master/Cora-Z7-07S-Master.xdc) from the Digilent [XDC repository](https://github.com/Digilent/digilent-xdc/tree/master) and import it in Vivado as a constraints file (this file will work also for Cora Z7-10).
 
 We will use the two buttons, the dedicated analog input v_p/v_n (labeled V_P/V_N on the board) and the auxiliary input vaux1_p/vaux1_n (labeled A0 on the board; the vaux1_n is connected to ground, it doesn't have a pin on the board).  
-These are the port definitions, which are uncommented in the constraints file:
+Uncomment the following lines in the constraints file:
 
 ```
 ## Buttons
@@ -453,12 +453,6 @@ set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { Vaux1_
 >
 > For auxiliary channels, the constraints specification can be omitted only if you don't use other Zynq pins from Bank 35.  
 > In our case, we need buttons and they are connected to pins in Bank 35 on Cora Z7. Without the constraints for VAUX[1], the implementation would fail because of incompatible IO standards error.
-
-> [!NOTE]
->
-> I'm on purpose not using the Cora Z7 master XDC file from the [Digilent GitHub repository](https://github.com/Digilent/digilent-xdc/).  
-> Instead, I'm using a version that is based on the XDC file provided in Digilent's [Cora Z7 XADC Demo](https://digilent.com/reference/programmable-logic/cora-z7/demos/xadc).  
-> This is because, at the time of writing this, the names of analog input ports in the XDC file on Digilent GitHub are not correct.
 
 ### Zynq Processing System
 
