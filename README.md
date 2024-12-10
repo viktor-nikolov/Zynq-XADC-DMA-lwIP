@@ -908,7 +908,6 @@ XGpioPs_WritePin( &GpioInstance, 54, 0 /*low*/  );
 ```
 
 After that, we wait in a while loop for the AXI DMA to finish the data transfer.  
-Please note that there is no way to get information about how much data the AXI DMA actually transferred. That's why we need the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) module to have the ultimate control over the AXI-Stream data flow.  
 After the AXI DMA transfer finishes, we must invalidate the memory region of the `DataBuffer` in the data cache.
 
 ```c++
@@ -919,6 +918,15 @@ while( XAxiDma_Busy( &AxiDmaInstance, XAXIDMA_DEVICE_TO_DMA ) )
 // Invalidate the CPU cache for the memory region holding the DataBuffer.
 Xil_DCacheInvalidateRange( (UINTPTR)DataBuffer, sizeof(DataBuffer) );
 ```
+
+> [!TIP]
+>
+> Please note that in my code, I don't need to check how much data the AXI DMA actually transferred. This is because we have the [stream_tlaster.v](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/blob/main/sources/HDL/stream_tlaster.v) module in the HW design, which gives us the ultimate control over the AXI-Stream data flow. We control in the HW when the stream starts and how much data comes in it.  
+> This may not be the case in other HW designs. Post DMA transfer, the information about how many bytes were actually transferred (i.e., how many bytes came before AXI-Stream signal TLAST was asserted) is available in the AXI DMA's [S2MM_LENGTH](https://docs.amd.com/r/en-US/pg021_axi_dma/S2MM_LENGTH-S2MM-DMA-Buffer-Length-Register-Offset-58h) register. You can read this value by the following call:  
+>
+> ```
+> u32 BytesTransferred = XAxiDma_ReadReg( AxiDmaInstance.RegBase, XAXIDMA_RX_OFFSET+XAXIDMA_BUFFLEN_OFFSET );
+> ```
 
 ### Converting raw XADC data samples to the voltage
 
