@@ -35,5 +35,6 @@ The following project exports are for building the demo application in Vitis 202
   - This is the XADC demo application for the Digilent [Cora Z7-07S](https://digilent.com/reference/programmable-logic/cora-z7/start) board, which I described in the chapter [Software](https://github.com/viktor-nikolov/Zynq-XADC-DMA-lwIP/tree/main?#software).
   - To use the export, create an empty folder on your PC and open it as a workspace in Vitis 2024.1.1.  
     Then select File|Import. Select the archive file, and select all projects in the archive.
+  - Note: Please note that I created this project archive on Windows, and it is, unfortunately, not usable on Linux. This is because Vitis Unified stores names of build executables in the BSP configuration. Linux executables differ from those on Windows. Generally, Vitis Unified exports are not compatible across different operating systems.
 
 <img src="..\pictures\unif_import.png" width="380">
